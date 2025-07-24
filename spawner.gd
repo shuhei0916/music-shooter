@@ -3,7 +3,7 @@ extends Node
 signal spawn_object(object_scene, properties)
 
 @export var enemy_scene: PackedScene
-@export var gate_scene: PackedScene # We will create gate.tscn later
+@export var gate_scene: PackedScene
 
 var spawn_timer: Timer
 
@@ -15,15 +15,24 @@ func _ready():
 	spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))
 	add_child(spawn_timer)
 
-func _on_spawn_timer_timeout():
-	# Randomly decide to spawn an enemy or a gate
-	if randf() > 0.5:
-		spawn_enemy()
-	else:
-		spawn_gate()
+var spawn_counter = 0
 
-func spawn_enemy():
-	var lane = randi_range(0, 2) # 0: left, 1: center, 2: right
+func _on_spawn_timer_timeout():
+	spawn_counter += 1
+	
+	# Every 4th spawn, do a full row spawn
+	if spawn_counter % 4 == 0:
+		spawn_full_row()
+	else:
+		# Randomly decide to spawn an enemy or a gate
+		if randf() > 0.5:
+			spawn_enemy()
+		else:
+			spawn_gate()
+
+func spawn_enemy(lane = -1):
+	if lane == -1:
+		lane = randi_range(0, 2) # 0: left, 1: center, 2: right
 	var x_pos = (lane - 1) * 3.0 # -3, 0, 3
 	
 	var properties = {
@@ -32,8 +41,9 @@ func spawn_enemy():
 	}
 	emit_signal("spawn_object", enemy_scene, properties)
 
-func spawn_gate():
-	var lane = randi_range(0, 2)
+func spawn_gate(lane = -1):
+	if lane == -1:
+		lane = randi_range(0, 2)
 	var x_pos = (lane - 1) * 3.0
 	
 	var gate_type = "add" if randf() > 0.5 else "multiply"
@@ -45,3 +55,13 @@ func spawn_gate():
 		"position": Vector3(x_pos, 1, -40)
 	}
 	emit_signal("spawn_object", gate_scene, properties)
+
+func spawn_full_row():
+	# Decide if the row will be enemies or gates
+	var is_enemy_row = randf() > 0.5
+	
+	for i in range(3): # For each of the 3 lanes
+		if is_enemy_row:
+			spawn_enemy(i)
+		else:
+			spawn_gate(i)

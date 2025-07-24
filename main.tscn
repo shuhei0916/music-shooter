@@ -1,19 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=10 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
-[ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="2_player"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://spawner.gd" id="3_spawner"]
 [ext_resource type="PackedScene" uid="uid://c1w2w3g4h5j6h" path="res://enemy.tscn" id="4_enemy"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://gate.tscn" id="5_gate"]
 [ext_resource type="PackedScene" path="res://game_ui.tscn" id="6_ui"]
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0xm2m"]
-albedo_color = Color(0.305882, 0.85098, 1, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-material = SubResource("StandardMaterial3D_0xm2m")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -43,21 +35,8 @@ shadow_enabled = true
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 3)
 
-[node name="Player" type="CharacterBody3D" parent="." groups=["player"]]
+[node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-script = ExtResource("2_player")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
-mesh = SubResource("CapsuleMesh_player")
-
-[node name="HPLabel" type="Label3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-billboard = 1
-text = "1"
-font_size = 64
 
 [node name="Ground" type="StaticBody3D" parent="."]
 
