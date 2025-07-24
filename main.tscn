@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=9 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="2_player"]
@@ -14,7 +14,11 @@ material = SubResource("StandardMaterial3D_0xm2m")
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_color = Color(0.513726, 0.74902, 0.592157, 1)
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = SubResource("StandardMaterial3D_h2yge")
 size = Vector2(10, 100)
 
 [node name="Main" type="Node3D"]
@@ -61,6 +65,7 @@ mesh = SubResource("PlaneMesh_ground")
 
 [node name="Ground3" type="StaticBody3D" parent="." groups=["Ground"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -200)
+visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground3"]
 shape = SubResource("BoxShape3D_ground")
