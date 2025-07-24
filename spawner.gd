@@ -22,19 +22,25 @@ func _on_spawn_timer_timeout():
 		spawn_gate()
 
 func spawn_enemy():
+	var lane = randi_range(0, 2) # 0: left, 1: center, 2: right
+	var x_pos = (lane - 1) * 3.0 # -3, 0, 3
+	
 	var properties = {
 		"hp": randi_range(5, 30),
-		"position": Vector3(randf_range(-4, 4), 1, -40)
+		"position": Vector3(x_pos, 1, -40)
 	}
 	emit_signal("spawn_object", enemy_scene, properties)
 
 func spawn_gate():
+	var lane = randi_range(0, 2)
+	var x_pos = (lane - 1) * 3.0
+	
 	var gate_type = "add" if randf() > 0.5 else "multiply"
 	var value = randi_range(5, 20) if gate_type == "add" else randi_range(2, 3)
 	
 	var properties = {
 		"type": gate_type,
 		"value": value,
-		"position": Vector3(randf_range(-4, 4), 1, -40)
+		"position": Vector3(x_pos, 1, -40)
 	}
 	emit_signal("spawn_object", gate_scene, properties)

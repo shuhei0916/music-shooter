@@ -8,17 +8,9 @@ func _ready():
 	player = get_node("Player")
 	player.hp_changed.connect(_on_player_hp_changed)
 	
-	# Add existing grounds to world_objects group
-	for ground in get_tree().get_nodes_in_group("Ground"):
-		ground.add_to_group("world_objects")
 
-	# Create Spawner
-	var spawner = Node.new()
-	spawner.set_script(load("res://spawner.gd"))
-	spawner.name = "Spawner"
-	spawner.enemy_scene = preload("res://enemy.tscn")
-	spawner.gate_scene = preload("res://gate.tscn")
-	add_child(spawner)
+	# Connect to Spawner
+	var spawner = get_node("Spawner")
 	spawner.spawn_object.connect(_on_spawn_object)
 
 func _on_spawn_object(object_scene, properties):
@@ -54,8 +46,3 @@ func _on_player_hp_changed(new_hp):
 func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
-		
-		# Reposition ground
-		if obj.is_in_group("Ground"):
-			if obj.global_transform.origin.z > 100:
-				obj.global_transform.origin.z -= 300

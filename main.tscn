@@ -1,7 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=12 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://spawner.gd" id="3_spawner"]
+[ext_resource type="PackedScene" uid="uid://c1w2w3g4h5j6h" path="res://enemy.tscn" id="4_enemy"]
+[ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://gate.tscn" id="5_gate"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -23,6 +26,11 @@ size = Vector2(10, 100)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
+
+[node name="Spawner" type="Node" parent="."]
+script = ExtResource("3_spawner")
+enemy_scene = ExtResource("4_enemy")
+gate_scene = ExtResource("5_gate")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 4, 0)
@@ -46,29 +54,10 @@ billboard = 1
 text = "1"
 font_size = 64
 
-[node name="Ground1" type="StaticBody3D" parent="." groups=["Ground"]]
+[node name="Ground" type="StaticBody3D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground1"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("BoxShape3D_ground")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground1"]
-mesh = SubResource("PlaneMesh_ground")
-
-[node name="Ground2" type="StaticBody3D" parent="." groups=["Ground"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -100)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground2"]
-shape = SubResource("BoxShape3D_ground")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground2"]
-mesh = SubResource("PlaneMesh_ground")
-
-[node name="Ground3" type="StaticBody3D" parent="." groups=["Ground"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -200)
-visible = false
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground3"]
-shape = SubResource("BoxShape3D_ground")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground3"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
