@@ -1,11 +1,15 @@
-[gd_scene load_steps=7 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=8 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="2_player"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0xm2m"]
+albedo_color = Color(0.305882, 0.85098, 1, 1)
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+material = SubResource("StandardMaterial3D_0xm2m")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -15,6 +19,12 @@ size = Vector2(10, 100)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 4, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 3)
 
 [node name="Player" type="CharacterBody3D" parent="." groups=["player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

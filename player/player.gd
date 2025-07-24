@@ -36,3 +36,13 @@ func add_characters(amount):
 func multiply_characters(factor):
 	self.character_count *= factor
 	print("Characters: ", character_count)
+
+func take_damage(damage):
+	if character_count > damage:
+		self.character_count -= damage
+	else:
+		game_over()
+
+func game_over():
+	print("GAME OVER")
+	get_tree().reload_current_scene() # Restart the game

@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://d2w3w4g5h6j7h"]
+
+[ext_resource type="Script" path="res://gate.gd" id="1_abcde"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gate"]
+size = Vector3(2, 2, 0.2)
+[sub_resource type="BoxMesh" id="BoxMesh_gate"]
+size = Vector3(2, 2, 0.2)
+
+[node name="Gate" type="Area3D" groups=["world_objects"]]
+script = ExtResource("1_abcde")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_gate")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_gate")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
+billboard = 1
+font_size = 96
+text = "+10"
