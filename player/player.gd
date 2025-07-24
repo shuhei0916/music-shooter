@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal hp_changed(new_hp)
+signal game_over_signal
 
 var character_count = 1:
 	set(value):
@@ -61,4 +62,5 @@ func take_damage(damage):
 
 func game_over():
 	print("GAME OVER")
-	get_tree().reload_current_scene() # Restart the game
+	emit_signal("game_over_signal")
+	# The game over screen will now handle restarting

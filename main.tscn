@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=13 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="2_player"]
 [ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://spawner.gd" id="3_spawner"]
 [ext_resource type="PackedScene" uid="uid://c1w2w3g4h5j6h" path="res://enemy.tscn" id="4_enemy"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://gate.tscn" id="5_gate"]
+[ext_resource type="PackedScene" path="res://game_ui.tscn" id="6_ui"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -18,7 +19,7 @@ material = SubResource("StandardMaterial3D_0xm2m")
 size = Vector3(10, 1, 100)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
-albedo_color = Color(0.513726, 0.74902, 0.592157, 1)
+albedo_color = Color(0.309804, 0.294118, 0.470588, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 material = SubResource("StandardMaterial3D_h2yge")
@@ -27,13 +28,17 @@ size = Vector2(10, 100)
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
 
+[node name="GameUI" parent="." instance=ExtResource("6_ui")]
+
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_spawner")
 enemy_scene = ExtResource("4_enemy")
 gate_scene = ExtResource("5_gate")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 4, 0)
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965925, 0, -0.965925, 0.258819, 0, 10, 2)
+light_color = Color(1, 0.956863, 0.839216, 1)
+shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 3)

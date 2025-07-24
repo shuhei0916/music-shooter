@@ -21,4 +21,4 @@ func set_hp(new_hp):
 func update_label():
 	var label = $Label3D
 	if label:
-		label.text = str(hp)
+		label.text = get_node("/root/Utils").format_number(hp)

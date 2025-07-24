@@ -9,6 +9,7 @@ var spawn_timer: Timer
 
 func _ready():
 	spawn_timer = Timer.new()
+	spawn_timer.name = "SpawnTimer" # Give the timer a name
 	spawn_timer.wait_time = 2.0 # Spawn every 2 seconds
 	spawn_timer.autostart = true
 	spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))

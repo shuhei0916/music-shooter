@@ -7,6 +7,7 @@ var player
 func _ready():
 	player = get_node("Player")
 	player.hp_changed.connect(_on_player_hp_changed)
+	player.game_over_signal.connect(_on_game_over)
 	
 
 	# Connect to Spawner
@@ -38,10 +39,15 @@ func _on_player_collided_with_enemy(enemy_hp):
 	if player:
 		player.take_damage(enemy_hp)
 
+func _on_game_over():
+	var ui = get_node("GameUI")
+	if ui:
+		ui.show_result(false) # It's a loss
+
 func _on_player_hp_changed(new_hp):
 	var hp_label = player.get_node("HPLabel")
 	if hp_label:
-		hp_label.text = str(new_hp)
+		hp_label.text = get_node("/root/Utils").format_number(new_hp)
 
 func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
