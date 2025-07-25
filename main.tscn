@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=11 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://player/player.tscn" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://c1w2w3g4h5j6h" path="res://enemy.tscn" id="4_enemy"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://gate.tscn" id="5_gate"]
 [ext_resource type="PackedScene" uid="uid://d3w4w5g6h7j8h" path="res://game_ui.tscn" id="6_ui"]
+[ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="7_272bh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -47,3 +48,8 @@ shape = SubResource("BoxShape3D_ground")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
+
+[node name="MidiPlayer" type="Node" parent="."]
+script = ExtResource("7_272bh")
+soundfont = "res://music/GeneralUser-GS.sf2"
+metadata/_custom_type_script = "uid://bwch5nk77teaf"

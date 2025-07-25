@@ -4,7 +4,14 @@ const WORLD_SPEED = 5.0
 
 var player
 
+@onready var midi_player = $MidiPlayer
+
 func _ready():
+	# Setup MidiPlayer
+	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
+	midi_player.file = "res://music/ABBA_-_Dancing_Queen.mid"
+	midi_player.play()
+
 	player = get_node("Player")
 	player.hp_changed.connect(_on_player_hp_changed)
 	player.game_over_signal.connect(_on_game_over)
