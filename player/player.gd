@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const BULLET_SCENE = preload("res://bullet.tscn")
+
 signal hp_changed(new_hp)
 signal game_over_signal
 
@@ -64,3 +66,16 @@ func game_over():
 	print("GAME OVER")
 	emit_signal("game_over_signal")
 	# The game over screen will now handle restarting
+
+func _ready():
+	var shoot_timer = Timer.new()
+	shoot_timer.set_wait_time(0.5)
+	shoot_timer.set_autostart(true)
+	shoot_timer.connect("timeout", Callable(self, "_on_shoot_timer_timeout"))
+	add_child(shoot_timer)
+
+func _on_shoot_timer_timeout():
+	var bullet = BULLET_SCENE.instantiate()
+	get_tree().get_root().add_child(bullet)
+	bullet.global_transform = self.global_transform
+	bullet.position.z -= 1.0

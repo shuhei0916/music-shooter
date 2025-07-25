@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://cgy7qg1vj3w3v"]
+
+[ext_resource type="Script" path="res://bullet.gd" id="1_t7w2w"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_uafn7"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_55x2g"]
+radius = 0.1
+
+[node name="Bullet" type="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = ExtResource("1_t7w2w")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_uafn7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_55x2g")
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="."]
+aabb = AABB(-0.1, -0.1, -0.1, 0.2, 0.2, 0.2)
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

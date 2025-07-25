@@ -22,3 +22,10 @@ func update_label():
 	var label = $Label3D
 	if label:
 		label.text = get_node("/root/Utils").format_number(hp)
+
+func take_damage(damage):
+	hp -= damage
+	if hp <= 0:
+		queue_free()
+	else:
+		update_label()
