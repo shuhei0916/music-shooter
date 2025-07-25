@@ -27,8 +27,17 @@ func set_gate_properties(type, val):
 func update_label():
 	var label = get_node("Pivot/Label3D")
 	if label:
-		var prefix = "+" if gate_type == "add" else "x"
-		label.text = prefix + str(value)
+		var text = ""
+		match gate_type:
+			"add":
+				text = "❤️ +" + str(value)
+			"multiply":
+				text = "💕 x" + str(value)
+			_:
+				# Fallback for unknown types
+				var prefix = "+" if gate_type == "add" else "x"
+				text = prefix + str(value)
+		label.text = text
 
 func _process(delta):
 	time += delta
