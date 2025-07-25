@@ -22,6 +22,8 @@ script = ExtResource("1_main")
 
 [node name="GameUI" parent="." instance=ExtResource("6_ui")]
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_spawner")
 enemy_scene = ExtResource("4_enemy")
