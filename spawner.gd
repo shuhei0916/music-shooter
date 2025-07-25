@@ -5,15 +5,25 @@ signal spawn_object(object_scene, properties)
 @export var enemy_scene: PackedScene
 @export var gate_scene: PackedScene
 
+const SPAWN_INTERVAL = 2.0
+const SPAWN_DISTANCE = -40.0
+const LANE_WIDTH = 3.0
+
 var spawn_timer: Timer
 
 func _ready():
 	spawn_timer = Timer.new()
-	spawn_timer.name = "SpawnTimer" # Give the timer a name
-	spawn_timer.wait_time = 2.0 # Spawn every 2 seconds
-	spawn_timer.autostart = true
+	spawn_timer.name = "SpawnTimer"
+	spawn_timer.wait_time = SPAWN_INTERVAL
 	spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))
 	add_child(spawn_timer)
+	# Don't start automatically
+
+func start_spawning():
+	spawn_timer.start()
+
+func stop_spawning():
+	spawn_timer.stop()
 
 var spawn_counter = 0
 
@@ -32,19 +42,19 @@ func _on_spawn_timer_timeout():
 
 func spawn_enemy(lane = -1):
 	if lane == -1:
-		lane = randi_range(0, 2) # 0: left, 1: center, 2: right
-	var x_pos = (lane - 1) * 3.0 # -3, 0, 3
+		lane = randi_range(0, 2)
+	var x_pos = (lane - 1) * LANE_WIDTH
 	
 	var properties = {
 		"hp": randi_range(5, 30),
-		"position": Vector3(x_pos, 1, -40)
+		"position": Vector3(x_pos, 1, SPAWN_DISTANCE)
 	}
 	emit_signal("spawn_object", enemy_scene, properties)
 
 func spawn_gate(lane = -1):
 	if lane == -1:
 		lane = randi_range(0, 2)
-	var x_pos = (lane - 1) * 3.0
+	var x_pos = (lane - 1) * LANE_WIDTH
 	
 	var gate_type = "add" if randf() > 0.5 else "multiply"
 	var value = randi_range(5, 20) if gate_type == "add" else randi_range(2, 3)
@@ -52,7 +62,7 @@ func spawn_gate(lane = -1):
 	var properties = {
 		"type": gate_type,
 		"value": value,
-		"position": Vector3(x_pos, 1, -40)
+		"position": Vector3(x_pos, 1, SPAWN_DISTANCE)
 	}
 	emit_signal("spawn_object", gate_scene, properties)
 

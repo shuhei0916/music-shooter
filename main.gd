@@ -13,6 +13,7 @@ func _ready():
 	# Connect to Spawner
 	var spawner = get_node("Spawner")
 	spawner.spawn_object.connect(_on_spawn_object)
+	spawner.start_spawning()
 
 func _on_spawn_object(object_scene, properties):
 	var instance = object_scene.instantiate()

@@ -29,8 +29,7 @@ func show_result(is_win):
 	if root:
 		var spawner = root.get_node("Spawner")
 		if spawner:
-			spawner.set_process(false)
-			spawner.get_node("SpawnTimer").stop()
+			spawner.stop_spawning()
 		
 		var player = root.get_node("Player")
 		if player:

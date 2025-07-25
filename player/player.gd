@@ -31,7 +31,7 @@ func _physics_process(delta):
 var current_lane = 1 # 0: left, 1: center, 2: right
 var target_x = 0.0
 const LANE_WIDTH = 3.0
-const MOVE_SPEED = 10.0
+const LANE_MOVE_SPEED = 10.0
 
 func handle_lane_movement(delta):
 	if Input.is_action_just_pressed("ui_right") and current_lane < 2:
@@ -42,7 +42,7 @@ func handle_lane_movement(delta):
 	target_x = (current_lane - 1) * LANE_WIDTH
 	
 	# Smoothly move to the target lane
-	global_transform.origin.x = lerp(global_transform.origin.x, target_x, MOVE_SPEED * delta)
+	global_transform.origin.x = lerp(global_transform.origin.x, target_x, LANE_MOVE_SPEED * delta)
 	velocity.x = 0 # We handle movement directly via transform
 	velocity.z = 0
 
