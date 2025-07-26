@@ -36,4 +36,4 @@ func show_result(is_win):
 			player.set_physics_process(false)
 
 func _on_new_run_pressed():
-	get_tree().reload_current_scene()
+	get_node("/root/SceneManager").change_scene("res://main_menu.tscn")

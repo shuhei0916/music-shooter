@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbscgytmkqyn7"]
+
+[ext_resource type="Script" path="res://stage_select.gd" id="1_stageselect"]
+
+[node name="StageSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_stageselect")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -50.0
+offset_right = 150.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Stage1Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "ABBA - Dancing Queen"
+
+[node name="BackButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Back to Main Menu"
+
+[connection signal="pressed" from="VBoxContainer/Stage1Button" to="." method="_on_stage_1_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
