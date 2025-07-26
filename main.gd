@@ -1,12 +1,24 @@
 extends Node3D
 
+const DEBUG_UI_SCENE = preload("res://debug_midi_ui.tscn")
 const WORLD_SPEED = 5.0
 
 var player
+var debug_ui
+var note_counts = []
 
 @onready var midi_player = $MidiPlayer
 
 func _ready():
+	# Setup Note Counts
+	for i in range(16):
+		note_counts.append(0)
+
+	# Setup Debug UI
+	debug_ui = DEBUG_UI_SCENE.instantiate()
+	add_child(debug_ui)
+	debug_ui.visible = false
+
 	# Setup MidiPlayer
 	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
 	midi_player.file = "res://music/ABBA_-_Dancing_Queen.mid"
@@ -61,9 +73,27 @@ func _on_player_hp_changed(new_hp):
 func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
+	
+	# Update debug UI if visible
+	if debug_ui.visible:
+		for i in range(16):
+			var channel_status = midi_player.channel_status[i]
+			debug_ui.update_track_data(i, channel_status.instrument_name, note_counts[i])
+
+func _unhandled_input(event):
+	# Use the Input singleton to check for actions, not the event object itself
+	if Input.is_action_just_pressed("ui_cancel"): # Corresponds to Esc key by default
+		get_tree().quit()
+	if Input.is_action_just_pressed("debug_toggle"):
+		if debug_ui:
+			debug_ui.visible = not debug_ui.visible
 
 func _on_midi_event(channel, event):
 	# We are interested in Note On events
 	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
-		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [channel_status.number, channel_status.track_name, event.note, event.velocity])
+		var ch_num = channel_status.number
+		if ch_num >= 0 and ch_num < 16:
+			note_counts[ch_num] += 1
+		# Keep the print for now, it's still useful
+		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
