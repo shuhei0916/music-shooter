@@ -123,6 +123,10 @@ func _on_midi_event(channel, event):
 	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
 		var ch_num = channel_status.number
+
+		if player:
+			player.shoot(ch_num)
+			
 		if ch_num >= 0 and ch_num < 16:
 			note_counts[ch_num] += 1
 		# Keep the print for now, it's still useful
