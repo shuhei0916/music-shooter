@@ -61,6 +61,7 @@ func _on_player_collided_with_enemy(enemy_hp):
 		player.take_damage(enemy_hp)
 
 func _on_game_over():
+	midi_player.stop()
 	var ui = get_node("GameUI")
 	if ui:
 		ui.show_result(false) # It's a loss
