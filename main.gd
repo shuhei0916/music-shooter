@@ -23,6 +23,7 @@ func _ready():
 	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
 	midi_player.file = "res://music/ABBA_-_Dancing_Queen.mid"
 	midi_player.midi_event.connect(_on_midi_event)
+	midi_player.finished.connect(_on_midi_player_finished)
 	midi_player.play()
 
 	player = get_node("Player")
@@ -66,6 +67,15 @@ func _on_game_over():
 	if ui:
 		ui.show_result(false) # It's a loss
 
+func _on_midi_player_finished():
+	var ui = get_node("GameUI")
+	if ui:
+		ui.show_result(true) # It's a win
+	
+	# Also stop the player from moving
+	if player:
+		player.set_physics_process(false)
+
 func _on_player_hp_changed(new_hp):
 	var hp_label = player.get_node("HPLabel")
 	if hp_label:
@@ -75,6 +85,20 @@ func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
 	
+	# Update song progress UI
+	if midi_player.playing and midi_player.smf_data:
+		var current_ticks = midi_player.position
+		var total_ticks = midi_player.last_position
+		
+		# Correctly convert ticks to seconds
+		var ticks_per_beat = midi_player.smf_data.timebase
+		var seconds_per_beat = midi_player.timebase_to_seconds
+		
+		var current_time = (current_ticks / ticks_per_beat) * seconds_per_beat
+		var total_time = (total_ticks / ticks_per_beat) * seconds_per_beat
+		
+		get_node("GameUI").update_progress(current_time, total_time, current_ticks, total_ticks)
+
 	# Update debug UI if visible
 	if debug_ui.visible:
 		for i in range(16):
@@ -97,4 +121,4 @@ func _on_midi_event(channel, event):
 		if ch_num >= 0 and ch_num < 16:
 			note_counts[ch_num] += 1
 		# Keep the print for now, it's still useful
-		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
+		# print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
