@@ -10,6 +10,7 @@ func _ready():
 	# Setup MidiPlayer
 	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
 	midi_player.file = "res://music/ABBA_-_Dancing_Queen.mid"
+	midi_player.midi_event.connect(_on_midi_event)
 	midi_player.play()
 
 	player = get_node("Player")
@@ -60,3 +61,9 @@ func _on_player_hp_changed(new_hp):
 func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
+
+func _on_midi_event(channel, event):
+	# We are interested in Note On events
+	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
+		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
+		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [channel_status.number, channel_status.track_name, event.note, event.velocity])

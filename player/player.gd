@@ -50,11 +50,11 @@ func handle_lane_movement(delta):
 
 func add_characters(amount):
 	self.character_count += amount
-	print("Characters: ", character_count)
+	# print("Characters: ", character_count)
 
 func multiply_characters(factor):
 	self.character_count *= factor
-	print("Characters: ", character_count)
+	# print("Characters: ", character_count)
 
 func take_damage(damage):
 	if character_count > damage:

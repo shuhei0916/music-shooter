@@ -30,6 +30,11 @@ script = ExtResource("3_spawner")
 enemy_scene = ExtResource("4_enemy")
 gate_scene = ExtResource("5_gate")
 
+[node name="MidiPlayer" type="Node" parent="."]
+script = ExtResource("7_272bh")
+soundfont = "res://music/GeneralUser-GS.sf2"
+metadata/_custom_type_script = "uid://bwch5nk77teaf"
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965925, 0, -0.965925, 0.258819, 0, 10, 2)
 light_color = Color(1, 0.956863, 0.839216, 1)
@@ -48,8 +53,3 @@ shape = SubResource("BoxShape3D_ground")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_ground")
-
-[node name="MidiPlayer" type="Node" parent="."]
-script = ExtResource("7_272bh")
-soundfont = "res://music/GeneralUser-GS.sf2"
-metadata/_custom_type_script = "uid://bwch5nk77teaf"
