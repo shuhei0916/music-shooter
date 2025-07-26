@@ -1,14 +1,17 @@
 [gd_scene load_steps=5 format=3 uid="uid://b5w2w5g5h5j5h"]
 
-[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="1_player"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player"]
 albedo_color = Color(0.305882, 0.85098, 1, 1)
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 material = SubResource("StandardMaterial3D_player")
 
 [node name="Player" type="CharacterBody3D" groups=["player"]]
+collision_mask = 12
 script = ExtResource("1_player")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -20,5 +23,5 @@ mesh = SubResource("CapsuleMesh_player")
 [node name="HPLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
-font_size = 128
 text = "1"
+font_size = 128

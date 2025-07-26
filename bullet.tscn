@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cgy7qg1vj3w3v"]
 
-[ext_resource type="Script" path="res://bullet.gd" id="1_t7w2w"]
+[ext_resource type="Script" uid="uid://d1w5pdm88nq0e" path="res://bullet.gd" id="1_t7w2w"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_uafn7"]
 radius = 0.1
@@ -11,6 +11,8 @@ radius = 0.1
 
 [node name="Bullet" type="Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+collision_layer = 2
+collision_mask = 8
 script = ExtResource("1_t7w2w")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]

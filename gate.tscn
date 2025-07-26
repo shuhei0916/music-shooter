@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://d2w3w4g5h6j7h"]
 
-[ext_resource type="Script" uid="uid://c6c4y0y48wpg1" path="res://gate.gd" id="1_abcde"]
+[ext_resource type="Script" path="res://gate.gd" id="1_abcde"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gate"]
 size = Vector3(1.5, 1.5, 1.5)
@@ -14,6 +14,7 @@ material = SubResource("StandardMaterial3D_15vrf")
 size = Vector3(1.5, 1.5, 1.5)
 
 [node name="Gate" type="Area3D" groups=["world_objects"]]
+collision_layer = 4
 script = ExtResource("1_abcde")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
