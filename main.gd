@@ -20,8 +20,13 @@ func _ready():
 	debug_ui.visible = false
 
 	# Setup MidiPlayer
+	var selected_song = get_node("/root/SongManager").get_selected_song()
+	if selected_song.is_empty():
+		printerr("No song selected, defaulting to first song in list.")
+		selected_song = get_node("/root/SongManager").get_song_list()[0]
+
 	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
-	midi_player.file = "res://music/ABBA_-_Dancing_Queen.mid"
+	midi_player.file = selected_song
 	midi_player.midi_event.connect(_on_midi_event)
 	midi_player.finished.connect(_on_midi_player_finished)
 	midi_player.play()

@@ -26,13 +26,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="Stage1Button" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "ABBA - Dancing Queen"
-
 [node name="BackButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Back to Main Menu"
 
-[connection signal="pressed" from="VBoxContainer/Stage1Button" to="." method="_on_stage_1_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
