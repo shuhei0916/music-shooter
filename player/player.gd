@@ -67,11 +67,27 @@ func game_over():
 	emit_signal("game_over_signal")
 	# The game over screen will now handle restarting
 
-func shoot(channel_num = -1):
-	# For now, just print the channel number to verify
-	# We'll implement different bullet types later
-	print("Shooting from channel: ", channel_num)
+enum WeaponType { HANDGUN, MELEE, LASER }
+
+func attack(channel_num):
+	var weapon_type
+	if channel_num == 9:
+		weapon_type = WeaponType.MELEE
+	elif channel_num >= 10:
+		weapon_type = WeaponType.LASER
+	else:
+		weapon_type = WeaponType.HANDGUN
 	
+	# 武器タイプに応じて、それぞれの攻撃処理を呼び出す
+	match weapon_type:
+		WeaponType.HANDGUN:
+			_attack_handgun()
+		WeaponType.MELEE:
+			_attack_melee()
+		WeaponType.LASER:
+			_attack_laser()
+
+func _attack_handgun():
 	var bullet = BULLET_SCENE.instantiate()
 	# Add the bullet to the main scene, not the player
 	var main_node = get_tree().get_root().get_node("Main")
@@ -81,3 +97,34 @@ func shoot(channel_num = -1):
 		bullet.position.z -= 1.0 # Spawn slightly in front of the player
 	else:
 		printerr("Could not find Main node to add bullet.")
+
+func _attack_melee():
+	var melee_area = $MeleeAttackArea
+	var melee_effect = $MeleeEffectMesh # We will add this node in the editor
+
+	if melee_area:
+		melee_area.monitoring = true
+		if melee_effect:
+			melee_effect.visible = true
+
+		# Disable the area and effect after a short time
+		var timer = get_tree().create_timer(0.2)
+		timer.timeout.connect(func(): 
+			melee_area.monitoring = false
+			if melee_effect:
+				melee_effect.visible = false
+		)
+		print("Attack: MELEE")
+	else:
+		printerr("MeleeAttackArea node not found. Please add it to the player scene.")
+
+
+func _attack_laser():
+	# TODO: Implement laser attack
+	print("Attack: LASER")
+
+func _on_melee_attack_area_body_entered(body):
+	if body.is_in_group("enemies"):
+		# Assuming enemies have a take_damage method
+		body.take_damage(10) # Example damage value
+		print("Melee hit: ", body.name)

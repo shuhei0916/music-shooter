@@ -125,7 +125,7 @@ func _on_midi_event(channel, event):
 		var ch_num = channel_status.number
 
 		if player:
-			player.shoot(ch_num)
+			player.attack(ch_num)
 			
 		if ch_num >= 0 and ch_num < 16:
 			note_counts[ch_num] += 1

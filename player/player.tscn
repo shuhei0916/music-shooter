@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://b5w2w5g5h5j5h"]
+[gd_scene load_steps=8 format=3 uid="uid://b5w2w5g5h5j5h"]
 
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://player/player.gd" id="1_player"]
 
@@ -9,6 +9,16 @@ albedo_color = Color(0.305882, 0.85098, 1, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 material = SubResource("StandardMaterial3D_player")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oul6g"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4j1t3"]
+transparency = 1
+albedo_color = Color(1, 0.894118, 0.305882, 0.501961)
+
+[sub_resource type="BoxMesh" id="BoxMesh_w7qf8"]
+material = SubResource("StandardMaterial3D_4j1t3")
+size = Vector3(3, 1, 1)
 
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 collision_mask = 12
@@ -25,3 +35,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
 text = "1"
 font_size = 128
+
+[node name="MeleeAttackArea" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeleeAttackArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+shape = SubResource("BoxShape3D_oul6g")
+
+[node name="MeleeEffectMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+visible = false
+mesh = SubResource("BoxMesh_w7qf8")
+
+[connection signal="body_entered" from="MeleeAttackArea" to="." method="_on_melee_attack_area_body_entered"]
