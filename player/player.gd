@@ -69,15 +69,33 @@ func game_over():
 
 enum WeaponType { HANDGUN, MELEE, LASER }
 
+var enabled_weapons = {
+	WeaponType.HANDGUN: true,
+	WeaponType.MELEE: false, # Disable melee as requested
+	WeaponType.LASER: true
+}
+
+func set_weapon_enabled(weapon_type: WeaponType, is_enabled: bool):
+	if enabled_weapons.has(weapon_type):
+		enabled_weapons[weapon_type] = is_enabled
+		print("Weapon %s is now %s" % [WeaponType.keys()[weapon_type], "enabled" if is_enabled else "disabled"])
+	else:
+		printerr("Tried to set status for an unknown weapon type.")
+
 func attack(channel_num):
 	var weapon_type
 	if channel_num == 9:
 		weapon_type = WeaponType.MELEE
+	elif channel_num == 4:
+		weapon_type = WeaponType.HANDGUN
 	elif channel_num >= 10:
 		weapon_type = WeaponType.LASER
-	else:
-		weapon_type = WeaponType.HANDGUN
 	
+	# Check if the determined weapon is enabled before attacking
+	if not enabled_weapons.get(weapon_type, false):
+		# print("Weapon type %s is disabled." % WeaponType.keys()[weapon_type])
+		return # Do nothing if the weapon is disabled
+
 	# 武器タイプに応じて、それぞれの攻撃処理を呼び出す
 	match weapon_type:
 		WeaponType.HANDGUN:
@@ -114,14 +132,15 @@ func _attack_melee():
 			if melee_effect:
 				melee_effect.visible = false
 		)
-		print("Attack: MELEE")
+		# print("Attack: MELEE")
 	else:
 		printerr("MeleeAttackArea node not found. Please add it to the player scene.")
 
 
 func _attack_laser():
 	# TODO: Implement laser attack
-	print("Attack: LASER")
+	# print("Attack: LASER")
+	pass
 
 func _on_melee_attack_area_body_entered(body):
 	if body.is_in_group("enemies"):
