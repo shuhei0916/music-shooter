@@ -25,28 +25,34 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# Lane-based movement
-	handle_lane_movement(delta)
+	# Get the input direction and handle the movement/deceleration.
+	var direction = Input.get_axis("ui_left", "ui_right")
+	if direction:
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
 	
 	move_and_slide()
 
-var current_lane = 1 # 0: left, 1: center, 2: right
-var target_x = 0.0
-const LANE_WIDTH = 3.0
-const LANE_MOVE_SPEED = 10.0
-
-func handle_lane_movement(delta):
-	if Input.is_action_just_pressed("ui_right") and current_lane < 2:
-		current_lane += 1
-	if Input.is_action_just_pressed("ui_left") and current_lane > 0:
-		current_lane -= 1
-	
-	target_x = (current_lane - 1) * LANE_WIDTH
-	
-	# Smoothly move to the target lane
-	global_transform.origin.x = lerp(global_transform.origin.x, target_x, LANE_MOVE_SPEED * delta)
-	velocity.x = 0 # We handle movement directly via transform
-	velocity.z = 0
+# --- Start of commented out lane movement code ---
+#var current_lane = 1 # 0: left, 1: center, 2: right
+#var target_x = 0.0
+#const LANE_WIDTH = 3.0
+#const LANE_MOVE_SPEED = 10.0
+#
+#func handle_lane_movement(delta):
+#	if Input.is_action_just_pressed("ui_right") and current_lane < 2:
+#		current_lane += 1
+#	if Input.is_action_just_pressed("ui_left") and current_lane > 0:
+#		current_lane -= 1
+#
+#	target_x = (current_lane - 1) * LANE_WIDTH
+#
+#	# Smoothly move to the target lane
+#	global_transform.origin.x = lerp(global_transform.origin.x, target_x, LANE_MOVE_SPEED * delta)
+#	velocity.x = 0 # We handle movement directly via transform
+#	velocity.z = 0
+# --- End of commented out lane movement code ---
 
 func add_characters(amount):
 	self.character_count += amount
