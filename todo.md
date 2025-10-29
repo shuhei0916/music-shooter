@@ -4,7 +4,7 @@
     - [x] `format_number` は非整数の値で小数第一位まで丸めて返す
 - [ ] `Player` の HP 管理
     - [x] `add_hp` は HP を加算し `hp_changed` シグナルを発火する
-    - [ ] `multiply_hp` は HP を乗算し `hp_changed` シグナルを発火する
+    - [x] `multiply_hp` は HP を乗算し `hp_changed` シグナルを発火する
     - [ ] `take_damage` はダメージが残存数未満なら減算し `hp_changed` を発火する
     - [ ] `take_damage` は致死ダメージ時に `game_over_signal` を発火しキャラクター数を 0 にする
 - [ ] `Player` の武器切替・攻撃
