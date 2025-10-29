@@ -6,7 +6,7 @@
     - [x] `add_hp` は HP を加算し `hp_changed` シグナルを発火する
     - [x] `multiply_hp` は HP を乗算し `hp_changed` シグナルを発火する
     - [ ] `take_damage` はダメージが残存数未満なら減算し `hp_changed` を発火する
-    - [ ] `take_damage` は致死ダメージ時に `game_over_signal` を発火しキャラクター数を 0 にする
+    - [x] `take_damage` は致死ダメージ時に `game_over_signal` を発火しキャラクター数を 0 にする
 - [ ] `Player` の武器切替・攻撃
     - [ ] `set_weapon_enabled` は武器有効フラグを更新し後続の攻撃判定に反映される
     - [ ] `attack` はチャンネル 4 でハンドガン攻撃を行う

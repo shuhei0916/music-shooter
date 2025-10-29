@@ -66,6 +66,7 @@ func take_damage(damage):
 	if character_count > damage:
 		self.character_count -= damage
 	else:
+		self.character_count = 0
 		game_over()
 
 func game_over():
