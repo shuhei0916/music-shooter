@@ -1,6 +1,7 @@
 - [ ] `Utils` のユーティリティ関数
     - [x] `format_number` は 1000 未満の整数をそのままの文字列で返す
     - [x] `format_number` は 1000 以上の値に対して適切な接尾辞（K/M/B/T）を付ける
+    - [x] `format_number` は非整数の値で小数第一位まで丸めて返す
 - [ ] `Player` のキャラクター管理
     - [ ] `add_characters` はキャラクター数を増やし `hp_changed` シグナルを発火する
     - [ ] `multiply_characters` はキャラクター数を乗算し `hp_changed` シグナルを発火する
