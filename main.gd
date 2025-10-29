@@ -58,9 +58,9 @@ func _on_spawn_object(object_scene, properties):
 func _on_player_entered_gate(gate_type, value):
 	if player:
 		if gate_type == "add":
-			player.add_characters(value)
+			player.add_hp(value)
 		elif gate_type == "multiply":
-			player.multiply_characters(value)
+			player.multiply_hp(value)
 
 func _on_player_collided_with_enemy(enemy_hp):
 	if player:

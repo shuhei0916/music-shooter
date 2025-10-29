@@ -54,11 +54,11 @@ func _physics_process(delta):
 #	velocity.z = 0
 # --- End of commented out lane movement code ---
 
-func add_characters(amount):
+func add_hp(amount):
 	self.character_count += amount
 	# print("Characters: ", character_count)
 
-func multiply_characters(factor):
+func multiply_hp(factor):
 	self.character_count *= factor
 	# print("Characters: ", character_count)
 

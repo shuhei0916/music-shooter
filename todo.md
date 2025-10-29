@@ -2,9 +2,9 @@
     - [x] `format_number` は 1000 未満の整数をそのままの文字列で返す
     - [x] `format_number` は 1000 以上の値に対して適切な接尾辞（K/M/B/T）を付ける
     - [x] `format_number` は非整数の値で小数第一位まで丸めて返す
-- [ ] `Player` のキャラクター管理
-    - [ ] `add_characters` はキャラクター数を増やし `hp_changed` シグナルを発火する
-    - [ ] `multiply_characters` はキャラクター数を乗算し `hp_changed` シグナルを発火する
+- [ ] `Player` の HP 管理
+    - [x] `add_hp` は HP を加算し `hp_changed` シグナルを発火する
+    - [ ] `multiply_hp` は HP を乗算し `hp_changed` シグナルを発火する
     - [ ] `take_damage` はダメージが残存数未満なら減算し `hp_changed` を発火する
     - [ ] `take_damage` は致死ダメージ時に `game_over_signal` を発火しキャラクター数を 0 にする
 - [ ] `Player` の武器切替・攻撃
