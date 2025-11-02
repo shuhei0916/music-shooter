@@ -77,8 +77,8 @@ func _on_spawn_object(object_scene, properties):
 
 func _on_player_entered_gate(gate_type, value, gate_node):
 	if player:
-		var applied = player.try_apply_gate_effect(gate_type, value)
-		if applied and is_instance_valid(gate_node):
+		player.apply_gate_effect(gate_type, value)
+		if is_instance_valid(gate_node):
 			gate_node.queue_free()
 
 func _on_player_collided_with_enemy(enemy_hp):

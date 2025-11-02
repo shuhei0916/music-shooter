@@ -2,8 +2,6 @@ extends CharacterBody3D
 
 @export var bullet_scene: PackedScene
 
-# const BULLET_SCENE = preload("res://bullet.tscn")
-
 signal hp_changed(new_hp)
 signal game_over_signal
 
@@ -14,78 +12,38 @@ var character_count = 1:
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
-const GATE_COOLDOWN_MS = 400
 
-# Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
-var _next_gate_ready_ms = 0
 
 func _physics_process(delta):
-	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	# Handle Jump.
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# Get the input direction and handle the movement/deceleration.
 	var direction = Input.get_axis("ui_left", "ui_right")
 	if direction:
 		velocity.x = direction * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
-	
-	move_and_slide()
 
-# --- Start of commented out lane movement code ---
-#var current_lane = 1 # 0: left, 1: center, 2: right
-#var target_x = 0.0
-#const LANE_WIDTH = 3.0
-#const LANE_MOVE_SPEED = 10.0
-#
-#func handle_lane_movement(delta):
-#	if Input.is_action_just_pressed("ui_right") and current_lane < 2:
-#		current_lane += 1
-#	if Input.is_action_just_pressed("ui_left") and current_lane > 0:
-#		current_lane -= 1
-#
-#	target_x = (current_lane - 1) * LANE_WIDTH
-#
-#	# Smoothly move to the target lane
-#	global_transform.origin.x = lerp(global_transform.origin.x, target_x, LANE_MOVE_SPEED * delta)
-#	velocity.x = 0 # We handle movement directly via transform
-#	velocity.z = 0
-# --- End of commented out lane movement code ---
+	move_and_slide()
 
 func add_hp(amount):
 	self.character_count += amount
-	# print("Characters: ", character_count)
 
 func multiply_hp(factor):
 	self.character_count *= factor
-	# print("Characters: ", character_count)
 
-func try_apply_gate_effect(gate_type: String, value: int) -> bool:
-	if not is_gate_ready():
-		return false
-
+func apply_gate_effect(gate_type: String, value: int):
 	match gate_type:
 		"add":
 			add_hp(value)
 		"multiply":
 			multiply_hp(value)
 		_:
-			return false
-
-	_next_gate_ready_ms = Time.get_ticks_msec() + GATE_COOLDOWN_MS
-	return true
-
-func is_gate_ready() -> bool:
-	return Time.get_ticks_msec() >= _next_gate_ready_ms
-
-func reset_gate_cooldown():
-	_next_gate_ready_ms = 0
+			printerr("Unknown gate_type: ", gate_type)
 
 func take_damage(damage):
 	if character_count > damage:
@@ -97,13 +55,12 @@ func take_damage(damage):
 func game_over():
 	print("GAME OVER")
 	emit_signal("game_over_signal")
-	# The game over screen will now handle restarting
 
 enum WeaponType { HANDGUN, MELEE, LASER }
 
 var enabled_weapons = {
 	WeaponType.HANDGUN: true,
-	WeaponType.MELEE: false, # Disable melee as requested
+	WeaponType.MELEE: false,
 	WeaponType.LASER: true
 }
 
@@ -122,13 +79,10 @@ func attack(channel_num):
 		weapon_type = WeaponType.HANDGUN
 	elif channel_num >= 10:
 		weapon_type = WeaponType.LASER
-	
-	# Check if the determined weapon is enabled before attacking
-	if not enabled_weapons.get(weapon_type, false):
-		# print("Weapon type %s is disabled." % WeaponType.keys()[weapon_type])
-		return # Do nothing if the weapon is disabled
 
-	# 武器タイプに応じて、それぞれの攻撃処理を呼び出す
+	if not enabled_weapons.get(weapon_type, false):
+		return
+
 	match weapon_type:
 		WeaponType.HANDGUN:
 			_attack_handgun()
@@ -138,48 +92,41 @@ func attack(channel_num):
 			_attack_laser()
 
 func _attack_handgun():
-	if bullet_scene:
-		var bullet = bullet_scene.instantiate()
-		# Add the bullet to the main scene, not the player
-		var main_node = get_tree().get_root().get_node("Main")
-		if main_node:
-			main_node.add_child(bullet)
-			bullet.global_transform = self.global_transform
-			bullet.position.z -= 1.0 # Spawn slightly in front of the player
-		else:
-			printerr("Could not find Main node to add bullet.")
-	else:
+	if not bullet_scene:
 		printerr("bullet_scene が未設定です")
+		return
 
+	var bullet = bullet_scene.instantiate()
+	var main_node = get_tree().get_root().get_node("Main")
+	if main_node:
+		main_node.add_child(bullet)
+		bullet.global_transform = self.global_transform
+		bullet.position.z -= 1.0
+	else:
+		printerr("Could not find Main node to add bullet.")
 
 func _attack_melee():
 	var melee_area = $MeleeAttackArea
-	var melee_effect = $MeleeEffectMesh # We will add this node in the editor
+	var melee_effect = $MeleeEffectMesh
 
 	if melee_area:
 		melee_area.monitoring = true
 		if melee_effect:
 			melee_effect.visible = true
 
-		# Disable the area and effect after a short time
 		var timer = get_tree().create_timer(0.2)
-		timer.timeout.connect(func(): 
+		timer.timeout.connect(func():
 			melee_area.monitoring = false
 			if melee_effect:
 				melee_effect.visible = false
 		)
-		# print("Attack: MELEE")
 	else:
 		printerr("MeleeAttackArea node not found. Please add it to the player scene.")
 
-
 func _attack_laser():
-	# TODO: Implement laser attack
-	# print("Attack: LASER")
 	pass
 
 func _on_melee_attack_area_body_entered(body):
 	if body.is_in_group("enemies"):
-		# Assuming enemies have a take_damage method
-		body.take_damage(10) # Example damage value
+		body.take_damage(10)
 		print("Melee hit: ", body.name)

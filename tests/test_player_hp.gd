@@ -40,65 +40,16 @@ func test_非致死ダメージでは残量を減らしゲームオーバーに�
 	var game_over_params = get_signal_parameters(player, "game_over_signal")
 	assert_eq([7, [7], null], [player.character_count, hp_args, game_over_params])
 
-func test_ゲート効果適用でhpが増えクールダウンが開始される():
+func test_ゲート加算効果でhpが増える():
 	player.character_count = 10
 	watch_signals(player)
-	var result = player.try_apply_gate_effect("add", 5)
-	var emit_count = get_signal_emit_count(player, "hp_changed")
-	assert_eq(
-		{
-			"hp": player.character_count,
-			"result": result,
-			"emit_count": emit_count,
-			"ready": player.is_gate_ready()
-		},
-		{
-			"hp": 15,
-			"result": true,
-			"emit_count": 1,
-			"ready": false
-		}
-	)
+	player.apply_gate_effect("add", 4)
+	var hp_args = get_signal_parameters(player, "hp_changed")
+	assert_eq([14, [14]], [player.character_count, hp_args])
 
-func test_クールダウン中のゲート効果は無視される():
-	player.character_count = 10
-	watch_signals(player)
-	player.try_apply_gate_effect("add", 5)
-	var after_first_hp = player.character_count
-	var first_emit_count = get_signal_emit_count(player, "hp_changed")
-	var second_result = player.try_apply_gate_effect("multiply", 3)
-	var emit_count = get_signal_emit_count(player, "hp_changed")
-	assert_eq(
-		{
-			"hp": player.character_count,
-			"emit_count": emit_count,
-			"first_emit_count": first_emit_count,
-			"second_result": second_result
-		},
-		{
-			"hp": after_first_hp,
-			"emit_count": first_emit_count,
-			"first_emit_count": 1,
-			"second_result": false
-		}
-	)
-
-func test_クールダウン解除後は再びゲート効果を受けられる():
+func test_ゲート乗算効果でhpが変わる():
 	player.character_count = 5
 	watch_signals(player)
-	player.try_apply_gate_effect("add", 5)
-	player.reset_gate_cooldown()
-	var second_result = player.try_apply_gate_effect("multiply", 2)
-	var emit_count = get_signal_emit_count(player, "hp_changed")
-	assert_eq(
-		{
-			"hp": player.character_count,
-			"emit_count": emit_count,
-			"second_result": second_result
-		},
-		{
-			"hp": 20,
-			"emit_count": 2,
-			"second_result": true
-		}
-	)
+	player.apply_gate_effect("multiply", 3)
+	var hp_args = get_signal_parameters(player, "hp_changed")
+	assert_eq([15, [15]], [player.character_count, hp_args])

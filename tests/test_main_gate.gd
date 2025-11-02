@@ -35,12 +35,21 @@ func _new_gate():
 	_gates.append(gate)
 	return gate
 
-func test_ゲート効果適用時のみゲートが破棄される():
-	var gate1 = _new_gate()
-	main_node._on_player_entered_gate("add", 2, gate1)
-	assert_true(gate1.is_queued_for_deletion())
-	await get_tree().process_frame
+func test_ゲート効果適用後にゲートを破棄する():
+	player.character_count = 10
+	var gate = _new_gate()
+	main_node._on_player_entered_gate("add", 5, gate)
+	assert_eq(15, player.character_count)
+	assert_true(gate.is_queued_for_deletion())
 
-	var gate2 = _new_gate()
-	main_node._on_player_entered_gate("multiply", 3, gate2)
-	assert_false(gate2.is_queued_for_deletion())
+func test_複数回呼び出すとその都度効果が適用される():
+	player.character_count = 2
+	var gate = _new_gate()
+	main_node._on_player_entered_gate("multiply", 3, gate)
+	assert_eq(6, player.character_count)
+	assert_true(gate.is_queued_for_deletion())
+
+	var second_gate = _new_gate()
+	main_node._on_player_entered_gate("add", 4, second_gate)
+	assert_eq(10, player.character_count)
+	assert_true(second_gate.is_queued_for_deletion())
