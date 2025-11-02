@@ -43,10 +43,11 @@ func _process(delta):
 	time += delta
 	
 	var pivot = get_node("Pivot")
-	if pivot:
-		# Floating animation (up and down)
-		var float_offset = sin(time * FLOAT_SPEED) * FLOAT_AMOUNT
-		pivot.position.y = float_offset
+	# 回転を一時的に停止
+	# if pivot:
+	# 	# Floating animation (up and down)
+	# 	var float_offset = sin(time * FLOAT_SPEED) * FLOAT_AMOUNT
+	# 	pivot.position.y = float_offset
 		
-		# Rotation animation
-		pivot.rotate_y(ROTATION_SPEED * delta)
+	# 	# Rotation animation
+	# 	pivot.rotate_y(ROTATION_SPEED * delta)

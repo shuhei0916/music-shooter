@@ -23,7 +23,7 @@ func _ready():
 	var selected_song = get_node("/root/SongManager").get_selected_song()
 	if selected_song.is_empty():
 		printerr("No song selected, defaulting to first song in list.")
-		selected_song = get_node("/root/SongManager").get_song_list()[0]
+		selected_song = get_node("/root/SongManager").get_song_list()[1] # city lights - avicii を選択
 
 	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
 	midi_player.file = selected_song
