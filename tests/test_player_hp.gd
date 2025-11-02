@@ -31,3 +31,11 @@ func test_致死ダメージでhpを0にしてゲームオーバーシグナル�
 	var hp_args = get_signal_parameters(player, "hp_changed")
 	var game_over_params = get_signal_parameters(player, "game_over_signal")
 	assert_eq([0, [0], []], [player.character_count, hp_args, game_over_params])
+
+func test_非致死ダメージでは残量を減らしゲームオーバーにならない():
+	player.character_count = 10
+	watch_signals(player)
+	player.take_damage(3)
+	var hp_args = get_signal_parameters(player, "hp_changed")
+	var game_over_params = get_signal_parameters(player, "game_over_signal")
+	assert_eq([7, [7], null], [player.character_count, hp_args, game_over_params])
