@@ -39,3 +39,23 @@ func test_非致死ダメージでは残量を減らしゲームオーバーに�
 	var hp_args = get_signal_parameters(player, "hp_changed")
 	var game_over_params = get_signal_parameters(player, "game_over_signal")
 	assert_eq([7, [7], null], [player.character_count, hp_args, game_over_params])
+
+func test_ゲート効果適用でhpが増えクールダウンが開始される():
+	player.character_count = 10
+	watch_signals(player)
+	var result = player.try_apply_gate_effect("add", 5)
+	var emit_count = get_signal_emit_count(player, "hp_changed")
+	assert_eq(
+		{
+			"hp": player.character_count,
+			"result": result,
+			"emit_count": emit_count,
+			"ready": player.is_gate_ready()
+		},
+		{
+			"hp": 15,
+			"result": true,
+			"emit_count": 1,
+			"ready": false
+		}
+	)

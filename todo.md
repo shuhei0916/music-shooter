@@ -22,6 +22,11 @@
 - [ ] `Gate` の振る舞い
     - [ ] `set_gate_properties` はゲート種別と値を更新してラベル表示に反映する
     - [ ] `_on_body_entered` はプレイヤー接触で `player_entered_gate` を発火し自身を破棄する
+- [ ] `Player` のゲート制御
+    - [x] `try_apply_gate_effect` は準備完了時のみ効果を適用しクールダウンを開始する
+    - [ ] `try_apply_gate_effect` はクールダウン中に呼ばれても HP を変化させず false を返す
+    - [ ] クールダウン終了後は再びゲート効果を受けられる
+- [ ] `Main._on_player_entered_gate` はクールダウン中のゲート効果を適用しない
 - [ ] `Spawner` の生成ロジック
     - [ ] `spawn_enemy` は指定レーンに敵を生成するプロパティを `spawn_object` で通知する
     - [ ] `spawn_gate` は指定レーンにゲートを生成するプロパティを `spawn_object` で通知する

@@ -12,9 +12,11 @@ var character_count = 1:
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+const GATE_COOLDOWN_MS = 400
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+var _next_gate_ready_ms = 0
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -61,6 +63,27 @@ func add_hp(amount):
 func multiply_hp(factor):
 	self.character_count *= factor
 	# print("Characters: ", character_count)
+
+func try_apply_gate_effect(gate_type: String, value: int) -> bool:
+	if not is_gate_ready():
+		return false
+
+	match gate_type:
+		"add":
+			add_hp(value)
+		"multiply":
+			multiply_hp(value)
+		_:
+			return false
+
+	_next_gate_ready_ms = Time.get_ticks_msec() + GATE_COOLDOWN_MS
+	return true
+
+func is_gate_ready() -> bool:
+	return Time.get_ticks_msec() >= _next_gate_ready_ms
+
+func reset_gate_cooldown():
+	_next_gate_ready_ms = 0
 
 func take_damage(damage):
 	if character_count > damage:
