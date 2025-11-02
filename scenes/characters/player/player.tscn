@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://b5w2w5g5h5j5h"]
+[gd_scene load_steps=9 format=3 uid="uid://b5w2w5g5h5j5h"]
 
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://scenes/characters/player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://cgy7qg1vj3w3v" path="res://scenes/objects/bullet/bullet.tscn" id="2_t61fv"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -23,6 +24,7 @@ size = Vector3(3, 1, 1)
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 collision_mask = 12
 script = ExtResource("1_player")
+bullet_scene = ExtResource("2_t61fv")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_player")

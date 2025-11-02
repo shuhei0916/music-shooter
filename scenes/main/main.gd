@@ -1,6 +1,5 @@
 extends Node3D
 
-# const DEBUG_UI_SCENE = preload("res://debug_midi_ui.tscn")
 @export var debug_ui_scene: PackedScene
 const WORLD_SPEED = 5.0
 
@@ -16,9 +15,12 @@ func _ready():
 		note_counts.append(0)
 
 	# Setup Debug UI
-	debug_ui = DEBUG_UI_SCENE.instantiate()
-	add_child(debug_ui)
-	debug_ui.visible = false
+	if debug_ui_scene:
+		debug_ui = debug_ui_scene.instantiate() 
+		add_child(debug_ui)	
+		debug_ui.visible = false
+	else:
+		printerr("debug_ui_scene が未設定です")
 
 	# Setup MidiPlayer
 	var selected_song = get_node("/root/SongManager").get_selected_song()

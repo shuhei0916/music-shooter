@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
-const BULLET_SCENE = preload("res://bullet.tscn")
+@export var bullet_scene: PackedScene
+
+# const BULLET_SCENE = preload("res://bullet.tscn")
 
 signal hp_changed(new_hp)
 signal game_over_signal
@@ -136,15 +138,19 @@ func attack(channel_num):
 			_attack_laser()
 
 func _attack_handgun():
-	var bullet = BULLET_SCENE.instantiate()
-	# Add the bullet to the main scene, not the player
-	var main_node = get_tree().get_root().get_node("Main")
-	if main_node:
-		main_node.add_child(bullet)
-		bullet.global_transform = self.global_transform
-		bullet.position.z -= 1.0 # Spawn slightly in front of the player
+	if bullet_scene:
+		var bullet = bullet_scene.instantiate()
+		# Add the bullet to the main scene, not the player
+		var main_node = get_tree().get_root().get_node("Main")
+		if main_node:
+			main_node.add_child(bullet)
+			bullet.global_transform = self.global_transform
+			bullet.position.z -= 1.0 # Spawn slightly in front of the player
+		else:
+			printerr("Could not find Main node to add bullet.")
 	else:
-		printerr("Could not find Main node to add bullet.")
+		printerr("bullet_scene が未設定です")
+
 
 func _attack_melee():
 	var melee_area = $MeleeAttackArea
