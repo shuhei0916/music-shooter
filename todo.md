@@ -27,6 +27,7 @@
     - [x] `try_apply_gate_effect` はクールダウン中に呼ばれても HP を変化させず false を返す
     - [x] クールダウン終了後は再びゲート効果を受けられる
 - [ ] `Main._on_player_entered_gate` はクールダウン中のゲート効果を適用しない
+- [x] `Main._on_player_entered_gate` はクールダウン中のゲート効果を適用しない
 - [ ] `Spawner` の生成ロジック
     - [ ] `spawn_enemy` は指定レーンに敵を生成するプロパティを `spawn_object` で通知する
     - [ ] `spawn_gate` は指定レーンにゲートを生成するプロパティを `spawn_object` で通知する
