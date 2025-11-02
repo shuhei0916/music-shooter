@@ -82,3 +82,23 @@ func test_クールダウン中のゲート効果は無視される():
 			"second_result": false
 		}
 	)
+
+func test_クールダウン解除後は再びゲート効果を受けられる():
+	player.character_count = 5
+	watch_signals(player)
+	player.try_apply_gate_effect("add", 5)
+	player.reset_gate_cooldown()
+	var second_result = player.try_apply_gate_effect("multiply", 2)
+	var emit_count = get_signal_emit_count(player, "hp_changed")
+	assert_eq(
+		{
+			"hp": player.character_count,
+			"emit_count": emit_count,
+			"second_result": second_result
+		},
+		{
+			"hp": 20,
+			"emit_count": 2,
+			"second_result": true
+		}
+	)
