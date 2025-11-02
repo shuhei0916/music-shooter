@@ -1,6 +1,7 @@
 extends Node3D
 
-const DEBUG_UI_SCENE = preload("res://debug_midi_ui.tscn")
+# const DEBUG_UI_SCENE = preload("res://debug_midi_ui.tscn")
+@export var debug_ui_scene: PackedScene
 const WORLD_SPEED = 5.0
 
 var player
