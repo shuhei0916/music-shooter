@@ -55,9 +55,11 @@ func _on_spawn_object(object_scene, properties):
 			instance.set_gate_properties(properties.type, properties.value)
 			instance.player_entered_gate.connect(_on_player_entered_gate)
 
-func _on_player_entered_gate(gate_type, value):
+func _on_player_entered_gate(gate_type, value, gate_node):
 	if player:
-		player.try_apply_gate_effect(gate_type, value)
+		var applied = player.try_apply_gate_effect(gate_type, value)
+		if applied and is_instance_valid(gate_node):
+			gate_node.queue_free()
 
 func _on_player_collided_with_enemy(enemy_hp):
 	if player:
