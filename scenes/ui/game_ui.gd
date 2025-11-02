@@ -1,5 +1,8 @@
 extends Control
 
+@export var scene_manager_path: NodePath = NodePath("/root/SceneManager")
+@export_file("*.tscn") var main_menu_scene_path: String
+
 @onready var result_panel = $ResultPanel
 @onready var result_label = $ResultPanel/ResultLabel
 @onready var new_run_button = $ResultPanel/NewRunButton
@@ -30,7 +33,14 @@ func show_result(is_win):
 			player.set_physics_process(false)
 
 func _on_new_run_pressed():
-	get_node("/root/SceneManager").change_scene("res://main_menu.tscn")
+	if main_menu_scene_path == "":
+		printerr("main_menu_scene_path が未設定です")
+		return
+	var scene_manager = get_node_or_null(scene_manager_path)
+	if scene_manager == null:
+		printerr("SceneManager が見つかりません: ", scene_manager_path)
+		return
+	scene_manager.change_scene(main_menu_scene_path)
 
 func update_progress(current_time, total_time, current_tick, total_ticks):
 	var time_str = "%s/%s" % [format_seconds_to_string(current_time), format_seconds_to_string(total_time)]

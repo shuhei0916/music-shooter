@@ -5,7 +5,7 @@ class_name TestPlayerHp
 var player
 
 func before_each():
-	player = load("res://player/player.gd").new()
+	player = load("res://scenes/characters/player/player.gd").new()
 
 func after_each():
 	player.free()

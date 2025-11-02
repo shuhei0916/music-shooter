@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://scenes/objects/gate/gate.tscn" id="5_ouso4"]
 [ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="6_blune"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="7_th5th"]
+[ext_resource type="PackedScene" uid="uid://b1x2y304a5b6c" path="res://scenes/ui/debug_midi_ui.tscn" id="8_debugui"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -20,8 +21,13 @@ size = Vector2(10, 100)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_hujxm")
+debug_ui_scene = ExtResource("8_debugui")
+midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
+song_manager_path = NodePath("/root/SongManager")
+utils_path = NodePath("/root/Utils")
 
 [node name="GameUI" parent="." instance=ExtResource("2_yyfjg")]
+main_menu_scene_path = "res://scenes/ui/main_menu.tscn"
 
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_b1x3f")
@@ -30,7 +36,7 @@ gate_scene = ExtResource("5_ouso4")
 
 [node name="MidiPlayer" type="Node" parent="."]
 script = ExtResource("6_blune")
-soundfont = "res://music/GeneralUser-GS.sf2"
+soundfont = "res://assets/audio/GeneralUser-GS.sf2"
 metadata/_custom_type_script = "uid://bwch5nk77teaf"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]

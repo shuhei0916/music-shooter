@@ -10,6 +10,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_abcde")
+scene_manager_path = NodePath("/root/SceneManager")
+main_menu_scene_path = "res://scenes/ui/main_menu.tscn"
 
 [node name="SongProgressLabel" type="Label" parent="."]
 layout_mode = 1

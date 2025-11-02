@@ -1,6 +1,9 @@
 extends Node3D
 
 @export var debug_ui_scene: PackedScene
+@export_file("*.sf2") var midi_soundfont_path: String
+@export var song_manager_path: NodePath = NodePath("/root/SongManager")
+@export var utils_path: NodePath = NodePath("/root/Utils")
 const WORLD_SPEED = 5.0
 
 var player
@@ -16,19 +19,33 @@ func _ready():
 
 	# Setup Debug UI
 	if debug_ui_scene:
-		debug_ui = debug_ui_scene.instantiate() 
-		add_child(debug_ui)	
+		debug_ui = debug_ui_scene.instantiate()
+		add_child(debug_ui)
 		debug_ui.visible = false
 	else:
+		debug_ui = null
 		printerr("debug_ui_scene が未設定です")
 
 	# Setup MidiPlayer
-	var selected_song = get_node("/root/SongManager").get_selected_song()
+	var song_manager = get_node_or_null(song_manager_path)
+	if song_manager == null:
+		printerr("SongManager が見つかりません: ", song_manager_path)
+		return
+
+	var selected_song = song_manager.get_selected_song()
 	if selected_song.is_empty():
 		printerr("No song selected, defaulting to first song in list.")
-		selected_song = get_node("/root/SongManager").get_song_list()[1] # city lights - avicii を選択
+		var songs = song_manager.get_song_list()
+		if songs.size() > 0:
+			selected_song = songs[0]
+		else:
+			printerr("SongManager に楽曲がありません。")
+			return
 
-	midi_player.soundfont = "res://music/GeneralUser-GS.sf2"
+	if midi_soundfont_path != "":
+		midi_player.soundfont = midi_soundfont_path
+	else:
+		printerr("midi_soundfont_path が未設定です")
 	midi_player.file = selected_song
 	midi_player.midi_event.connect(_on_midi_event)
 	midi_player.finished.connect(_on_midi_player_finished)
@@ -86,7 +103,11 @@ func _on_midi_player_finished():
 func _on_player_hp_changed(new_hp):
 	var hp_label = player.get_node("HPLabel")
 	if hp_label:
-		hp_label.text = get_node("/root/Utils").format_number(new_hp)
+		var utils = get_node_or_null(utils_path)
+		if utils:
+			hp_label.text = utils.format_number(new_hp)
+		else:
+			printerr("Utils が見つかりません: ", utils_path)
 
 func _process(delta):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
@@ -107,7 +128,7 @@ func _process(delta):
 		get_node("GameUI").update_progress(current_time, total_time, current_ticks, total_ticks)
 
 	# Update debug UI if visible
-	if debug_ui.visible:
+	if debug_ui and debug_ui.visible:
 		for i in range(16):
 			var channel_status = midi_player.channel_status[i]
 			debug_ui.update_track_data(i, channel_status.instrument_name, note_counts[i])

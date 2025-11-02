@@ -2,9 +2,9 @@ extends GutTest
 
 class_name TestMainGate
 
-var main_script := preload("res://main.gd")
-var player_scene := preload("res://player/player.tscn")
-var gate_scene := preload("res://gate.tscn")
+var main_script := preload("res://scenes/main/main.gd")
+var player_scene := preload("res://scenes/characters/player/player.tscn")
+var gate_scene := preload("res://scenes/objects/gate/gate.tscn")
 
 var main_node: Node3D
 var player

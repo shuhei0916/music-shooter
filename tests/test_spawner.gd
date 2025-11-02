@@ -6,9 +6,9 @@ var spawner
 var emitted := []
 
 func before_each():
-	spawner = load("res://spawner.gd").new()
-	spawner.enemy_scene = load("res://enemy.tscn")
-	spawner.gate_scene = load("res://gate.tscn")
+	spawner = load("res://scenes/components/spawner.gd").new()
+	spawner.enemy_scene = load("res://scenes/characters/enemy/enemy.tscn")
+	spawner.gate_scene = load("res://scenes/objects/gate/gate.tscn")
 	spawner.spawn_object.connect(_on_spawn_object)
 	emitted.clear()
 

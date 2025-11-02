@@ -2,8 +2,8 @@ extends GutTest
 
 class_name TestGate
 
-var gate_scene := load("res://gate.tscn")
-var player_scene := load("res://player/player.tscn")
+var gate_scene := load("res://scenes/objects/gate/gate.tscn")
+var player_scene := load("res://scenes/characters/player/player.tscn")
 var gate
 var player
 
