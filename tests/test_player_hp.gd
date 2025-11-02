@@ -59,3 +59,26 @@ func test_ゲート効果適用でhpが増えクールダウンが開始され�
 			"ready": false
 		}
 	)
+
+func test_クールダウン中のゲート効果は無視される():
+	player.character_count = 10
+	watch_signals(player)
+	player.try_apply_gate_effect("add", 5)
+	var after_first_hp = player.character_count
+	var first_emit_count = get_signal_emit_count(player, "hp_changed")
+	var second_result = player.try_apply_gate_effect("multiply", 3)
+	var emit_count = get_signal_emit_count(player, "hp_changed")
+	assert_eq(
+		{
+			"hp": player.character_count,
+			"emit_count": emit_count,
+			"first_emit_count": first_emit_count,
+			"second_result": second_result
+		},
+		{
+			"hp": after_first_hp,
+			"emit_count": first_emit_count,
+			"first_emit_count": 1,
+			"second_result": false
+		}
+	)
