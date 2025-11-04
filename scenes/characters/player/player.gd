@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
 @export var bullet_scene: PackedScene
+@export var horizontal_limit_min: float = -4.0
+@export var horizontal_limit_max: float = 4.0
 
 signal hp_changed(new_hp)
 signal game_over_signal
@@ -29,6 +31,7 @@ func _physics_process(delta):
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	move_and_slide()
+	clamp_horizontal_position()
 
 func add_hp(amount):
 	self.character_count += amount
@@ -44,6 +47,15 @@ func apply_gate_effect(gate_type: String, value: int):
 			multiply_hp(value)
 		_:
 			printerr("Unknown gate_type: ", gate_type)
+
+func clamp_horizontal_position():
+	if horizontal_limit_min > horizontal_limit_max:
+		var temp = horizontal_limit_min
+		horizontal_limit_min = horizontal_limit_max
+		horizontal_limit_max = temp
+	var pos = position
+	pos.x = clamp(pos.x, horizontal_limit_min, horizontal_limit_max)
+	position = pos
 
 func take_damage(damage):
 	if character_count > damage:

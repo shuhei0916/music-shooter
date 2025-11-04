@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=12 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://scenes/main/main.gd" id="1_hujxm"]
 [ext_resource type="PackedScene" uid="uid://d3w4w5g6h7j8h" path="res://scenes/ui/game_ui.tscn" id="2_yyfjg"]
@@ -23,11 +23,8 @@ size = Vector2(10, 100)
 script = ExtResource("1_hujxm")
 debug_ui_scene = ExtResource("8_debugui")
 midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
-song_manager_path = NodePath("/root/SongManager")
-utils_path = NodePath("/root/Utils")
 
 [node name="GameUI" parent="." instance=ExtResource("2_yyfjg")]
-main_menu_scene_path = "res://scenes/ui/main_menu.tscn"
 
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_b1x3f")

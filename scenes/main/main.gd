@@ -37,7 +37,7 @@ func _ready():
 		printerr("No song selected, defaulting to first song in list.")
 		var songs = song_manager.get_song_list()
 		if songs.size() > 0:
-			selected_song = songs[0]
+			selected_song = songs[1]
 		else:
 			printerr("SongManager に楽曲がありません。")
 			return
