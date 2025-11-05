@@ -9,6 +9,7 @@ const WORLD_SPEED = 5.0
 var player
 var debug_ui
 var note_counts = []
+var song_manager_node
 
 @onready var midi_player = $MidiPlayer
 
@@ -27,20 +28,23 @@ func _ready():
 		printerr("debug_ui_scene が未設定です")
 
 	# Setup MidiPlayer
-	var song_manager = get_node_or_null(song_manager_path)
-	if song_manager == null:
+	song_manager_node = get_node_or_null(song_manager_path)
+	if song_manager_node == null:
 		printerr("SongManager が見つかりません: ", song_manager_path)
 		return
 
-	var selected_song = song_manager.get_selected_song()
+	var selected_song = song_manager_node.get_selected_song()
 	if selected_song.is_empty():
 		printerr("No song selected, defaulting to first song in list.")
-		var songs = song_manager.get_song_list()
+		var songs = song_manager_node.get_song_list()
 		if songs.size() > 0:
 			selected_song = songs[1]
+			song_manager_node.select_song(selected_song)
 		else:
 			printerr("SongManager に楽曲がありません。")
 			return
+	else:
+		song_manager_node.select_song(selected_song)
 
 	if midi_soundfont_path != "":
 		midi_player.soundfont = midi_soundfont_path
@@ -50,6 +54,10 @@ func _ready():
 	midi_player.midi_event.connect(_on_midi_event)
 	midi_player.finished.connect(_on_midi_player_finished)
 	midi_player.play()
+
+	if debug_ui and song_manager_node:
+		var growth_curve = song_manager_node.get_growth_curve()
+		debug_ui.update_growth_curve(growth_curve)
 
 	player = get_node("Player")
 	player.hp_changed.connect(_on_player_hp_changed)
@@ -140,6 +148,8 @@ func _unhandled_input(event):
 	if Input.is_action_just_pressed("debug_toggle"):
 		if debug_ui:
 			debug_ui.visible = not debug_ui.visible
+			if debug_ui.visible and song_manager_node:
+				debug_ui.update_growth_curve(song_manager_node.get_growth_curve())
 
 func _on_midi_event(channel, event):
 	# We are interested in Note On events
