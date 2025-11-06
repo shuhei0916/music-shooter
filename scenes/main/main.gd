@@ -22,7 +22,6 @@ func _ready():
 	if debug_ui_scene:
 		debug_ui = debug_ui_scene.instantiate()
 		add_child(debug_ui)
-		debug_ui.visible = false
 	else:
 		debug_ui = null
 		printerr("debug_ui_scene が未設定です")
@@ -38,7 +37,7 @@ func _ready():
 		printerr("No song selected, defaulting to first song in list.")
 		var songs = song_manager_node.get_song_list()
 		if songs.size() > 0:
-			selected_song = songs[1]
+			selected_song = songs[0]
 			song_manager_node.select_song(selected_song)
 		else:
 			printerr("SongManager に楽曲がありません。")
@@ -136,7 +135,7 @@ func _process(delta):
 		get_node("GameUI").update_progress(current_time, total_time, current_ticks, total_ticks)
 
 	# Update debug UI if visible
-	if debug_ui and debug_ui.visible:
+	if debug_ui and debug_ui.is_ui_visible():
 		for i in range(16):
 			var channel_status = midi_player.channel_status[i]
 			debug_ui.update_track_data(i, channel_status.instrument_name, note_counts[i])
@@ -147,8 +146,8 @@ func _unhandled_input(event):
 		get_tree().quit()
 	if Input.is_action_just_pressed("debug_toggle"):
 		if debug_ui:
-			debug_ui.visible = not debug_ui.visible
-			if debug_ui.visible and song_manager_node:
+			debug_ui.toggle_ui()
+			if debug_ui.is_ui_visible() and song_manager_node:
 				debug_ui.update_growth_curve(song_manager_node.get_growth_curve())
 
 func _on_midi_event(channel, event):

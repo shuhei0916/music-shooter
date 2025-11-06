@@ -1,48 +1,19 @@
 [gd_scene load_steps=3 format=3 uid="uid://b1x2y304a5b6c"]
 
 [ext_resource type="Script" uid="uid://4rnrhv1y8c3y" path="res://scenes/ui/debug_midi_ui.gd" id="1_abcde"]
-[ext_resource type="Script" path="res://scenes/ui/components/growth_curve_graph.gd" id="2_growth_graph"]
+[ext_resource type="Script" uid="uid://6e17bq5tjewu" path="res://scenes/ui/components/growth_curve_graph.gd" id="2_growth_graph"]
 
-[node name="DebugMidiUi" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="DebugMidiUi" type="CanvasLayer"]
 script = ExtResource("1_abcde")
 
-[node name="Panel" type="Panel" parent="."]
-layout_mode = 0
-offset_right = 400.0
-offset_bottom = 500.0
+[node name="TrackInfoContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(320, 200)
 
-[node name="MarginContainer" type="MarginContainer" parent="Panel"]
-layout_mode = 1
-anchors_preset = 15
+[node name="GrowthCurveGraph" type="Control" parent="."]
+custom_minimum_size = Vector2(320, 200)
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="Content" type="VBoxContainer" parent="Panel/MarginContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 10
-
-[node name="TrackInfoContainer" type="VBoxContainer" parent="Panel/MarginContainer/Content"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 1
-
-[node name="GrowthCurveGraph" type="Control" parent="Panel/MarginContainer/Content"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 160)
-size_flags_horizontal = 3
-size_flags_vertical = 3
+grow_horizontal = 0
 script = ExtResource("2_growth_graph")
