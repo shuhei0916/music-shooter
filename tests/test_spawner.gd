@@ -34,7 +34,7 @@ func _set_rand_sources(rand_values := [], randi_values := []):
 			return min_val
 		return randi_queue.pop_front()
 
-func test_spawn_enemy_emits_expected_properties():
+func test_敵スポーンは指定レーン位置とhpを通知する():
 	_set_rand_sources([], [2, 12]) # lane index 2 (right), hp 12
 	spawner.spawn_enemy()
 	assert_eq(1, emitted.size())
@@ -44,7 +44,7 @@ func test_spawn_enemy_emits_expected_properties():
 	assert_eq(Vector3((2 - 1) * 3, 1, -40), props["position"])
 	assert_eq(12, props["hp"])
 
-func test_spawn_gate_row_emits_three_gates():
+func test_ゲート列スポーンは3レーン分を通知する():
 	_set_rand_sources([0.7, 0.7, 0.7], [10, 11, 12]) # all add gates with deterministic values
 	spawner.spawn_gate_row()
 	assert_eq(3, emitted.size())
@@ -56,7 +56,7 @@ func test_spawn_gate_row_emits_three_gates():
 		assert_eq("add", props["type"])
 		assert_eq(10 + i, props["value"])
 
-func test_full_row_enemy_triggered_on_interval():
+func test_4回目のスポーン処理で3レーン敵を出す():
 	_set_rand_sources([0.8], [9, 10, 11]) # one randf for deciding enemy row, randi for hp
 	spawner.spawn_counter = 3 # so after increment it becomes 4
 	spawner._on_spawn_timer_timeout()
@@ -66,7 +66,7 @@ func test_full_row_enemy_triggered_on_interval():
 		assert_eq(Vector3((i - 1) * 3, 1, -40), props["position"])
 	assert_eq([9, 10, 11], emitted.map(func(record): return record["properties"]["hp"]))
 
-func test_non_interval_gate_spawns_full_row():
+func test_確率判定でゲートを選ぶと3レーンゲートを出す():
 	_set_rand_sources([0.3, 0.6, 0.6, 0.6], [15, 16, 17]) 
 	# First randf selects gate row because 0.3 <= 0.5, remaining for gate types (3 calls)
 	spawner.spawn_counter = 1
@@ -75,7 +75,7 @@ func test_non_interval_gate_spawns_full_row():
 	var types = emitted.map(func(record): return record["properties"]["type"])
 	assert_eq(["add", "add", "add"], types)
 
-func test_non_interval_enemy_spawns_single_enemy():
+func test_確率判定で敵を選ぶと単一レーン敵を出す():
 	_set_rand_sources([0.9], [1, 25]) # lane, hp
 	spawner.spawn_counter = 1
 	spawner._on_spawn_timer_timeout()
