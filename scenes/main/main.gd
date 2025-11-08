@@ -162,4 +162,4 @@ func _on_midi_event(channel, event):
 		if ch_num >= 0 and ch_num < 16:
 			note_counts[ch_num] += 1
 		# Keep the print for now, it's still useful
-		# print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
+		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
