@@ -5,6 +5,9 @@ signal spawn_object(object_scene, properties)
 @export var enemy_scene: PackedScene
 @export var gate_scene: PackedScene
 
+@onready var anchor_root: Node3D = $AnchorRoot
+@onready var spawn_timer: Timer = $SpawnTimer
+
 const SPAWN_INTERVAL = 2.0
 const SPAWN_DISTANCE = -40.0
 const LANE_WIDTH = 3.0
@@ -13,39 +16,36 @@ const LANE_COUNT = 3
 var randf_provider: Callable
 var randi_range_provider: Callable
 
-var spawn_timer: Timer
-
 func _init():
 	randf_provider = Callable(self, "_default_randf")
 	randi_range_provider = Callable(self, "_default_randi_range")
 
-func _ready():
-	spawn_timer = Timer.new()
-	spawn_timer.name = "SpawnTimer"
-	spawn_timer.wait_time = SPAWN_INTERVAL
-	spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))
-	add_child(spawn_timer)
+#func _ready():
+	# spawn_timer = Timer.new()
+	# spawn_timer.name = "SpawnTimer"
+	# spawn_timer.wait_time = SPAWN_INTERVAL
+	#spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))
+	# add_child(spawn_timer)
 	# Don't start automatically
 
 func start_spawning():
+	print("Starting Spawner...")
+	# print("start", spawn_timer)
 	spawn_timer.start()
-
-func stop_spawning():
-	spawn_timer.stop()
 
 var spawn_counter = 0
 
-func _on_spawn_timer_timeout():
-	spawn_counter += 1
-	
-	# Every 4th spawn, do a full row spawn
-	if spawn_counter % 4 == 0:
-		_spawn_full_row()
-	else:
-		if _randf() > 0.5:
-			spawn_enemy()
-		else:
-			spawn_gate_row()
+# func _on_spawn_timer_timeout():
+# 	spawn_counter += 1
+# 	print("Spawn Timer Timeout: ", spawn_counter)	
+# 	# # Every 4th spawn, do a full row spawn
+# 	# if spawn_counter % 4 == 0:
+# 	# 	_spawn_full_row()
+# 	# else:
+# 	# 	if _randf() > 0.5:
+# 	# 		spawn_enemy()
+# 	# 	else:
+# 	# 		spawn_gate_row()
 
 func spawn_enemy(lane = -1):
 	if lane == -1:
@@ -98,3 +98,8 @@ func _randf():
 
 func _randi_range(min_val, max_val):
 	return randi_range_provider.call(min_val, max_val)
+
+
+func _on_spawn_timer_timeout() -> void:
+	print("Spawn Timer Timeout: ", spawn_counter)
+	# pass # Replace with function body.

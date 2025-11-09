@@ -14,17 +14,14 @@ var song_manager_node
 @onready var midi_player = $MidiPlayer
 
 func _ready():
+	print("hoge")
 	# Setup Note Counts
 	for i in range(16):
 		note_counts.append(0)
 
 	# Setup Debug UI
-	if debug_ui_scene:
-		debug_ui = debug_ui_scene.instantiate()
-		add_child(debug_ui)
-	else:
-		debug_ui = null
-		printerr("debug_ui_scene が未設定です")
+	debug_ui = debug_ui_scene.instantiate()
+	add_child(debug_ui)
 
 	# Setup MidiPlayer
 	song_manager_node = get_node_or_null(song_manager_path)
@@ -62,7 +59,6 @@ func _ready():
 	player.hp_changed.connect(_on_player_hp_changed)
 	player.game_over_signal.connect(_on_game_over)
 	
-
 	# Connect to Spawner
 	var spawner = get_node("Spawner")
 	spawner.spawn_object.connect(_on_spawn_object)

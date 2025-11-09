@@ -31,6 +31,10 @@ script = ExtResource("3_b1x3f")
 enemy_scene = ExtResource("4_a8run")
 gate_scene = ExtResource("5_ouso4")
 
+[node name="SpawnTimer" type="Timer" parent="Spawner"]
+
+[node name="AnchorRoot" type="Node3D" parent="Spawner"]
+
 [node name="MidiPlayer" type="Node" parent="."]
 script = ExtResource("6_blune")
 soundfont = "res://assets/audio/GeneralUser-GS.sf2"
@@ -60,3 +64,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0)
 mesh = SubResource("PlaneMesh_ground")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
+
+[connection signal="timeout" from="Spawner/SpawnTimer" to="Spawner" method="_on_spawn_timer_timeout"]
