@@ -101,5 +101,6 @@ func _randi_range(min_val, max_val):
 
 
 func _on_spawn_timer_timeout() -> void:
-	print("Spawn Timer Timeout: ", spawn_counter)
+	pass
+	#print("Spawn Timer Timeout: ", spawn_counter)
 	# pass # Replace with function body.
