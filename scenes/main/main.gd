@@ -17,6 +17,12 @@ var spawn_counter = 0
 @onready var anchor_root: Node3D = $Spawner/AnchorRoot
 @export var gate_scene: PackedScene
 
+func _get_spawn_counter():
+	return spawn_counter
+
+func _set_spawn_counter(val):
+	spawn_counter = val
+
 func _ready():
 	$Spawner/SpawnTimer.start()
 	
@@ -29,6 +35,7 @@ func _on_player_entered_gate(gate_type, value, gate_node):
 
 func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
+	hoge()
 	if spawn_counter % 5 == 0:
 		gate_spawn()
 	else:
@@ -40,3 +47,6 @@ func gate_spawn():
 		gate.global_transform = marker.global_transform
 		add_child(gate)
 	print("Gate spawned!")
+
+func hoge():
+	print('hoge')

@@ -27,7 +27,6 @@ mesh = SubResource("BoxMesh_gate")
 
 [node name="Label3D" type="Label3D" parent="Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
-billboard = 1
 text = "+10"
 font_size = 128
 
