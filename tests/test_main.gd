@@ -28,6 +28,7 @@ func test_5回に1回ゲートがスポーンする():
 func test_Playerとゲートが衝突するとゲートが消滅する():
 	var gate = preload("res://scenes/objects/gate/gate.tscn").instantiate()
 	var player = preload("res://scenes/characters/player/player.tscn").instantiate()
+	gate.player_entered_gate.connect(player._on_gate_entered)
 	gate._on_body_entered(player)
 	assert_true(gate.is_queued_for_deletion())
 
@@ -37,5 +38,6 @@ func test_Playerとゲートが衝突するとPlayerのHPが変化する():
 	gate.value = 5
 	var player = preload("res://scenes/characters/player/player.tscn").instantiate()
 	player.hp = 10
+	gate.player_entered_gate.connect(player._on_gate_entered)
 	gate._on_body_entered(player)
 	assert_eq(15, player.hp)

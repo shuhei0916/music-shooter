@@ -29,7 +29,6 @@ gate_scene = ExtResource("5_ouso4")
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_b1x3f")
 gate_scene = ExtResource("5_ouso4")
-spawn_parent_path = NodePath("..")
 
 [node name="SpawnTimer" type="Timer" parent="Spawner"]
 

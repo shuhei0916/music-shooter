@@ -22,5 +22,3 @@ func _process(delta: float) -> void:
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
 	
-func _on_player_entered_gate(gate_type, value, gate_node):
-	player.apply_gate_effect(gate_type, value)

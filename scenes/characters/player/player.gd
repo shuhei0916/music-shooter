@@ -63,3 +63,8 @@ func take_damage(damage):
 func game_over():
 	print("GAME OVER")
 	emit_signal("game_over_signal")
+
+func _on_gate_entered(gate_type: String, value: int, gate_node: Node) -> void:
+	apply_gate_effect(gate_type, value)
+	if is_instance_valid(gate_node):
+		gate_node.queue_free()
