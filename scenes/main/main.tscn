@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=11 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://scenes/main/main.gd" id="1_hujxm"]
 [ext_resource type="PackedScene" uid="uid://d3w4w5g6h7j8h" path="res://scenes/ui/game_ui.tscn" id="2_yyfjg"]
+[ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://scenes/components/spawner.gd" id="3_b1x3f"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://scenes/objects/gate/gate.tscn" id="5_ouso4"]
 [ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="6_blune"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="7_th5th"]
@@ -26,6 +27,9 @@ gate_scene = ExtResource("5_ouso4")
 [node name="GameUI" parent="." instance=ExtResource("2_yyfjg")]
 
 [node name="Spawner" type="Node" parent="."]
+script = ExtResource("3_b1x3f")
+gate_scene = ExtResource("5_ouso4")
+spawn_parent_path = NodePath("..")
 
 [node name="SpawnTimer" type="Timer" parent="Spawner"]
 
@@ -70,5 +74,4 @@ mesh = SubResource("PlaneMesh_ground")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 
-[connection signal="timeout" from="Spawner/SpawnTimer" to="." method="_on_spawn_timer_timeout"]
 [connection signal="timeout" from="Spawner/SpawnTimer" to="Spawner" method="_on_spawn_timer_timeout"]
