@@ -53,6 +53,11 @@
 - **1テストケースにつき1アサーション** を原則とする。  
 - **1サイクルにつき1コミット**。  
 - コミットは **Conventional Commits** に従うこと。  
+- コードを書く際は、シンプルな実装を心がけ、ガード過多なif文などを不用意に書かない。
+- 必要に応じて、下記のチュートリアルプロジェクトを参考にする：
+	- /home/shuhei0916/c/projects/GodotProjects/dodge_the_creeps
+	- /home/shuhei0916/c/projects/GodotProjects/squash_the_creeps_start_1.1.0
+
 
 ---
 

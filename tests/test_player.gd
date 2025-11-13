@@ -31,3 +31,8 @@ func test_Playerとゲートが衝突するとPlayerのHPが変化する():
 	player.hp = 10
 	gate._on_body_entered(player)
 	assert_eq(15, player.hp)
+
+func test_HPが変化するとHPLabelも更新される():
+	player.hp = 7
+	var label: Label3D = player.get_node("HPLabel")
+	assert_eq("7", label.text)
