@@ -13,12 +13,15 @@ var song_manager_node
 @onready var player = $Player
 @onready var midi_player = $MidiPlayer
 @onready var spawner = $Spawner
+@onready var spawn_timer = $Spawner/SpawnTimer
 
-func _ready():
-	if spawner:
-		spawner.start()
+func _ready():	
+	spawn_timer.start()
 	
 func _process(delta: float) -> void:
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, WORLD_SPEED * delta))
-	
+
+func _on_spawner_gate_spawned(gate: Variant) -> void:
+	if gate.has_signal("player_entered_gate"):
+		gate.player_entered_gate.connect(player._on_gate_entered)
