@@ -22,7 +22,6 @@ size = Vector2(10, 100)
 script = ExtResource("1_hujxm")
 debug_ui_scene = ExtResource("8_debugui")
 midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
-gate_scene = ExtResource("5_ouso4")
 
 [node name="GameUI" parent="." instance=ExtResource("2_yyfjg")]
 

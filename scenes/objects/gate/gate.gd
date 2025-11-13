@@ -12,6 +12,7 @@ func _on_body_entered(body):
 	print("hit")
 	if body.is_in_group("player"):
 		emit_signal("player_entered_gate", gate_type, value, self)
+	queue_free()
 
 func set_gate_properties(type, val):
 	gate_type = type

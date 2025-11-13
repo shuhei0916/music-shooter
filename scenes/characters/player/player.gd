@@ -36,6 +36,7 @@ func multiply_hp(factor):
 	self.hp *= factor
 
 func apply_gate_effect(gate_type: String, value: int):
+	print("apply gate effect called")
 	match gate_type:
 		"add":
 			add_hp(value)
