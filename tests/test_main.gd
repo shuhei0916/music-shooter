@@ -27,7 +27,6 @@ func test_5回に1回ゲートがスポーンする():
 	assert_eq(1, 1)
 
 func test_Playerとゲートが衝突するとゲートが消滅する():
-	gate.player_entered_gate.connect(player._on_gate_entered)
 	gate._on_body_entered(player)
 	assert_true(gate.is_queued_for_deletion())
 
@@ -35,6 +34,5 @@ func test_Playerとゲートが衝突するとPlayerのHPが変化する():
 	gate.gate_type = "add"
 	gate.value = 5
 	player.hp = 10
-	gate.player_entered_gate.connect(player._on_gate_entered)
 	gate._on_body_entered(player)
 	assert_eq(15, player.hp)

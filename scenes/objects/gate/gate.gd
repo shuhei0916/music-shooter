@@ -1,17 +1,16 @@
 extends Area3D
 
-signal player_entered_gate(gate_type, value, gate_node)
-
 @export var gate_type: String = "add" # "add", "multiply"
 @export var value: int = 1
 
 func _ready():
 	update_label()
 
-func _on_body_entered(body):
-	print("hit")
-	if body.is_in_group("player"):
-		emit_signal("player_entered_gate", gate_type, value, self)
+func _on_body_entered(body: Node) -> void:
+	if not body:
+		return
+	if body.is_in_group("player") and body.has_method("apply_gate_effect"):
+		body.apply_gate_effect(gate_type, value)
 	queue_free()
 
 func set_gate_properties(type, val):

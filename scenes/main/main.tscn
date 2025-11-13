@@ -72,5 +72,4 @@ mesh = SubResource("PlaneMesh_ground")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 
-[connection signal="gate_spawned" from="Spawner" to="." method="_on_spawner_gate_spawned"]
 [connection signal="timeout" from="Spawner/SpawnTimer" to="Spawner" method="_on_spawn_timer_timeout"]
