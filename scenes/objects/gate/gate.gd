@@ -13,11 +13,6 @@ func _on_body_entered(body: Node) -> void:
 		body.apply_gate_effect(gate_type, value)
 	queue_free()
 
-func set_gate_properties(type, val):
-	gate_type = type
-	value = val
-	update_label()
-
 func update_label():
 	var label = get_node("Pivot/Label3D")
 	if label:
