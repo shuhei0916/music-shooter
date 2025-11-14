@@ -36,10 +36,8 @@ func clamp_horizontal_position():
 	position.x = clamp(position.x, horizontal_limit_min, horizontal_limit_max)
 
 func take_damage(damage):
-	if hp > damage:
-		self.hp -= damage
-	else:
-		self.hp = 0
+	self.hp -= damage
+	if self.hp <= 0:
 		game_over()
 
 func game_over():
@@ -48,3 +46,7 @@ func game_over():
 
 func _update_hp_label() -> void:
 	$HPLabel.text = str(hp)
+
+func _on_enemy_collided(enemy: Node) -> void:
+	take_damage(enemy.hp)
+	enemy.queue_free()

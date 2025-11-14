@@ -36,3 +36,12 @@ func test_HPが変化するとHPLabelも更新される():
 	player.hp = 7
 	var label: Label3D = player.get_node("HPLabel")
 	assert_eq("7", label.text)
+
+func test_敵HP7と衝突するとPlayerのHPは3になり敵は消滅する():
+	var enemy = preload("res://scenes/characters/enemy/enemy.tscn").instantiate()
+	add_child_autofree(enemy)
+	player.hp = 10
+	enemy.hp = 7
+	player._on_enemy_collided(enemy)
+	assert_eq(3, player.hp)
+	assert_true(enemy.is_queued_for_deletion())
