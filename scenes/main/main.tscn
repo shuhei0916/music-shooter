@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=12 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://scenes/main/main.gd" id="1_hujxm"]
 [ext_resource type="PackedScene" uid="uid://d3w4w5g6h7j8h" path="res://scenes/ui/game_ui.tscn" id="2_yyfjg"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="6_blune"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="7_th5th"]
 [ext_resource type="PackedScene" uid="uid://b1x2y304a5b6c" path="res://scenes/ui/debug_midi_ui.tscn" id="8_debugui"]
+[ext_resource type="PackedScene" uid="uid://cuecnhmhkeac" path="res://scenes/characters/enemy/enemy.tscn" id="9_enemy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -28,6 +29,8 @@ midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_b1x3f")
 gate_scene = ExtResource("5_ouso4")
+enemy_scene = ExtResource("9_enemy")
+enemy_spawn_probability = 0.2
 
 [node name="SpawnTimer" type="Timer" parent="Spawner"]
 
