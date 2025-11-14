@@ -48,5 +48,7 @@ func _update_hp_label() -> void:
 	$HPLabel.text = str(hp)
 
 func _on_enemy_collided(enemy: Node) -> void:
+	var player_hp_before = hp
+	
 	take_damage(enemy.hp)
-	enemy.queue_free()
+	enemy.take_damage(player_hp_before)

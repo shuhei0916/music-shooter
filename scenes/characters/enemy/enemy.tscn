@@ -21,7 +21,7 @@ shape = SubResource("CapsuleShape3D_enemy")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_enemy")
 
-[node name="Label3D" type="Label3D" parent="."]
+[node name="HPLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
 text = "5"
