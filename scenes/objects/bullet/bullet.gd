@@ -1,3 +1,4 @@
+class_name Bullet
 extends Area3D
 
 var speed = 30.0

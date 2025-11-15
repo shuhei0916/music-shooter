@@ -9,8 +9,7 @@ height = 0.2
 [sub_resource type="SphereShape3D" id="SphereShape3D_55x2g"]
 radius = 0.1
 
-[node name="Bullet" type="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+[node name="Bullet" type="Area3D" groups=["bullet"]]
 collision_layer = 2
 collision_mask = 8
 script = ExtResource("1_ds4j2")

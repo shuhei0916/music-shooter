@@ -6,12 +6,18 @@ extends CharacterBody3D
 
 signal game_over_signal
 
+var bullet_container: Node
 var hp = 1:
 	set(value):
 		hp = value
 		_update_hp_label()
 
 const SPEED = 5.0
+
+func _ready() -> void:
+	bullet_container = get_parent()
+	#if bullet_container == null:
+		#bullet_container = get_tree().current_scene if get_tree().current_scene else get_parent()
 
 func _physics_process(delta):
 	var direction = Input.get_axis("ui_left", "ui_right")
@@ -52,3 +58,12 @@ func _on_enemy_collided(enemy: Node) -> void:
 	
 	take_damage(enemy.hp)
 	enemy.take_damage(player_hp_before)
+
+func shoot():
+	var bullet = bullet_scene.instantiate()
+	bullet.global_transform = global_transform
+	#var container = bullet_container if bullet_container else get_parent()
+	bullet_container.add_child(bullet)
+
+func _on_shoot_timer_timeout() -> void:
+	shoot()

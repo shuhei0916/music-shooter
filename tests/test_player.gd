@@ -63,3 +63,14 @@ func test_Playerと敵のHPが等しいときはどちらも消滅する():
 	assert_true(player.hp <= 0)
 	assert_true(enemy.hp <= 0)
 	
+func test_shootが呼ばれると弾丸がシーンに追加される():
+	var bullet_parent = Node3D.new()
+	add_child_autofree(bullet_parent)
+	
+	player.bullet_container = bullet_parent
+	player.shoot()
+	
+	var bullets = bullet_parent.get_children()
+	assert_eq(1, bullets.size())
+	assert_true(bullets[0].is_in_group("bullet"))
+	
