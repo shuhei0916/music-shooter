@@ -10,7 +10,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_abcde")
-scene_manager_path = NodePath("/root/SceneManager")
 main_menu_scene_path = "res://scenes/ui/main_menu.tscn"
 
 [node name="SongProgressLabel" type="Label" parent="."]
@@ -23,7 +22,7 @@ offset_top = 10.0
 offset_right = 150.0
 offset_bottom = 33.0
 grow_horizontal = 2
-text = "00:00/00:00, 0/0 ticks"
+text = "00:00/00:00"
 horizontal_alignment = 1
 
 [node name="ResultPanel" type="Panel" parent="."]
