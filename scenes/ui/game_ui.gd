@@ -13,23 +13,20 @@ func _ready():
 func _process(delta):
 	pass
 
-func show_result(is_win):
+func show_result(is_win: bool):
 	result_panel.visible = true
-	if is_win:
-		result_label.text = "Run Completed!"
-	else:
-		result_label.text = "Game Over"
+	result_label.text = "Run Completed!" if is_win else "Game Over"
 	
 	# Stop the spawner and player
-	var root = get_tree().get_root().get_node("Main")
-	if root:
-		var spawner = root.get_node("Spawner")
-		if spawner:
-			spawner.stop_spawning()
-		
-		var player = root.get_node("Player")
-		if player:
-			player.set_physics_process(false)
+	#var root = get_tree().get_root().get_node_or_null("Main")
+	#if root == null:
+		#return
+	#var spawner = root.get_node_or_null("Spawner")
+	#if spawner:
+		#spawner.stop_spawning()
+	#var player = root.get_node_or_null("Player")
+	#if player:
+		#player.set_physics_process(false)
 
 func _on_new_run_pressed():
 	if main_menu_scene_path == "":

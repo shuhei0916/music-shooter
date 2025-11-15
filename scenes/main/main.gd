@@ -11,7 +11,8 @@ var note_counts = []
 var song_manager_node
 
 @onready var midi_player = $MidiPlayer
-
+@onready var player = $Player
+@onready var game_ui = $GameUI
 
 func _ready():
 	$Spawner/SpawnTimer.start()
@@ -40,8 +41,15 @@ func _update_song_progress():
 
 func _on_player_game_over() -> void:
 	world_speed = 0.0
+	if game_ui:
+		game_ui.show_result(false)
+		
+	$Spawner/SpawnTimer.stop()
+	
+	player.set_physics_process(false)
+	
 
-func _on_midi_event(channel: Variant, event: Variant) -> void:	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
+func _on_midi_event(channel: Variant, event: Variant) -> void:
 	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
 
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
@@ -50,4 +58,4 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:	if event.type == 
 		
 		print("MIDI Event: Channel %d (%s), Note: %d, Velocity: %d" % [ch_num, channel_status.track_name, event.note, event.velocity])
 		if ch_num == 9:
-			$Player.shoot()
+			player.shoot()
