@@ -4,7 +4,7 @@ extends Node3D
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var song_manager_path: NodePath = NodePath("/root/SongManager")
 @export var utils_path: NodePath = NodePath("/root/Utils")
-@export var world_speed: float = 5.0
+@export var world_speed: float
 
 var debug_ui
 var note_counts = []
@@ -15,7 +15,8 @@ var song_manager_node
 @onready var game_ui = $GameUI
 
 func _ready():
-	$Spawner/SpawnTimer.start()
+	world_speed = 0.0
+	$StartTimer.start()
 	
 func _process(delta: float) -> void:
 	for obj in get_tree().get_nodes_in_group("world_objects"):
@@ -44,6 +45,11 @@ func _on_midi_finished() -> void:
 	game_ui.show_result(true)
 	$Spawner/SpawnTimer.stop()
 	midi_player.stop()
+
+func _on_start_timer_timeout() -> void:
+	world_speed = 5.0
+	$Spawner/SpawnTimer.start()
+	$MidiPlayer.play()
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and $GameUI/ResultPanel.visible:
