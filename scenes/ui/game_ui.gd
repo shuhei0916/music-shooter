@@ -24,6 +24,9 @@ func update_progress(current_time, total_time):
 	]
 	$SongProgressLabel.text = str(time_str)
 
+func update_countdown(text: String) -> void:
+	$SongProgressLabel.text = text
+
 func format_seconds_to_string(seconds: float) -> String:
 	var minutes = int(seconds) / 60
 	var secs = int(seconds) % 60

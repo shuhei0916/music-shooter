@@ -4,7 +4,8 @@ extends Node3D
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var song_manager_path: NodePath = NodePath("/root/SongManager")
 @export var utils_path: NodePath = NodePath("/root/Utils")
-@export var world_speed: float
+@export var world_speed: float = 5.0
+@export var initial_world_speed: float = 5.0
 
 var debug_ui
 var note_counts = []
@@ -17,6 +18,7 @@ var song_manager_node
 func _ready():
 	world_speed = 0.0
 	$StartTimer.start()
+	_update_song_progress()
 	
 func _process(delta: float) -> void:
 	for obj in get_tree().get_nodes_in_group("world_objects"):
@@ -47,15 +49,25 @@ func _on_midi_finished() -> void:
 	midi_player.stop()
 
 func _on_start_timer_timeout() -> void:
-	world_speed = 5.0
+	world_speed = initial_world_speed
 	$Spawner/SpawnTimer.start()
-	$MidiPlayer.play()
+	midi_player.play()
+	$StartTimer.stop()
+	game_ui.update_countdown("")
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and $GameUI/ResultPanel.visible:
 		get_tree().reload_current_scene() # This restarts the current scene.
 		
 func _update_song_progress():
+	if not $StartTimer.is_stopped():
+		var remaining = int(ceil($StartTimer.time_left))
+		if remaining > 0:
+			game_ui.update_countdown(str(remaining))
+		else:
+			game_ui.update_countdown("")
+		return
+	
 	if not (midi_player.playing and midi_player.smf_data):
 		return
 		
