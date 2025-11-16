@@ -78,5 +78,6 @@ mesh = SubResource("PlaneMesh_ground")
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 
 [connection signal="timeout" from="Spawner/SpawnTimer" to="Spawner" method="_on_spawn_timer_timeout"]
+[connection signal="finished" from="MidiPlayer" to="." method="_on_midi_finished"]
 [connection signal="midi_event" from="MidiPlayer" to="." method="_on_midi_event"]
 [connection signal="game_over_signal" from="Player" to="." method="_on_player_game_over"]

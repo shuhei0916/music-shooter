@@ -64,6 +64,3 @@ func shoot():
 	bullet.global_transform = global_transform
 	#var container = bullet_container if bullet_container else get_parent()
 	bullet_container.add_child(bullet)
-
-func _on_shoot_timer_timeout() -> void:
-	shoot()

@@ -27,8 +27,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
 text = "1"
 font_size = 128
-
-[node name="ShootTimer" type="Timer" parent="."]
-autostart = true
-
-[connection signal="timeout" from="ShootTimer" to="." method="_on_shoot_timer_timeout"]

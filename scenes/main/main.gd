@@ -39,6 +39,12 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		if ch_num == 9:
 			player.shoot()
 
+func _on_midi_finished() -> void:
+	world_speed = 0.0
+	game_ui.show_result(true)
+	$Spawner/SpawnTimer.stop()
+	midi_player.stop()
+
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and $GameUI/ResultPanel.visible:
 		get_tree().reload_current_scene() # This restarts the current scene.

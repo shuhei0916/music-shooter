@@ -30,3 +30,11 @@ func test_game_overするとリザルト画面が表示される():
 	assert_false(game_ui.result_panel.visible)
 	main.player.game_over()
 	assert_true(game_ui.result_panel.visible)
+
+func test_完奏すると勝利パネルが表示される():
+	await get_tree().process_frame
+	var game_ui = main.get_node("GameUI")
+	assert_false(game_ui.result_panel.visible)
+	main._on_midi_finished()
+	assert_true(game_ui.result_panel.visible)
+	assert_true(game_ui.result_label.text.begins_with("Run Completed"))
