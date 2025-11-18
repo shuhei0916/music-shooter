@@ -13,7 +13,7 @@ config_version=5
 config/name="music-shooter"
 run/main_scene="uid://dllqgs6rewvnf"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://bh3st6iox5yj2"
 
 [autoload]
 
