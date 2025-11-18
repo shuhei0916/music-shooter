@@ -16,6 +16,6 @@ func after_each():
 	gate.free()
 	player.free()
 
-func test_プレイヤーとゲートが衝突するとゲートが消滅する():
+func test_プレイヤーと衝突するとゲートが消滅する():
 	gate._on_body_entered(player)
 	assert_true(gate.is_queued_for_deletion())

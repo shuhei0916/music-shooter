@@ -62,5 +62,4 @@ func _on_enemy_collided(enemy: Node) -> void:
 func shoot():
 	var bullet = bullet_scene.instantiate()
 	bullet.global_transform = global_transform
-	#var container = bullet_container if bullet_container else get_parent()
 	bullet_container.add_child(bullet)

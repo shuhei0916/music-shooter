@@ -19,7 +19,9 @@ func set_hp(new_hp):
 	update_label()
 
 func update_label():
-	$HPLabel.text = str(hp)
+	var label := get_node_or_null("HPLabel")
+	if label:
+		label.text = str(hp)
 
 func take_damage(damage):
 	hp -= damage
