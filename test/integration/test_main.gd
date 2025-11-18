@@ -1,7 +1,5 @@
 extends GutTest
 
-const MAIN_SCENE := preload("res://scenes/main/main.tscn")
-
 var main
 
 func before_each():
