@@ -35,8 +35,6 @@ func apply_gate_effect(gate_type: String, value: int):
 			self.hp += value
 		"multiply":
 			self.hp *= value
-		_:
-			printerr("Unknown gate_type: ", gate_type)
 
 func clamp_horizontal_position():
 	position.x = clamp(position.x, horizontal_limit_min, horizontal_limit_max)
@@ -51,7 +49,9 @@ func game_over():
 	emit_signal("game_over_signal")
 
 func _update_hp_label() -> void:
-	$HPLabel.text = str(hp)
+	var label := get_node_or_null("HPLabel")
+	if label:
+		label.text = str(hp)
 
 func _on_enemy_collided(enemy: Node) -> void:
 	var player_hp_before = hp

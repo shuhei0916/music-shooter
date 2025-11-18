@@ -9,9 +9,9 @@ func _ready():
 func _on_body_entered(body: Node) -> void:
 	if not body:
 		return
-	if body.is_in_group("player") and body.has_method("apply_gate_effect"):
+	if body.is_in_group("player"):
 		body.apply_gate_effect(gate_type, value)
-	queue_free()
+		queue_free()
 
 func update_label():
 	var label = get_node("Pivot/Label3D")
