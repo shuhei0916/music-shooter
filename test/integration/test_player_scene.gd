@@ -17,6 +17,7 @@ func before_each():
 func after_each():
 	player.free()
 	
+# 単体テストへの切り出しに失敗。とりあえずここに残している。
 func test_shootが呼ばれると弾丸がシーンに追加される():
 	var bullet_parent = Node3D.new()
 	add_child_autofree(bullet_parent)
@@ -28,6 +29,7 @@ func test_shootが呼ばれると弾丸がシーンに追加される():
 	assert_eq(1, bullets.size())
 	assert_true(bullets[0].is_in_group("bullet"))
 
+# test_enemyへ移行予定。
 func test_弾丸と敵が衝突すると敵にダメージが入る():
 	var bullet = preload("res://scenes/objects/bullet/bullet.tscn").instantiate()
 	add_child_autofree(bullet)

@@ -39,6 +39,7 @@ func _set_gate_properties(gate: Node) -> void:
 
 func _maybe_spawn_enemy() -> void:
 	if enemy_scene == null:
+		print("hogehoge")
 		return
 	if randf() < enemy_spawn_probability:
 		_spawn_enemy()
@@ -50,8 +51,14 @@ func _spawn_enemy() -> void:
 	main_scene.add_child(enemy)
 
 func _pick_random_marker() -> Marker3D:
-	return markers[randi() % markers.size()]
+	if markers:
+		return markers[randi() % markers.size()]
+	else:
+		return null
 
 func _set_enemy_properties(enemy: Node) -> void:
 	var value = randi_range(enemy_hp_min, enemy_hp_max)
 	enemy.hp = value
+	
+func _hoge():
+	print("hgoe")

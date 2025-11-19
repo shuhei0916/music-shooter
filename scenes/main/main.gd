@@ -16,11 +16,6 @@ var song_manager_node
 @onready var game_ui = $GameUI
 
 func _ready():
-	if Engine.is_editor_hint():
-		print("this code is executed in editor.")
-	else:
-		print("hogehoge")
-	
 	world_speed = 0.0
 	$StartTimer.start()
 	_update_song_progress()
