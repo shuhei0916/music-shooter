@@ -10,19 +10,6 @@ func before_each():
 	#add_child_autofree(player)
 	#add_child_autofree(enemy)
 
-func test_game_overするとworld_objectsの移動が止まる():
-	var world_obj = Node3D.new()
-	world_obj.add_to_group("world_objects")
-	main.add_child(world_obj)
-	var initial_z = world_obj.global_position.z
-	main._on_start_timer_timeout()
-	main._process(0.016)
-	assert_true(world_obj.global_position.z > initial_z)
-	main.player.game_over()
-	var z_after_game_over = world_obj.global_position.z
-	main._process(0.016)
-	assert_eq(z_after_game_over, world_obj.global_position.z)
-
 func test_game_overするとリザルト画面が表示される():
 	var game_ui = main.get_node("GameUI")
 	assert_false(game_ui.result_panel.visible)

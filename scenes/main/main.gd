@@ -11,21 +11,25 @@ var debug_ui
 var note_counts = []
 var song_manager_node
 
-@onready var midi_player = $MidiPlayer
-@onready var player = $Player
-@onready var game_ui = $GameUI
+@onready var midi_player = get_node_or_null("MidiPlayer")
+@onready var player = get_node_or_null("Player")
+@onready var game_ui = get_node_or_null("GameUI")
+@onready var start_timer = get_node_or_null("StartTimer")
 
 func _ready():
 	world_speed = 0.0
-	$StartTimer.start()
-	_update_song_progress()
+	if start_timer:
+		start_timer.start()
+	#_update_song_progress()
 	
 func _process(delta: float) -> void:
+	_move_world_objects(delta)
+	_update_song_progress()
+	
+func _move_world_objects(delta: float):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, world_speed * delta))
 	
-	_update_song_progress()
-
 func _on_player_game_over() -> void:
 	world_speed = 0.0
 	game_ui.show_result(false)
@@ -60,7 +64,7 @@ func _unhandled_input(event):
 		get_tree().reload_current_scene() # This restarts the current scene.
 		
 func _update_song_progress():
-	if not $StartTimer.is_stopped():
+	if not start_timer.is_stopped():
 		var remaining = int(ceil($StartTimer.time_left))
 		if remaining > 0:
 			game_ui.update_countdown(str(remaining))
