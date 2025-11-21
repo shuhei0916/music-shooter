@@ -2,9 +2,8 @@ extends GutTest
 
 const MainScript = preload("res://scenes/main/main.gd")
 
-var main
-var obj
 var main_double
+var obj
 
 func before_each():
 	main_double = partial_double(MainScript).new()

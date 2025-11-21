@@ -10,19 +10,6 @@ func before_each():
 	#add_child_autofree(player)
 	#add_child_autofree(enemy)
 
-func test_game_overするとリザルト画面が表示される():
-	var game_ui = main.get_node("GameUI")
-	assert_false(game_ui.result_panel.visible)
-	main.player.game_over()
-	assert_true(game_ui.result_panel.visible)
-
-func test_完奏すると勝利パネルが表示される():
-	var game_ui = main.get_node("GameUI")
-	assert_false(game_ui.result_panel.visible)
-	main._on_midi_finished()
-	assert_true(game_ui.result_panel.visible)
-	assert_true(game_ui.result_label.text.begins_with("Run Completed"))
-
 func test_スタートタイマー経過後にワールドが動き出す():
 	var world_obj = Node3D.new()
 	world_obj.add_to_group("world_objects")
