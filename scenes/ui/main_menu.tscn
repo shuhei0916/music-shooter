@@ -1,6 +1,29 @@
-[gd_scene load_steps=2 format=3 uid="uid://d4e5f6g7h8jaj"]
+[gd_scene load_steps=2 format=3 uid="uid://coci4i1lkvaev"]
 
-[ext_resource type="Script" uid="uid://bax0twhbrhhp5" path="res://scenes/ui/main_menu.gd" id="1_mainmenu"]
+[sub_resource type="GDScript" id="GDScript_87aya"]
+script/source = "extends Control
+
+@export var scene_manager_path: NodePath = NodePath(\"/root/SceneManager\")
+@export_file(\"*.tscn\") var stage_select_scene_path: String
+
+func _on_stage_select_button_pressed():
+	# Use get_node to avoid editor errors with new autoloads
+	var scene_manager = get_node_or_null(scene_manager_path)
+	if scene_manager == null:
+		printerr(\"SceneManager が見つかりません: \", scene_manager_path)
+		return
+	if stage_select_scene_path == \"\":
+		printerr(\"stage_select_scene_path が未設定です\")
+		return
+	scene_manager.change_scene(stage_select_scene_path)
+
+func _on_settings_button_pressed():
+	# This button doesn't do anything yet.
+	print(\"Settings button pressed.\")
+
+func _on_exit_button_pressed():
+	get_tree().quit()
+"
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -9,8 +32,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_mainmenu")
-scene_manager_path = NodePath("/root/SceneManager")
+script = SubResource("GDScript_87aya")
 stage_select_scene_path = "res://scenes/levels/stage_select/stage_select.tscn"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]

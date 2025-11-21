@@ -1,13 +1,94 @@
-[gd_scene load_steps=12 format=3 uid="uid://dllqgs6rewvnf"]
+[gd_scene load_steps=14 format=3 uid="uid://dllqgs6rewvnf"]
 
 [ext_resource type="Script" uid="uid://bupdlarvsyf3n" path="res://scenes/main/main.gd" id="1_hujxm"]
+[ext_resource type="Script" uid="uid://6e17bq5tjewu" path="res://scenes/ui/components/growth_curve_graph.gd" id="2_b1x3f"]
 [ext_resource type="PackedScene" uid="uid://d3w4w5g6h7j8h" path="res://scenes/ui/game_ui.tscn" id="2_yyfjg"]
 [ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://scenes/components/spawner.gd" id="3_b1x3f"]
-[ext_resource type="PackedScene" uid="uid://cuecnhmhkeac" path="res://scenes/characters/enemy/enemy.tscn" id="4_a8run"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://scenes/objects/gate/gate.tscn" id="5_ouso4"]
 [ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="6_blune"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="7_th5th"]
-[ext_resource type="PackedScene" uid="uid://b1x2y304a5b6c" path="res://scenes/ui/debug_midi_ui.tscn" id="8_debugui"]
+[ext_resource type="PackedScene" uid="uid://cuecnhmhkeac" path="res://scenes/characters/enemy/enemy.tscn" id="9_enemy"]
+
+[sub_resource type="GDScript" id="GDScript_a8run"]
+script/source = "extends CanvasLayer
+
+# チャンネルごとのラベルを保持
+var channel_labels := []
+@onready var track_info_container: VBoxContainer = $TrackInfoContainer
+@onready var growth_curve_graph: Control = $GrowthCurveGraph
+var growth_curve_points: PackedVector2Array = PackedVector2Array()
+
+func _ready():
+	if track_info_container == null:
+		printerr(\"DebugMidiUi scene needs TrackInfoContainer.\")
+		return
+	if growth_curve_graph == null:
+		printerr(\"DebugMidiUi scene needs GrowthCurveGraph.\")
+		return
+
+	hide_ui()
+
+	for i in range(16):
+		var hbox := HBoxContainer.new()
+		var ch_label := Label.new()
+		ch_label.text = \"Ch %2d:\" % (i + 1)
+		ch_label.set_custom_minimum_size(Vector2(70, 0))
+
+		var name_label := Label.new()
+		name_label.text = \"Instrument Name\"
+		name_label.set_custom_minimum_size(Vector2(200, 0))
+
+		var count_label := Label.new()
+		count_label.text = \"Notes: 0\"
+
+		hbox.add_child(ch_label)
+		hbox.add_child(name_label)
+		hbox.add_child(count_label)
+		track_info_container.add_child(hbox)
+
+		channel_labels.append({
+			\"name\": name_label,
+			\"count\": count_label
+		})
+
+	update_growth_curve(growth_curve_points)
+
+func update_track_data(channel_number: int, instrument_name: String, note_count: int) -> void:
+	if channel_number >= 0 and channel_number < channel_labels.size():
+		var labels = channel_labels[channel_number]
+		labels[\"name\"].text = instrument_name
+		labels[\"count\"].text = \"Notes: \" + str(note_count)
+
+func update_growth_curve(points: PackedVector2Array) -> void:
+	growth_curve_points = points
+	if growth_curve_graph:
+		growth_curve_graph.set_points(points)
+
+func show_ui() -> void:
+	visible = true
+
+func hide_ui() -> void:
+	visible = false
+
+func toggle_ui() -> void:
+	visible = not visible
+
+func is_ui_visible() -> bool:
+	return visible
+"
+
+[sub_resource type="PackedScene" id="PackedScene_ouso4"]
+_bundled = {
+"conn_count": 0,
+"conns": PackedInt32Array(),
+"editable_instances": [],
+"names": PackedStringArray("DebugMidiUi", "CanvasLayer", "script", "TrackInfoContainer", "VBoxContainer", "custom_minimum_size", "GrowthCurveGraph", "Control", "custom_minimum_size", "layout_mode", "anchors_preset", "anchor_left", "anchor_right", "grow_horizontal", "script"),
+"node_count": 3,
+"node_paths": [NodePath("."), NodePath(".")],
+"nodes": PackedInt32Array(-1, -1, 1, 0, -1, 1, 2, 0, 0, 1073741824, 0, 4, 3, -1, 1, 5, 1, 0, 1073741825, 0, 7, 6, -1, 7, 8, 2, 9, 3, 10, 4, 11, 5, 12, 6, 13, 7, 14, 8, 0),
+"variants": [SubResource("GDScript_a8run"), Vector2(320, 200), Vector2(320, 200), 3, 1, 1.0, 1.0, 0, ExtResource("2_b1x3f")],
+"version": 3
+}
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -21,18 +102,33 @@ size = Vector2(10, 100)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_hujxm")
-debug_ui_scene = ExtResource("8_debugui")
+debug_ui_scene = SubResource("PackedScene_ouso4")
 midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
 
 [node name="GameUI" parent="." instance=ExtResource("2_yyfjg")]
 
 [node name="Spawner" type="Node" parent="."]
 script = ExtResource("3_b1x3f")
-enemy_scene = ExtResource("4_a8run")
 gate_scene = ExtResource("5_ouso4")
+enemy_scene = ExtResource("9_enemy")
+enemy_spawn_probability = 0.2
+
+[node name="SpawnTimer" type="Timer" parent="Spawner"]
+
+[node name="AnchorRoot" type="Node3D" parent="Spawner"]
+
+[node name="Lane0" type="Marker3D" parent="Spawner/AnchorRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, -40)
+
+[node name="Lane1" type="Marker3D" parent="Spawner/AnchorRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -40)
+
+[node name="Lane2" type="Marker3D" parent="Spawner/AnchorRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -40)
 
 [node name="MidiPlayer" type="Node" parent="."]
 script = ExtResource("6_blune")
+file = "res://assets/audio/Undertale_-_Megalovania.mid"
 soundfont = "res://assets/audio/GeneralUser-GS.sf2"
 metadata/_custom_type_script = "uid://bwch5nk77teaf"
 
@@ -42,7 +138,7 @@ light_color = Color(1, 0.956863, 0.839216, 1)
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 3)
+transform = Transform3D(1, 0, 0, 0, 0.70710695, 0.70710695, 0, -0.70710695, 0.70710695, 0, 7, 3)
 
 [node name="Player" parent="." instance=ExtResource("7_th5th")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -60,3 +156,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0)
 mesh = SubResource("PlaneMesh_ground")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="Spawner/SpawnTimer" to="Spawner" method="_on_spawn_timer_timeout"]
+[connection signal="finished" from="MidiPlayer" to="." method="_on_midi_finished"]
+[connection signal="midi_event" from="MidiPlayer" to="." method="_on_midi_event"]
+[connection signal="game_over_signal" from="Player" to="." method="_on_player_game_over"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]

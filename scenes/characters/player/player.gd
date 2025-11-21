@@ -4,26 +4,22 @@ extends CharacterBody3D
 @export var horizontal_limit_min: float = -4.0
 @export var horizontal_limit_max: float = 4.0
 
-signal hp_changed(new_hp)
 signal game_over_signal
 
-var character_count = 1:
+var bullet_container: Node
+var hp = 1:
 	set(value):
-		character_count = value
-		emit_signal("hp_changed", character_count)
+		hp = value
+		_update_hp_label()
 
 const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
 
-var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+func _ready() -> void:
+	bullet_container = get_parent()
+	#if bullet_container == null:
+		#bullet_container = get_tree().current_scene if get_tree().current_scene else get_parent()
 
 func _physics_process(delta):
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-
 	var direction = Input.get_axis("ui_left", "ui_right")
 	if direction:
 		velocity.x = direction * SPEED
@@ -33,112 +29,37 @@ func _physics_process(delta):
 	move_and_slide()
 	clamp_horizontal_position()
 
-func add_hp(amount):
-	self.character_count += amount
-
-func multiply_hp(factor):
-	self.character_count *= factor
-
 func apply_gate_effect(gate_type: String, value: int):
 	match gate_type:
 		"add":
-			add_hp(value)
+			self.hp += value
 		"multiply":
-			multiply_hp(value)
-		_:
-			printerr("Unknown gate_type: ", gate_type)
+			self.hp *= value
 
 func clamp_horizontal_position():
-	if horizontal_limit_min > horizontal_limit_max:
-		var temp = horizontal_limit_min
-		horizontal_limit_min = horizontal_limit_max
-		horizontal_limit_max = temp
-	var pos = position
-	pos.x = clamp(pos.x, horizontal_limit_min, horizontal_limit_max)
-	position = pos
+	position.x = clamp(position.x, horizontal_limit_min, horizontal_limit_max)
 
 func take_damage(damage):
-	if character_count > damage:
-		self.character_count -= damage
-	else:
-		self.character_count = 0
+	self.hp -= damage
+	if self.hp <= 0:
 		game_over()
 
 func game_over():
 	print("GAME OVER")
 	emit_signal("game_over_signal")
 
-enum WeaponType { HANDGUN, MELEE, LASER }
+func _update_hp_label() -> void:
+	var label := get_node_or_null("HPLabel")
+	if label:
+		label.text = str(hp)
 
-var enabled_weapons = {
-	WeaponType.HANDGUN: true,
-	WeaponType.MELEE: false,
-	WeaponType.LASER: true
-}
+func _on_enemy_collided(enemy: Node) -> void:
+	var player_hp_before = hp
+	
+	take_damage(enemy.hp)
+	enemy.take_damage(player_hp_before)
 
-func set_weapon_enabled(weapon_type: WeaponType, is_enabled: bool):
-	if enabled_weapons.has(weapon_type):
-		enabled_weapons[weapon_type] = is_enabled
-		print("Weapon %s is now %s" % [WeaponType.keys()[weapon_type], "enabled" if is_enabled else "disabled"])
-	else:
-		printerr("Tried to set status for an unknown weapon type.")
-
-func attack(channel_num):
-	var weapon_type
-	if channel_num == 9:
-		weapon_type = WeaponType.MELEE
-	elif channel_num == 4:
-		weapon_type = WeaponType.HANDGUN
-	elif channel_num >= 10:
-		weapon_type = WeaponType.LASER
-
-	if not enabled_weapons.get(weapon_type, false):
-		return
-
-	match weapon_type:
-		WeaponType.HANDGUN:
-			_attack_handgun()
-		WeaponType.MELEE:
-			_attack_melee()
-		WeaponType.LASER:
-			_attack_laser()
-
-func _attack_handgun():
-	if not bullet_scene:
-		printerr("bullet_scene が未設定です")
-		return
-
+func shoot():
 	var bullet = bullet_scene.instantiate()
-	var main_node = get_tree().get_root().get_node("Main")
-	if main_node:
-		main_node.add_child(bullet)
-		bullet.global_transform = self.global_transform
-		bullet.position.z -= 1.0
-	else:
-		printerr("Could not find Main node to add bullet.")
-
-func _attack_melee():
-	var melee_area = $MeleeAttackArea
-	var melee_effect = $MeleeEffectMesh
-
-	if melee_area:
-		melee_area.monitoring = true
-		if melee_effect:
-			melee_effect.visible = true
-
-		var timer = get_tree().create_timer(0.2)
-		timer.timeout.connect(func():
-			melee_area.monitoring = false
-			if melee_effect:
-				melee_effect.visible = false
-		)
-	else:
-		printerr("MeleeAttackArea node not found. Please add it to the player scene.")
-
-func _attack_laser():
-	pass
-
-func _on_melee_attack_area_body_entered(body):
-	if body.is_in_group("enemies"):
-		body.take_damage(10)
-		print("Melee hit: ", body.name)
+	bullet.global_transform = global_transform
+	bullet_container.add_child(bullet)

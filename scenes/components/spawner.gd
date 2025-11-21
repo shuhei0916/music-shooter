@@ -1,100 +1,64 @@
 extends Node
 
-signal spawn_object(object_scene, properties)
-
-@export var enemy_scene: PackedScene
 @export var gate_scene: PackedScene
+@export var enemy_scene: PackedScene
+@export var enemy_spawn_probability: float = 0.1
+@export_range(1, 100) var enemy_hp_min: int = 5
+@export_range(1, 100) var enemy_hp_max: int = 20
 
-const SPAWN_INTERVAL = 2.0
-const SPAWN_DISTANCE = -40.0
-const LANE_WIDTH = 3.0
-const LANE_COUNT = 3
+@onready var anchor_root: Node3D = $AnchorRoot
+@onready var spawn_timer: Timer = $SpawnTimer
+@onready var main_scene: Node = get_parent()
 
-var randf_provider: Callable
-var randi_range_provider: Callable
+var spawn_counter := 0
+var markers: Array = []
 
-var spawn_timer: Timer
+func _ready() -> void:
+	if anchor_root:
+		markers = anchor_root.get_children()
 
-func _init():
-	randf_provider = Callable(self, "_default_randf")
-	randi_range_provider = Callable(self, "_default_randi_range")
-
-func _ready():
-	spawn_timer = Timer.new()
-	spawn_timer.name = "SpawnTimer"
-	spawn_timer.wait_time = SPAWN_INTERVAL
-	spawn_timer.connect("timeout", Callable(self, "_on_spawn_timer_timeout"))
-	add_child(spawn_timer)
-	# Don't start automatically
-
-func start_spawning():
-	spawn_timer.start()
-
-func stop_spawning():
-	spawn_timer.stop()
-
-var spawn_counter = 0
-
-func _on_spawn_timer_timeout():
+func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
-	
-	# Every 4th spawn, do a full row spawn
-	if spawn_counter % 4 == 0:
-		_spawn_full_row()
+	if spawn_counter % 5 == 0:
+		_spawn_gate_row()
 	else:
-		if _randf() > 0.5:
-			spawn_enemy()
-		else:
-			spawn_gate_row()
+		_maybe_spawn_enemy()
 
-func spawn_enemy(lane = -1):
-	if lane == -1:
-		lane = _randi_range(0, LANE_COUNT - 1)
-	var x_pos = (lane - 1) * LANE_WIDTH
-	
-	var properties = {
-		"hp": _randi_range(5, 30),
-		"position": Vector3(x_pos, 1, SPAWN_DISTANCE)
-	}
-	emit_signal("spawn_object", enemy_scene, properties)
+func _spawn_gate_row() -> void:
+	if markers.is_empty():
+		return
+	for marker in markers:
+		var gate = gate_scene.instantiate()
+		gate.global_transform = marker.global_transform
+		_set_gate_properties(gate)
+		main_scene.add_child(gate)
 
-func spawn_gate(lane = -1):
-	if lane == -1:
-		lane = _randi_range(0, LANE_COUNT - 1)
-	var x_pos = (lane - 1) * LANE_WIDTH
-	
-	var gate_type = "add" if _randf() > 0.5 else "multiply"
-	var value = _randi_range(5, 20) if gate_type == "add" else _randi_range(2, 3)
-	
-	var properties = {
-		"type": gate_type,
-		"value": value,
-		"position": Vector3(x_pos, 1, SPAWN_DISTANCE)
-	}
-	emit_signal("spawn_object", gate_scene, properties)
+func _set_gate_properties(gate: Node) -> void:
+	gate.gate_type = "add"
+	gate.value = randi_range(5, 20)		
 
-func spawn_gate_row():
-	for i in range(LANE_COUNT):
-		spawn_gate(i)
+func _maybe_spawn_enemy() -> void:
+	if enemy_scene == null:
+		print("hogehoge")
+		return
+	if randf() < enemy_spawn_probability:
+		_spawn_enemy()
 
-func spawn_enemy_row():
-	for i in range(LANE_COUNT):
-		spawn_enemy(i)
+func _spawn_enemy() -> void:
+	var enemy = enemy_scene.instantiate()
+	enemy.global_transform = _pick_random_marker().global_transform
+	_set_enemy_properties(enemy)
+	main_scene.add_child(enemy)
 
-func _spawn_full_row():
-	if _randf() > 0.5:
-		spawn_enemy_row()
+func _pick_random_marker() -> Marker3D:
+	if markers:
+		return markers[randi() % markers.size()]
 	else:
-		spawn_gate_row()
+		return null
 
-func _default_randf():
-	return randf()
-
-func _default_randi_range(min_val, max_val):
-	return randi_range(min_val, max_val)
-
-func _randf():
-	return randf_provider.call()
-
-func _randi_range(min_val, max_val):
-	return randi_range_provider.call(min_val, max_val)
+func _set_enemy_properties(enemy: Node) -> void:
+	var value = randi_range(enemy_hp_min, enemy_hp_max)
+	enemy.hp = value
+	
+func _hoge():
+	print("hgoe")
