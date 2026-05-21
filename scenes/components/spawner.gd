@@ -59,6 +59,3 @@ func _pick_random_marker() -> Marker3D:
 func _set_enemy_properties(enemy: Node) -> void:
 	var value = randi_range(enemy_hp_min, enemy_hp_max)
 	enemy.hp = value
-	
-func _hoge():
-	print("hgoe")

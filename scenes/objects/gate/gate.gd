@@ -28,8 +28,5 @@ func update_label():
 				text = prefix + str(value)
 		label.text = text
 
-func _process(delta):
-	pass
-
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
 	queue_free()

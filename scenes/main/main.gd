@@ -20,7 +20,6 @@ func _ready():
 	world_speed = 0.0
 	if start_timer:
 		start_timer.start()
-	#_update_song_progress()
 	
 func _process(delta: float) -> void:
 	_move_world_objects(delta)

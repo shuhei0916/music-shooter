@@ -6,12 +6,6 @@ extends Control
 @onready var result_panel = $ResultPanel
 @onready var result_label = $ResultPanel/ResultLabel
 
-func _ready():
-	pass
-
-func _process(delta):
-	pass
-
 func show_result(is_win: bool):
 	result_panel.visible = true
 	result_label.text = "Run Completed!" if is_win else "Game Over"
