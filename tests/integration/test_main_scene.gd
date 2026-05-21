@@ -2,13 +2,15 @@ extends GutTest
 
 var main
 
+
 func before_each():
 	main = preload("res://scenes/main/main.tscn").instantiate()
-	
+
 	add_child_autofree(main)
 	await get_tree().process_frame
 	#add_child_autofree(player)
 	#add_child_autofree(enemy)
+
 
 func test_スタートタイマー経過後にワールドが動き出す():
 	var world_obj = Node3D.new()

@@ -3,10 +3,12 @@ extends GutTest
 const SPAWNER_SCENE := preload("res://scenes/components/spawner.tscn")
 var spawner
 
+
 func before_each():
 	spawner = SPAWNER_SCENE.instantiate()
 	add_child_autofree(spawner)
 	await get_tree().process_frame
+
 
 func test_敵スポーン確率が100パーセントならゲート非発生ターンで敵が1体スポーンする():
 	spawner.enemy_spawn_probability = 1.0

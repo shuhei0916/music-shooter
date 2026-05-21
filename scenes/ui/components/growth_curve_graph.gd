@@ -1,14 +1,15 @@
-extends Control
-
 class_name GrowthCurveGraph
+extends Control
 
 const MARGIN := 10.0
 
 var points: PackedVector2Array = PackedVector2Array()
 
+
 func set_points(new_points: PackedVector2Array) -> void:
 	points = new_points
 	queue_redraw()
+
 
 func compute_polyline(rect_size: Vector2) -> PackedVector2Array:
 	var result := PackedVector2Array()
@@ -27,6 +28,7 @@ func compute_polyline(rect_size: Vector2) -> PackedVector2Array:
 		var py := rect_size.y - MARGIN - (point.y / max_y) * height
 		result.append(Vector2(px, py))
 	return result
+
 
 func _draw() -> void:
 	var size := get_size()

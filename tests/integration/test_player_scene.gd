@@ -2,9 +2,11 @@ extends GutTest
 
 var player
 
+
 func before_each():
 	player = preload("res://scenes/characters/player/player.tscn").instantiate()
 	add_child_autofree(player)
+
 
 func test_shootが呼ばれると弾丸がシーンに追加される():
 	var bullet_parent = Node3D.new()
