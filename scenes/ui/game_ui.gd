@@ -1,8 +1,5 @@
 extends Control
 
-@export var scene_manager_path: NodePath = NodePath("/root/SceneManager")
-@export_file("*.tscn") var main_menu_scene_path: String
-
 @onready var result_panel = $ResultPanel
 @onready var result_label = $ResultPanel/ResultLabel
 

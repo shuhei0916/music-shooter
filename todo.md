@@ -21,4 +21,8 @@
 - [ ] PlayerのHPが変化したとき、「-18」などのエフェクトをHPLableの上に表示する
 
  ### リファクタリング
-- [ ] Spawnerノードを単体のシーンとして切り出す
+- [x] Spawnerノードを単体のシーンとして切り出す
+- [ ] main.gd / game_ui.gd の未使用変数を削除
+- [ ] _end_game() で重複ロジックを統合
+- [ ] spawner.gd の print("hogehoge") を削除
+- [ ] Spawner に stop() を公開し疎結合化

@@ -19,6 +19,14 @@ func _ready() -> void:
 		markers = anchor_root.get_children()
 
 
+func start() -> void:
+	spawn_timer.start()
+
+
+func stop() -> void:
+	spawn_timer.stop()
+
+
 func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
 	if spawn_counter % 5 == 0:
@@ -44,7 +52,6 @@ func _set_gate_properties(gate: Node) -> void:
 
 func _maybe_spawn_enemy() -> void:
 	if enemy_scene == null:
-		print("hogehoge")
 		return
 	if randf() < enemy_spawn_probability:
 		_spawn_enemy()

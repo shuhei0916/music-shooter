@@ -1,20 +1,14 @@
 extends Node3D
 
-@export var debug_ui_scene: PackedScene
 @export_file("*.sf2") var midi_soundfont_path: String
-@export var song_manager_path: NodePath = NodePath("/root/SongManager")
-@export var utils_path: NodePath = NodePath("/root/Utils")
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
-
-var debug_ui
-var note_counts = []
-var song_manager_node
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
 @onready var game_ui = get_node_or_null("GameUI")
 @onready var start_timer = get_node_or_null("StartTimer")
+@onready var spawner = get_node_or_null("Spawner")
 
 
 func _ready():
@@ -33,12 +27,16 @@ func _move_world_objects(delta: float):
 		obj.global_translate(Vector3(0, 0, world_speed * delta))
 
 
-func _on_player_game_over() -> void:
+func _end_game(is_win: bool) -> void:
 	world_speed = 0.0
-	game_ui.show_result(false)
-	$Spawner/SpawnTimer.stop()
-	player.queue_free()
+	spawner.stop()
 	midi_player.stop()
+	game_ui.show_result(is_win)
+
+
+func _on_player_game_over() -> void:
+	player.queue_free()
+	_end_game(false)
 
 
 func _on_midi_event(channel: Variant, event: Variant) -> void:
@@ -57,28 +55,25 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 
 
 func _on_midi_finished() -> void:
-	world_speed = 0.0
-	game_ui.show_result(true)
-	$Spawner/SpawnTimer.stop()
-	midi_player.stop()
+	_end_game(true)
 
 
 func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
-	$Spawner/SpawnTimer.start()
+	spawner.start()
 	midi_player.play()
-	$StartTimer.stop()
+	start_timer.stop()
 	game_ui.update_countdown("")
 
 
 func _unhandled_input(event):
-	if event.is_action_pressed("ui_accept") and $GameUI/ResultPanel.visible:
+	if event.is_action_pressed("ui_accept") and game_ui.result_panel.visible:
 		get_tree().reload_current_scene()  # This restarts the current scene.
 
 
 func _update_song_progress():
 	if not start_timer.is_stopped():
-		var remaining = int(ceil($StartTimer.time_left))
+		var remaining = int(ceil(start_timer.time_left))
 		if remaining > 0:
 			game_ui.update_countdown(str(remaining))
 		else:
@@ -98,4 +93,4 @@ func _update_song_progress():
 	var current_time = (current_ticks / ticks_per_beat) * seconds_per_beat
 	var total_time = (total_ticks / ticks_per_beat) * seconds_per_beat
 
-	$GameUI.update_progress(current_time, total_time)
+	game_ui.update_progress(current_time, total_time)
