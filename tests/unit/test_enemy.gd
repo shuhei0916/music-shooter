@@ -20,3 +20,9 @@ func test_弾丸と衝突すると敵にダメージが入る():
 	var hp_before = enemy.hp
 	enemy._on_area_entered(bullet)
 	assert_eq(enemy.hp, hp_before - 1)
+
+
+func test_HPが0になるとdiedシグナルが発火する():
+	watch_signals(enemy)
+	enemy.take_damage(5)
+	assert_signal_emitted(enemy, "died")
