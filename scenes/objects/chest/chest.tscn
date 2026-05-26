@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://cchestscene001"]
+
+[ext_resource type="Script" uid="uid://d4ibdby3y10li" path="res://scenes/objects/chest/chest.gd" id="1_chest"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
+size = Vector3(1.4, 1.5, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chest"]
+albedo_color = Color(1, 0.8, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_chest"]
+material = SubResource("StandardMaterial3D_chest")
+size = Vector3(1.5, 1.5, 1.5)
+
+[node name="Chest" type="Area3D" groups=["chest", "world_objects"]]
+collision_layer = 4
+script = ExtResource("1_chest")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_chest")
+
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pivot"]
+mesh = SubResource("BoxMesh_chest")
+
+[node name="Label3D" type="Label3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
+text = "+10"
+font_size = 128
+
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier3D" to="." method="_on_visible_on_screen_notifier_3d_screen_exited"]

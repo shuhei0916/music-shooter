@@ -3,11 +3,13 @@
 [ext_resource type="Script" uid="uid://blojv0rl7li1p" path="res://scenes/components/spawner.gd" id="1_spawner"]
 [ext_resource type="PackedScene" uid="uid://d2w3w4g5h6j7h" path="res://scenes/objects/gate/gate.tscn" id="2_gate"]
 [ext_resource type="PackedScene" uid="uid://cuecnhmhkeac" path="res://scenes/characters/enemy/enemy.tscn" id="3_enemy"]
+[ext_resource type="PackedScene" uid="uid://cchestscene001" path="res://scenes/objects/chest/chest.tscn" id="4_chest"]
 
 [node name="Spawner" type="Node"]
 script = ExtResource("1_spawner")
 gate_scene = ExtResource("2_gate")
 enemy_scene = ExtResource("3_enemy")
+chest_scene = ExtResource("4_chest")
 enemy_spawn_probability = 0.2
 
 [node name="SpawnTimer" type="Timer" parent="."]

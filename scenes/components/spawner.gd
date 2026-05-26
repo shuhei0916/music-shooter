@@ -1,7 +1,10 @@
 extends Node
 
+const CHEST_SPAWN_OFFSET_Z := -5.0
+
 @export var gate_scene: PackedScene
 @export var enemy_scene: PackedScene
+@export var chest_scene: PackedScene
 @export var enemy_spawn_probability: float = 0.1
 @export_range(1, 100) var enemy_hp_min: int = 5
 @export_range(1, 100) var enemy_hp_max: int = 20
@@ -61,7 +64,18 @@ func _spawn_enemy() -> void:
 	var enemy = enemy_scene.instantiate()
 	enemy.global_transform = _pick_random_marker().global_transform
 	_set_enemy_properties(enemy)
+	enemy.died.connect(_on_enemy_died.bind(enemy))
 	main_scene.add_child(enemy)
+
+
+func _on_enemy_died(enemy: Node) -> void:
+	if chest_scene == null:
+		return
+	var chest = chest_scene.instantiate()
+	chest.gate_type = "add"
+	chest.value = randi_range(5, 20)
+	main_scene.add_child(chest)
+	chest.global_position = enemy.global_position + Vector3(0, 0, CHEST_SPAWN_OFFSET_Z)
 
 
 func _pick_random_marker() -> Marker3D:
