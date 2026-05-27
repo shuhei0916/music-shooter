@@ -8,13 +8,11 @@ func before_each():
 	add_child_autofree(player)
 
 
+func after_each():
+	for bullet in get_tree().get_nodes_in_group("bullet"):
+		bullet.queue_free()
+
+
 func test_shoot0を呼ぶと弾丸がシーンに追加される():
-	var bullet_parent = Node3D.new()
-	add_child_autofree(bullet_parent)
-
-	player.bullet_container = bullet_parent
 	player.shoot(0)
-
-	var bullets = bullet_parent.get_children()
-	assert_eq(1, bullets.size())
-	assert_true(bullets[0].is_in_group("bullet"))
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())

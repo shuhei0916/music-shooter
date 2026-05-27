@@ -7,7 +7,6 @@ const SPEED = 5.0
 @export var horizontal_limit_min: float = -4.0
 @export var horizontal_limit_max: float = 4.0
 
-var bullet_container: Node
 var hp = 1:
 	set(value):
 		hp = value
@@ -17,7 +16,6 @@ var _weapons: Array = []
 
 
 func _ready() -> void:
-	bullet_container = get_parent()
 	_weapons = get_children().filter(func(n): return n.is_in_group("weapon"))
 
 
@@ -71,4 +69,4 @@ func _on_enemy_collided(enemy: Node) -> void:
 func shoot(channel: int = 0) -> void:
 	if channel >= _weapons.size():
 		return
-	_weapons[channel].fire(bullet_container)
+	_weapons[channel].fire()

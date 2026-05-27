@@ -4,5 +4,5 @@ extends Node
 @export var color: Color = Color.WHITE
 
 
-func fire(_container: Node) -> void:
+func fire() -> void:
 	pass
