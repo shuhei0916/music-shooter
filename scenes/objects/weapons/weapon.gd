@@ -1,5 +1,5 @@
 class_name Weapon
-extends Node
+extends Node3D
 
 @export var color: Color = Color.WHITE
 

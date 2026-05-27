@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://chandgunscript1" path="res://scenes/objects/weapons/handgun/handgun.gd" id="1_handgun"]
 [ext_resource type="PackedScene" uid="uid://cgy7qg1vj3w3v" path="res://scenes/objects/bullet/bullet.tscn" id="2_bullet"]
 
-[node name="Handgun" type="Node" groups=["weapon"]]
+[node name="Handgun" type="Node3D" groups=["weapon"]]
 script = ExtResource("1_handgun")
 bullet_scene = ExtResource("2_bullet")
 
