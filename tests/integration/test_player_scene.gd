@@ -5,8 +5,6 @@ var player
 
 func before_each():
 	player = preload("res://scenes/characters/player/player.tscn").instantiate()
-	var scenes: Array[PackedScene] = [preload("res://scenes/objects/weapons/handgun/handgun.tscn")]
-	player.weapon_scenes = scenes
 	add_child_autofree(player)
 
 

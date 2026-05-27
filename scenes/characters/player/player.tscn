@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://b5w2w5g5h5j5h"]
+[gd_scene format=3 uid="uid://b5w2w5g5h5j5h"]
 
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://scenes/characters/player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://dniw4g2b7emm3" path="res://scenes/objects/weapons/handgun/handgun.tscn" id="2_t61fv"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 
@@ -10,20 +11,20 @@ albedo_color = Color(0.305882, 0.85098, 1, 1)
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
 material = SubResource("StandardMaterial3D_player")
 
-[node name="Player" type="CharacterBody3D" groups=["player"]]
+[node name="Player" type="CharacterBody3D" unique_id=606577689 groups=["player"]]
 collision_mask = 12
 script = ExtResource("1_player")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2115158575]
 shape = SubResource("CapsuleShape3D_player")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=178321220]
 mesh = SubResource("CapsuleMesh_player")
 
-[node name="HPLabel" type="Label3D" parent="."]
+[node name="HPLabel" type="Label3D" parent="." unique_id=466701705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 billboard = 1
 text = "1"
 font_size = 128
 
-[node name="GunPoint" type="Node3D" parent="."]
+[node name="Handgun" parent="." instance=ExtResource("2_t61fv")]

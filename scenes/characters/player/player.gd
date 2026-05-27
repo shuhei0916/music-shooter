@@ -4,7 +4,6 @@ signal game_over_signal
 
 const SPEED = 5.0
 
-@export var weapon_scenes: Array[PackedScene]
 @export var horizontal_limit_min: float = -4.0
 @export var horizontal_limit_max: float = 4.0
 
@@ -16,15 +15,10 @@ var hp = 1:
 
 var _weapons: Array = []
 
-@onready var gun_point: Node3D = $GunPoint
-
 
 func _ready() -> void:
 	bullet_container = get_parent()
-	for scene in weapon_scenes:
-		var weapon = scene.instantiate()
-		add_child(weapon)
-		_weapons.append(weapon)
+	_weapons = get_children().filter(func(n): return n.is_in_group("weapon"))
 
 
 func _physics_process(_delta):
@@ -77,4 +71,4 @@ func _on_enemy_collided(enemy: Node) -> void:
 func shoot(channel: int = 0) -> void:
 	if channel >= _weapons.size():
 		return
-	_weapons[channel].fire(gun_point, bullet_container)
+	_weapons[channel].fire(bullet_container)
