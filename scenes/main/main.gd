@@ -50,8 +50,8 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 				% [ch_num, channel_status.track_name, event.note, event.velocity]
 			)
 		)
-		if ch_num == 9:
-			player.shoot()
+		if ch_num == 0:
+			player.shoot(ch_num)
 
 
 func _on_midi_finished() -> void:
