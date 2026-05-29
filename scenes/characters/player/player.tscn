@@ -27,4 +27,12 @@ billboard = 1
 text = "1"
 font_size = 128
 
-[node name="Handgun" parent="." instance=ExtResource("2_t61fv")]
+[node name="Handgun" parent="." unique_id=1135264173 instance=ExtResource("2_t61fv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0, 0)
+channel = 0
+color = Color(0.3, 0.7, 1, 1)
+
+[node name="Handgun2" parent="." instance=ExtResource("2_t61fv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0, 0)
+channel = 9
+color = Color(1, 0.5, 0.1, 1)

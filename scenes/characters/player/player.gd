@@ -12,11 +12,13 @@ var hp = 1:
 		hp = value
 		_update_hp_label()
 
-var _weapons: Array = []
+var _weapon_map: Dictionary = {}
 
 
 func _ready() -> void:
-	_weapons = get_children().filter(func(n): return n.is_in_group("weapon"))
+	for child in get_children():
+		if child.is_in_group("weapon"):
+			_weapon_map[child.channel] = child
 
 
 func _physics_process(_delta):
@@ -67,6 +69,7 @@ func _on_enemy_collided(enemy: Node) -> void:
 
 
 func shoot(channel: int = 0) -> void:
-	if channel >= _weapons.size():
+	var weapon = _weapon_map.get(channel)
+	if weapon == null:
 		return
-	_weapons[channel].fire()
+	weapon.fire()

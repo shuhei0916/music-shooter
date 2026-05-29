@@ -10,7 +10,7 @@ func before_each():
 
 func after_each():
 	for bullet in get_tree().get_nodes_in_group("bullet"):
-		bullet.queue_free()
+		bullet.free()
 
 
 func test_fireを呼ぶと弾がシーンに追加される():
