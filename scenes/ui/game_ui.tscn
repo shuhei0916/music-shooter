@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://d3w4w5g6h7j8h"]
+[gd_scene load_steps=2 format=3 uid="uid://d3w4w5g6h7j8h"]
 
 [ext_resource type="Script" uid="uid://ybtma1js06yd" path="res://scenes/ui/game_ui.gd" id="1_abcde"]
-[ext_resource type="Script" path="res://scenes/ui/components/growth_curve_graph.gd" id="2_gcgraph"]
 
 [node name="GameUI" type="Control"]
 layout_mode = 3
@@ -54,23 +53,3 @@ grow_horizontal = 2
 text = "Run Completed!"
 horizontal_alignment = 1
 
-[node name="DebugPanel" type="Control" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GrowthCurveGraph" type="Control" parent="DebugPanel"]
-layout_mode = 1
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 40.0
-offset_right = -20.0
-offset_bottom = -40.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("2_gcgraph")
