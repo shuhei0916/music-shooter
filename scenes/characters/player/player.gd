@@ -52,7 +52,7 @@ func take_damage(damage):
 
 func game_over():
 	print("GAME OVER")
-	emit_signal("game_over_signal")
+	game_over_signal.emit()
 
 
 func _update_hp_label() -> void:

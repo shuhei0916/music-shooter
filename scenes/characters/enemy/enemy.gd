@@ -35,5 +35,5 @@ func take_damage(damage):
 	hp -= damage
 	update_label()
 	if hp <= 0:
-		emit_signal("died")
+		died.emit()
 		queue_free()
