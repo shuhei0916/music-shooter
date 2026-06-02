@@ -2,6 +2,8 @@ extends Control
 
 @onready var result_panel = $ResultPanel
 @onready var result_label = $ResultPanel/ResultLabel
+@onready var _debug_panel = $DebugPanel
+@onready var _growth_curve_graph: GrowthCurveGraph = $DebugPanel/GrowthCurveGraph
 
 
 func show_result(is_win: bool):
@@ -19,6 +21,15 @@ func update_progress(current_time, total_time):
 
 func update_countdown(text: String) -> void:
 	$SongProgressLabel.text = text
+
+
+func set_growth_curve(points: PackedVector2Array) -> void:
+	_growth_curve_graph.set_points(points)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("debug_toggle"):
+		_debug_panel.visible = not _debug_panel.visible
 
 
 func format_seconds_to_string(seconds: float) -> String:

@@ -1,5 +1,7 @@
 extends Node3D
 
+const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
+
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
@@ -63,6 +65,18 @@ func _on_start_timer_timeout() -> void:
 	midi_player.play()
 	start_timer.stop()
 	game_ui.update_countdown("")
+	_setup_growth_curve()
+
+
+func _setup_growth_curve() -> void:
+	if midi_player.smf_data == null:
+		return
+	var used_channels: Array = player._weapon_map.keys()
+	var analyzer = SongAnalyzerScript.new()
+	var points: PackedVector2Array = analyzer.compute_cumulative_counts(
+		midi_player.smf_data, midi_player.timebase_to_seconds, used_channels
+	)
+	game_ui.set_growth_curve(points)
 
 
 func _unhandled_input(event):
