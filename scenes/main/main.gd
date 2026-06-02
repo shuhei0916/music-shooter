@@ -7,7 +7,6 @@ const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 @export var initial_world_speed: float = 5.0
 
 var _debug_ch_rows: Dictionary = {}
-var _debug_row_count: int = 0
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
@@ -50,16 +49,8 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		var ch_num = channel_status.number
 
 		if ch_num not in _debug_ch_rows:
-			_debug_ch_rows[ch_num] = _debug_row_count
-			_debug_row_count += 1
-			print("")
-		var up: int = _debug_row_count - _debug_ch_rows[ch_num]
-		var text := (
-			"ch%02d | %-20s | note=%-3d | vel=%d"
-			% [ch_num, channel_status.track_name, event.note, event.velocity]
-		)
-		var esc := char(27)
-		print("%s[%dA%s[2K%s%s[%dB" % [esc, up, esc, text, esc, up - 1])
+			_debug_ch_rows[ch_num] = channel_status.track_name
+			print("ch%02d | %s" % [ch_num, channel_status.track_name])
 
 		player.shoot(ch_num)
 
