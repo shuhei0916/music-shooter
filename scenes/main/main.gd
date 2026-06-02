@@ -77,6 +77,7 @@ func _setup_growth_curve() -> void:
 		midi_player.smf_data, midi_player.timebase_to_seconds, used_channels
 	)
 	game_ui.set_growth_curve(points)
+	spawner.set_growth_curve(points)
 
 
 func _unhandled_input(event):
