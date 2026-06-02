@@ -11,6 +11,7 @@ const CHEST_SPAWN_OFFSET_Z := -5.0
 
 var spawn_counter := 0
 var markers: Array = []
+var _growth_curve := PackedVector2Array()
 
 @onready var anchor_root: Node3D = $AnchorRoot
 @onready var spawn_timer: Timer = $SpawnTimer
@@ -28,6 +29,10 @@ func start() -> void:
 
 func stop() -> void:
 	spawn_timer.stop()
+
+
+func set_growth_curve(points: PackedVector2Array) -> void:
+	_growth_curve = points
 
 
 func _on_spawn_timer_timeout() -> void:
@@ -63,7 +68,7 @@ func _maybe_spawn_enemy() -> void:
 func _spawn_enemy() -> void:
 	var enemy = enemy_scene.instantiate()
 	enemy.global_transform = _pick_random_marker().global_transform
-	_set_enemy_properties(enemy)
+	_set_enemy_properties(enemy, _get_spawn_progress())
 	enemy.died.connect(_on_enemy_died.bind(enemy))
 	main_scene.add_child(enemy)
 
@@ -84,6 +89,23 @@ func _pick_random_marker() -> Marker3D:
 	return null
 
 
-func _set_enemy_properties(enemy: Node) -> void:
-	var value = randi_range(enemy_hp_min, enemy_hp_max)
+func _set_enemy_properties(enemy: Node, progress: float = -1.0) -> void:
+	var value: int
+	if _growth_curve.is_empty() or progress < 0.0:
+		value = randi_range(enemy_hp_min, enemy_hp_max)
+	else:
+		value = int(lerp(float(enemy_hp_min), float(enemy_hp_max), progress))
 	enemy.hp = value
+
+
+func _get_spawn_progress() -> float:
+	if _growth_curve.is_empty() or _growth_curve[-1].y == 0.0:
+		return -1.0
+	var current_time: float = (
+		main_scene.midi_player.position * main_scene.midi_player.timebase_to_seconds
+	)
+	var max_count: float = _growth_curve[-1].y
+	for i in range(_growth_curve.size() - 1, -1, -1):
+		if _growth_curve[i].x <= current_time:
+			return _growth_curve[i].y / max_count
+	return 0.0

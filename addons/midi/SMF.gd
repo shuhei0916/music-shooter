@@ -207,7 +207,7 @@ class MIDITrack:
 	## コンストラクタ
 	## @param	_track_number	トラック番号
 	## @param	_events			イベントリスト
-	func _init(_track_number:int = 0,_events:Array = []):	# Array[MIDIEventChunk]
+	func _init(_track_number:int = 0,_events:Array[MIDIEventChunk] = []):
 		self.track_number = _track_number
 		self.events = _events
 
