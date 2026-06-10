@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://d3w4w5g6h7j8h"]
+[gd_scene format=3 uid="uid://d3w4w5g6h7j8h"]
 
 [ext_resource type="Script" uid="uid://ybtma1js06yd" path="res://scenes/ui/game_ui.gd" id="1_abcde"]
 
-[node name="GameUI" type="Control"]
+[node name="GameUI" type="Control" unique_id=1619814195]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,9 +10,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_abcde")
-main_menu_scene_path = "res://scenes/ui/main_menu.tscn"
 
-[node name="SongProgressLabel" type="Label" parent="."]
+[node name="SongProgressLabel" type="Label" parent="." unique_id=1377757611]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -25,7 +24,7 @@ grow_horizontal = 2
 text = "00:00/00:00"
 horizontal_alignment = 1
 
-[node name="ResultPanel" type="Panel" parent="."]
+[node name="ResultPanel" type="Panel" parent="." unique_id=917158636]
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -40,7 +39,7 @@ offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ResultLabel" type="Label" parent="ResultPanel"]
+[node name="ResultLabel" type="Label" parent="ResultPanel" unique_id=1200162396]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -52,4 +51,3 @@ offset_bottom = 43.0
 grow_horizontal = 2
 text = "Run Completed!"
 horizontal_alignment = 1
-
