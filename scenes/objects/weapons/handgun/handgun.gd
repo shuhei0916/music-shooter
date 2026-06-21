@@ -13,10 +13,10 @@ func fire() -> void:
 	bullet.color = color
 	get_tree().root.add_child(bullet)
 	bullet.global_transform = $Muzzle.global_transform
-	_trigger_flash()
+	trigger_flash()
 
 
-func _trigger_flash() -> void:
+func trigger_flash() -> void:
 	_flash.light_energy = 3.0
 	var tween = create_tween()
 	tween.tween_property(_flash, "light_energy", 0.0, 0.1)
