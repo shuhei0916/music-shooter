@@ -8,3 +8,8 @@ script = ExtResource("1_handgun")
 bullet_scene = ExtResource("2_bullet")
 
 [node name="Muzzle" type="Node3D" parent="."]
+
+[node name="FlashLight" type="OmniLight3D" parent="Muzzle"]
+light_color = Color(1, 0.8, 0.4, 1)
+light_energy = 0.0
+omni_range = 3.0
