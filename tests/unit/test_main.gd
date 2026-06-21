@@ -28,3 +28,24 @@ func test_move_world_objects_停止中はworld_objectsが動かない():
 	main_double.world_speed = 0
 	main_double._move_world_objects(0.016)
 	assert_eq(initial_z, obj.global_position.z)
+
+
+func test_build_event_scheduleがnote_onイベントのタイムラインを構築する():
+	var smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
+
+	var note_on = SMF.MIDIEventNoteOn.new()
+	note_on.velocity = 100
+	var chunk = SMF.MIDIEventChunk.new()
+	chunk.time = 480
+	chunk.channel_number = 0
+	chunk.event = note_on
+
+	var track = SMF.MIDITrack.new()
+	track.events.append(chunk)
+	smf_data.tracks.append(track)
+
+	main_double._build_event_schedule(smf_data, 1.0 / 480.0)
+
+	assert_eq(1, main_double._event_schedule.size())
+	assert_eq(0, main_double._event_schedule[0].channel)
+	assert_almost_eq(1.0, main_double._event_schedule[0].time_sec, 0.001)

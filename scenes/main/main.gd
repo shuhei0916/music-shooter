@@ -8,6 +8,8 @@ const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 
 var _debug_ch_rows: Dictionary = {}
 var _debug_row_count: int = 0
+var _event_schedule: Array = []
+var _schedule_index: int = 0
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
@@ -76,6 +78,28 @@ func _on_start_timer_timeout() -> void:
 	start_timer.stop()
 	game_ui.update_countdown("")
 	_setup_growth_curve()
+
+
+func _build_event_schedule(smf_data: SMF.SMFData, timebase_to_seconds: float) -> void:
+	_event_schedule.clear()
+	_schedule_index = 0
+	for track: SMF.MIDITrack in smf_data.tracks:
+		for chunk: SMF.MIDIEventChunk in track.events:
+			if chunk.event.type != SMF.MIDIEventType.note_on:
+				continue
+			var note_on := chunk.event as SMF.MIDIEventNoteOn
+			if note_on.velocity == 0:
+				continue
+			(
+				_event_schedule
+				. append(
+					{
+						"time_sec": chunk.time * timebase_to_seconds,
+						"channel": chunk.channel_number,
+					}
+				)
+			)
+	_event_schedule.sort_custom(func(a, b): return a.time_sec < b.time_sec)
 
 
 func _setup_growth_curve() -> void:
