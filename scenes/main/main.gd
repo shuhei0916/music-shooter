@@ -5,6 +5,7 @@ const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
+@export var flash_lookahead_sec: float = 0.05
 
 var _debug_ch_rows: Dictionary = {}
 var _debug_row_count: int = 0
@@ -27,6 +28,7 @@ func _ready():
 func _process(delta: float) -> void:
 	_move_world_objects(delta)
 	_update_song_progress()
+	_fire_scheduled_flashes()
 
 
 func _move_world_objects(delta: float):
@@ -78,6 +80,21 @@ func _on_start_timer_timeout() -> void:
 	start_timer.stop()
 	game_ui.update_countdown("")
 	_setup_growth_curve()
+	_build_event_schedule(midi_player.smf_data, midi_player.timebase_to_seconds)
+
+
+func _fire_scheduled_flashes() -> void:
+	if not midi_player or not midi_player.playing:
+		return
+	var lookahead := flash_lookahead_sec + AudioServer.get_output_latency()
+	var current_time: float = midi_player.position * midi_player.timebase_to_seconds
+	while _schedule_index < _event_schedule.size():
+		var ev: Dictionary = _event_schedule[_schedule_index]
+		if current_time + lookahead >= ev.time_sec:
+			player.trigger_flash(ev.channel)
+			_schedule_index += 1
+		else:
+			break
 
 
 func _build_event_schedule(smf_data: SMF.SMFData, timebase_to_seconds: float) -> void:
