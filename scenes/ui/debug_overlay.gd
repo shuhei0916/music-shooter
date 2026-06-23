@@ -11,7 +11,9 @@ func notify_midi_event(ch_num: int, track_name: String, note: int, velocity: int
 		_add_channel_row(ch_num)
 	var label: Label = _channel_labels[ch_num]
 	var bar := _make_vel_bar(velocity)
-	label.text = "[ch%02d] %-20s note=%-3d vel=%-3d %s" % [ch_num, track_name, note, velocity, bar]
+	label.text = (
+		"ch%02d  %-20s  note=%-3d  vel=%-3d  %s" % [ch_num, track_name, note, velocity, bar]
+	)
 	_flash_label(label)
 
 
