@@ -64,7 +64,9 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 			% [ch_num, channel_status.track_name, event.note, event.velocity]
 		)
 		var esc := char(27)
-		print("%s[%dA%s[2K%s%s[%dB" % [esc, up, esc, text, esc, up - 1])
+		#print("%s[%dA%s[2K%s%s[%dB" % [esc, up, esc, text, esc, up - 1])
+		print(ch_num)
+		#player.trigger_flash(ch_num)
 
 		player.shoot(ch_num)
 
@@ -80,14 +82,18 @@ func _on_start_timer_timeout() -> void:
 	start_timer.stop()
 	game_ui.update_countdown("")
 	_setup_growth_curve()
-	_build_event_schedule(midi_player.smf_data, midi_player.timebase_to_seconds)
+	_build_event_schedule(
+		midi_player.smf_data, midi_player.smf_data.timebase, midi_player.timebase_to_seconds
+	)
 
 
 func _fire_scheduled_flashes() -> void:
 	if not midi_player or not midi_player.playing:
 		return
 	var lookahead := flash_lookahead_sec + AudioServer.get_output_latency()
-	var current_time: float = midi_player.position * midi_player.timebase_to_seconds
+	var current_time: float = (
+		midi_player.position / midi_player.smf_data.timebase * midi_player.timebase_to_seconds
+	)
 	while _schedule_index < _event_schedule.size():
 		var ev: Dictionary = _event_schedule[_schedule_index]
 		if current_time + lookahead >= ev.time_sec:
@@ -97,7 +103,9 @@ func _fire_scheduled_flashes() -> void:
 			break
 
 
-func _build_event_schedule(smf_data: SMF.SMFData, timebase_to_seconds: float) -> void:
+func _build_event_schedule(
+	smf_data: SMF.SMFData, timebase: int, timebase_to_seconds: float
+) -> void:
 	_event_schedule.clear()
 	_schedule_index = 0
 	for track: SMF.MIDITrack in smf_data.tracks:
@@ -111,7 +119,7 @@ func _build_event_schedule(smf_data: SMF.SMFData, timebase_to_seconds: float) ->
 				_event_schedule
 				. append(
 					{
-						"time_sec": chunk.time * timebase_to_seconds,
+						"time_sec": chunk.time / float(timebase) * timebase_to_seconds,
 						"channel": chunk.channel_number,
 					}
 				)

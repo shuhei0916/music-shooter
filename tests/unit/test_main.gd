@@ -44,8 +44,8 @@ func test_build_event_scheduleがnote_onイベントのタイムラインを構�
 	track.events.append(chunk)
 	smf_data.tracks.append(track)
 
-	main_double._build_event_schedule(smf_data, 1.0 / 480.0)
+	main_double._build_event_schedule(smf_data, 480, 0.5)
 
 	assert_eq(1, main_double._event_schedule.size())
 	assert_eq(0, main_double._event_schedule[0].channel)
-	assert_almost_eq(1.0, main_double._event_schedule[0].time_sec, 0.001)
+	assert_almost_eq(0.5, main_double._event_schedule[0].time_sec, 0.001)
