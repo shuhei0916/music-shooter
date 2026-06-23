@@ -28,3 +28,9 @@ func test_show_resultで勝利パネルが表示される():
 
 	assert_true(game_ui.result_panel.visible)
 	assert_true(game_ui.result_label.text.begins_with("Run Completed"))
+
+
+func test_toggle_debugでデバッグオーバーレイの表示が切り替わる():
+	var initial = game_ui.debug_overlay.visible
+	game_ui.toggle_debug()
+	assert_eq(not initial, game_ui.debug_overlay.visible)

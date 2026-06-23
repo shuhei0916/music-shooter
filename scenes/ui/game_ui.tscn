@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://d3w4w5g6h7j8h"]
+[gd_scene load_steps=3 format=3 uid="uid://d3w4w5g6h7j8h"]
 
 [ext_resource type="Script" uid="uid://ybtma1js06yd" path="res://scenes/ui/game_ui.gd" id="1_abcde"]
+[ext_resource type="PackedScene" uid="uid://debug_overlay_001" path="res://scenes/ui/debug_overlay.tscn" id="2_dbgovl"]
 
 [node name="GameUI" type="Control" unique_id=1619814195]
 layout_mode = 3
@@ -51,3 +52,5 @@ offset_bottom = 43.0
 grow_horizontal = 2
 text = "Run Completed!"
 horizontal_alignment = 1
+
+[node name="DebugOverlay" parent="." instance=ExtResource("2_dbgovl")]
