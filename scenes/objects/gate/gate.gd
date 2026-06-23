@@ -19,17 +19,11 @@ func _on_body_entered(body: Node) -> void:
 func update_label():
 	var label = get_node("Pivot/Label3D")
 	if label:
-		var text = ""
 		match gate_type:
 			"add":
-				text = "❤️ +" + str(value)
+				label.text = "❤️ +" + str(value)
 			"multiply":
-				text = "💕 x" + str(value)
-			_:
-				# Fallback for unknown types
-				var prefix = "+" if gate_type == "add" else "x"
-				text = prefix + str(value)
-		label.text = text
+				label.text = "💕 x" + str(value)
 
 
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:

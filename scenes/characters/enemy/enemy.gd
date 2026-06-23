@@ -2,7 +2,10 @@ extends Area3D
 
 signal died
 
-@export var hp: int = 5
+@export var hp: int = 5:
+	set(value):
+		hp = value
+		update_label()
 
 
 func _ready():
@@ -20,11 +23,6 @@ func _on_area_entered(area: Area3D) -> void:
 		area.queue_free()
 
 
-func set_hp(new_hp):
-	hp = new_hp
-	update_label()
-
-
 func update_label():
 	var label := get_node_or_null("HPLabel")
 	if label:
@@ -33,7 +31,6 @@ func update_label():
 
 func take_damage(damage):
 	hp -= damage
-	update_label()
 	if hp <= 0:
 		died.emit()
 		queue_free()
