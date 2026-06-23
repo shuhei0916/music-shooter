@@ -13,7 +13,6 @@ func fire() -> void:
 	bullet.color = color
 	get_tree().root.add_child(bullet)
 	bullet.global_transform = $Muzzle.global_transform
-	trigger_flash()
 
 
 func trigger_flash() -> void:

@@ -24,11 +24,6 @@ func test_fireで発射された弾はbulletグループに属する():
 	assert_true(bullet.is_in_group("bullet"))
 
 
-func test_fireを呼ぶとフラッシュが発動する():
-	handgun.fire()
-	assert_gt(handgun._flash.light_energy, 0.0)
-
-
 func test_trigger_flashを呼ぶとフラッシュが発動する():
 	handgun.trigger_flash()
 	assert_gt(handgun._flash.light_energy, 0.0)
