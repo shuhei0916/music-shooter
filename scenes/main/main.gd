@@ -62,6 +62,7 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		var esc := char(27)
 		print("%s[%dA%s[2K%s%s[%dB" % [esc, up, esc, text, esc, up - 1])
 
+		player.trigger_flash(ch_num)
 		player.shoot(ch_num)
 
 

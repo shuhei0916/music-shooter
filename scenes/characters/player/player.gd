@@ -73,3 +73,10 @@ func shoot(channel: int = 0) -> void:
 	if weapon == null:
 		return
 	weapon.fire()
+
+
+func trigger_flash(channel: int = 0) -> void:
+	var weapon = _weapon_map.get(channel)
+	if weapon == null:
+		return
+	weapon.trigger_flash()

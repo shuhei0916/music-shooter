@@ -56,3 +56,13 @@ func test_敵との衝突でお互いにダメージを与える() -> void:
 	enemy.hp = 7
 	player._on_enemy_collided(enemy)  # 将来的には FakeEnemy に差し替える余地アリ
 	assert_eq(3, player.hp)
+
+
+func test_trigger_flashがweapon_mapの対応する武器のtrigger_flashを呼ぶ():
+	var fake_weapon = preload("res://scenes/objects/weapons/handgun/handgun.tscn").instantiate()
+	add_child_autofree(fake_weapon)
+	player._weapon_map[0] = fake_weapon
+
+	player.trigger_flash(0)
+
+	assert_gt(fake_weapon._flash.light_energy, 0.0)

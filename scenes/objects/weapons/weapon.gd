@@ -7,3 +7,7 @@ extends Node3D
 
 func fire() -> void:
 	pass
+
+
+func trigger_flash() -> void:
+	pass

@@ -22,3 +22,8 @@ func test_fireで発射された弾はbulletグループに属する():
 	handgun.fire()
 	var bullet = get_tree().get_nodes_in_group("bullet")[0]
 	assert_true(bullet.is_in_group("bullet"))
+
+
+func test_trigger_flashを呼ぶとフラッシュが発動する():
+	handgun.trigger_flash()
+	assert_gt(handgun._flash.light_energy, 0.0)
