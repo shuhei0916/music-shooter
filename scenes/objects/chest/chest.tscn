@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cchestscene001"]
 
-[ext_resource type="Script" uid="uid://d4ibdby3y10li" path="res://scenes/objects/chest/chest.gd" id="1_chest"]
+[ext_resource type="Script" uid="uid://c6c4y0y48wpg1" path="res://scenes/objects/gate/gate.gd" id="1_chest"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
 size = Vector3(1.4, 1.5, 0.25)

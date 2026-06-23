@@ -19,11 +19,11 @@ run/main_scene="uid://dllqgs6rewvnf"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="uid://bh3st6iox5yj2"
 
-[autoload]
+[audio]
 
-Utils="*res://scripts/utils.gd"
-SceneManager="*res://scripts/scene_manager.gd"
-SongManager="*res://scripts/song_manager.gd"
+driver/output_latency=8
+
+[autoload]
 
 [editor_plugins]
 
