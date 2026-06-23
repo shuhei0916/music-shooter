@@ -1,5 +1,5 @@
 class_name Handgun
-extends "res://scenes/objects/weapons/weapon.gd"
+extends Weapon
 
 @export var bullet_scene: PackedScene
 
