@@ -6,9 +6,6 @@ const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
 
-var _debug_ch_rows: Dictionary = {}
-var _debug_row_count: int = 0
-
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
 @onready var game_ui = get_node_or_null("GameUI")
@@ -48,27 +45,9 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 	if event.type == SMF.MIDIEventType.note_on and event.velocity > 0:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
 		var ch_num = channel_status.number
-		_debug_print_channel(channel_status, event)
+		game_ui.notify_midi_event(ch_num, channel_status.track_name, event.note, event.velocity)
 		player.trigger_flash(ch_num)
 		player.shoot(ch_num)
-
-
-func _debug_print_channel(
-	channel_status: MidiPlayer.GodotMIDIPlayerChannelStatus, event: Variant
-) -> void:
-	var ch_num = channel_status.number
-	if ch_num not in _debug_ch_rows:
-		_debug_ch_rows[ch_num] = _debug_row_count
-		_debug_row_count += 1
-		print("")
-	var row: int = _debug_ch_rows[ch_num]
-	var up: int = _debug_row_count - row
-	var text := (
-		"ch%02d | %-20s | note=%-3d | vel=%d"
-		% [ch_num, channel_status.track_name, event.note, event.velocity]
-	)
-	var esc := char(27)
-	print("%s[%dA%s[2K%s%s[%dB" % [esc, up, esc, text, esc, up - 1])
 
 
 func _on_midi_finished() -> void:
@@ -97,7 +76,9 @@ func _setup_growth_curve() -> void:
 
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and game_ui.result_panel.visible:
-		get_tree().reload_current_scene()  # This restarts the current scene.
+		get_tree().reload_current_scene()
+	if event.is_action_pressed("debug_toggle"):
+		game_ui.toggle_debug()
 
 
 func _update_song_progress():
