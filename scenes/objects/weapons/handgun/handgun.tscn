@@ -1,13 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://chandgunscene01"]
+[gd_scene load_steps=4 format=3 uid="uid://chandgunscene01"]
 
 [ext_resource type="Script" uid="uid://chandgunscript1" path="res://scenes/objects/weapons/handgun/handgun.gd" id="1_handgun"]
 [ext_resource type="PackedScene" uid="uid://cgy7qg1vj3w3v" path="res://scenes/objects/bullet/bullet.tscn" id="2_bullet"]
+[ext_resource type="PackedScene" path="res://scenes/objects/weapons/handgun/blaster-a.glb" id="3_blaster"]
 
 [node name="Handgun" type="Node3D" groups=["weapon"]]
 script = ExtResource("1_handgun")
 bullet_scene = ExtResource("2_bullet")
 
+[node name="BlasterMesh" parent="." instance=ExtResource("3_blaster")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
 [node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
 
 [node name="FlashLight" type="OmniLight3D" parent="Muzzle"]
 light_color = Color(1, 0.8, 0.4, 1)
