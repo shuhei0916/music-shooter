@@ -1,125 +1,73 @@
 # CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## 言語
-
-**回答は思考も含め、すべて日本語で行うこと。** 
+回答は思考も含め、すべて日本語で行ってください。
 
 ## プロジェクト概要
+ゲートランナー系のゲーム（キャラを左右にスワイプして、×2や+10といったゲートをくぐり抜けて数字を大きくするゲーム）に、音ゲーの要素を足したゲームを開発します。
+プレイヤーを左右に操作してゲートを通過しHP・武器を強化 → MIDIの演奏に合わせて武器が自動発射 → 完奏（曲の最後まで生き残る）を目指す。
+- テスト駆動開発の第一人者であるt-wada氏の推奨する手法に従って開発を行うこと。
+- godot-likeな書き方を順守すること。
 
-MIDIの演奏に同期して自動で弾丸を発射する、**Arrow a Row** ライクな3Dレーンランゲーム。Godot 4.6 / GDScript で実装。
+## 開発環境
 
-**コアループ**: プレイヤーを左右に操作してゲートを通過しHP・武器を強化 → MIDIの演奏に合わせて武器が自動発射 → 完奏（曲の最後まで生き残る）を目指す。
+- **エンジン**: Godot 4.x  
 
-**主要コンセプト**:
-- **MIDIチャンネル = 武器種**: ドラム(ch9)=ハンドガン、ギター=追尾弾、ボーカル=ハンドガン、ベース=放射フィールド（将来設計）
-- **ビルド構築**: Vampire Survivors 的に、ゲートやドロップで武器を強化しながら敵の波を生き抜く
-- **終了条件**: 完奏（MIDIが最後まで再生される）またはHP0によるゲームオーバー
+---
 
-## テストコマンド
+## TDD
+### TDDワークフロー（t-wada式）
+1. **テストリストを作成する**  
+   - 新機能のブランチを作成する。
+   - 変更や新機能に対して期待される動作を、`todo.md` に網羅的にリストアップする。  
+   - この段階では **実装の設計判断は行わず**、あくまでインターフェースと期待動作のみを定義する。  
 
-テストフレームワーク: **GUT (Godot Unit Test)**
+2. 🔴 Red: **ひとつだけテストを書く**  
+   - テストリストから「ひとつだけ」取り出し、実際に、具体的で、実行可能なテストコードに翻訳する。  
+   - テストは **準備 → 実行 → 検証（アサーション）** の形を備えること。  
+   - 一度に複数のテストを書いてはいけない。  
+   - テストが正しい理由で失敗することを確認する。  
 
-```bash
-# 全テスト実行
-godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/ -ginclude_subdirs -gexit
+3. 🟢 Green: **テストを失敗させる → 成功させる**  
+   - その後、プロダクトコードを修正し、そのテストと既存の全テストを成功させる。  
+   - テストを通すためにテスト自体を書き換えてはならない。 
+   - 成功後、`todo.md` の該当項目にチェックする。  
+   - 過程で新しい必要性に気づいた場合は、テストリストに追記する。  
 
-# 単体テストのみ
-godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/unit/ -gexit
+4. 🔵 Refactor: **リファクタリング**  
+   - 次のサイクルへ進む前に「いま改善すべき設計はないか」を必ず一度検討する。
+   - リファクタリングの対象はプロダクトコードとテストコードの両方である。
+   - テストは「動作するドキュメント」としての性質を持つ。
+		- したがって、冗長なテスト・実装の詳細に依存しすぎたテスト・より上位のテストに包含されて価値を失ったテストは、仕様書としての可読性を損なうため積極的に削除する。
+   - 目的はテストの本数を増やすことではなく、テスト群が 仕様を過不足なく語れる状態 を保つこと。
 
-# 統合テストのみ
-godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/integration/ -gexit
-```
+5. **繰り返す**  
+   - テストリストが空になるまで、ステップ2に戻って繰り返す。  
 
+---
 
-## TDD ワークフロー（t-wada式）
+###  TDDにおける注意点
 
-**IMPORTANT: 必ずTDDに従って開発すること。省略・飛ばし禁止。**
+- **新機能ブランチをマージする前に、必ずユーザーの許可を受けること**。  
+- **1テストケースにつき1アサーション** を原則とする。  
+- **1サイクルにつき1コミット**を原則とする。  
 
-1. **テストリスト作成** — `todo.md` に期待動作を列挙する（設計判断はしない）
-2. 🔴 **Red** — テストリストから1つだけ取り出し、失敗するテストを書く
-3. 🟢 **Green** — プロダクトコードを修正してそのテストと全テストを通す。`todo.md` の該当項目をチェック
-4. 🔵 **Refactor** — 必要に応じてリファクタリング
-5. **繰り返す** — テストリストが空になるまで
+---
 
-- **1テストケースにつき1アサーション**を原則とする
-- **1サイクルにつき1コミット**（ユーザー確認後にコミット）
-- コミットは **Conventional Commits** に従う
+## GDScriptでのテスト
 
-## アーキテクチャ
+- テストフレームワークは `gut` を使用すること。  
+- テストファイルは `tests/` ディレクトリに配置すること。  
+- CLI実行例:  
+  ```bash
+  godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/ -gexit
+ ```
 
-### シーン構成
+## 画面確認（TDDの補助）
+- 描画・レイアウト・アニメーションなど「見た目の正しさ」は TDD で検証できない。
+- これらに限り、Godot を起動してスクリーンショットで確認してよい。
 
-```
-scenes/
-  main/main.tscn          # ゲームのルートシーン
-  characters/
-	player/player.tscn    # CharacterBody3D。移動・射撃・HP管理
-	enemy/enemy.tscn      # Area3D。HPラベル付き、弾丸衝突でダメージ
-  objects/
-	bullet/bullet.tscn    # Area3D。前方に直進し画面外で自動削除
-	gate/gate.tscn        # Area3D。プレイヤー通過時にHP効果を付与
-  components/
-	spawner.tscn          # Spawner独立シーン。SpawnTimer・AnchorRoot(Lane0〜2)含む
-  ui/
-	game_ui.tscn          # HUD（進行状況・カウントダウン・リザルト）
-	main_menu.tscn
-	components/growth_curve_graph.tscn
-```
+---
 
-### Autoload（グローバルシングルトン）
+## 参考
+- shapez.ioのレポジトリは下記を参照してください：/home/shuhei0916/c/projects/shapez.io
 
-| 名前 | ファイル |
-|------|--------|
-| Utils | `scripts/utils.gd` |
-| SceneManager | `scripts/scene_manager.gd` |
-| SongManager | `scripts/song_manager.gd` |
-
-### ゲームフロー
-
-1. **StartTimer** タイムアウト → `world_speed` を 0 → 5.0 に変更、SpawnTimer 開始、MidiPlayer 再生
-2. **MidiPlayer** が `note_on` イベントを発火 → `main._on_midi_event` → チャンネル9（ドラム）で `player.shoot()`
-3. 世界が移動（`world_objects` グループ全ノードをZ軸方向に `world_speed * delta` 移動）
-4. **MIDI完奏** または **HP≤0** → `world_speed=0`、SpawnTimer停止、`game_ui.show_result()` 表示
-5. Enter/Space で現在のシーンをリロード
-
-### Spawner のロジック
-
-- SpawnTimer タイムアウトごとに `spawn_counter` をインクリメント
-- `spawn_counter % 5 == 0` のターン → AnchorRoot の全マーカー位置にゲート行を生成（add +5〜20）
-- その他のターン → `enemy_spawn_probability`（デフォルト0.1）の確率で敵を1体スポーン
-
-### ノードグループ
-
-| グループ名 | 用途 |
-|-----------|------|
-| `world_objects` | メインループでZ軸移動させるオブジェクト |
-| `player` | Playerノードの識別（衝突判定用） |
-| `bullet` | Bulletノードの識別（敵との衝突判定用） |
-| `enemy` | Enemyノードの識別（スポーン数カウント用） |
-
-### 物理レイヤー
-
-| レイヤー | 用途 |
-|---------|------|
-| 1 | Player |
-| 2 | Bullet |
-| 3 | Item |
-| 4 | Enemy |
-| 5 | Ground |
-
-## テスト構成
-
-| 種別 | 場所 | 方針 |
-|------|------|------|
-| 単体テスト | `tests/unit/` | スクリプトを `new()` して直接テスト。シーンに依存しない |
-| 統合テスト | `tests/integration/` | `main.tscn` などをインスタンス化してシーン全体でテスト |
-
-- 単体テストで対応できない場合（Spawnerの統合など）は統合テストに落とす
-- 統合テストは `add_child_autofree()` と `await get_tree().process_frame` を使う
-
-## 参考プロジェクト
-
-- `/home/shuhei0916/c/projects/GodotProjects/dodge_the_creeps`
-- `/home/shuhei0916/c/projects/GodotProjects/squash_the_creeps_start_1.1.0`
+ 
