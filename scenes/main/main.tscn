@@ -27,6 +27,7 @@ midi_soundfont_path = "res://assets/audio/GeneralUser-GS.sf2"
 [node name="MidiPlayer" type="Node" parent="." unique_id=1243735698]
 script = ExtResource("6_blune")
 file = "res://assets/audio/Undertale_-_Megalovania.mid"
+play_speed = 0.5
 soundfont = "res://assets/audio/GeneralUser-GS.sf2"
 metadata/_custom_type_script = "uid://bwch5nk77teaf"
 
