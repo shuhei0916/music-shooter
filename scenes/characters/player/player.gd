@@ -71,7 +71,8 @@ func _on_enemy_collided(enemy: Node) -> void:
 func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
 	if weapon and weapon.is_on_grid(tick, timebase):
-		shoot(channel)
+		weapon.trigger_flash()
+		weapon.fire()
 
 
 func shoot(channel: int = 0) -> void:
