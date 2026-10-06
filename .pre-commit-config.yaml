@@ -7,9 +7,11 @@ repos:
         language: system
         types: [gdscript]
         files: ^(scenes|tests)/
+        require_serial: true
       - id: gdlint
         name: gdlint
         entry: gdlint
         language: system
         types: [gdscript]
         files: ^(scenes|tests)/
+        require_serial: true
