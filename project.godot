@@ -23,8 +23,6 @@ config/icon="uid://bh3st6iox5yj2"
 
 driver/output_latency=8
 
-[autoload]
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/midi/plugin.cfg")
