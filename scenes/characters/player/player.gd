@@ -73,17 +73,3 @@ func on_note(channel: int, tick: int, timebase: int) -> void:
 	if weapon and weapon.is_on_grid(tick, timebase):
 		weapon.trigger_flash()
 		weapon.fire()
-
-
-func shoot(channel: int = 0) -> void:
-	var weapon = _weapon_map.get(channel)
-	if weapon == null:
-		return
-	weapon.fire()
-
-
-func trigger_flash(channel: int = 0) -> void:
-	var weapon = _weapon_map.get(channel)
-	if weapon == null:
-		return
-	weapon.trigger_flash()
