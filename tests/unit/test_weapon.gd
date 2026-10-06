@@ -18,3 +18,8 @@ func after_each():
 func test_Lv1の武器は小節頭のノートで発射する():
 	weapon.level = 1
 	assert_true(weapon.is_on_grid(BAR * 2, TIMEBASE))
+
+
+func test_Lv1の武器は小節頭以外の4分音符位置のノートでは発射しない():
+	weapon.level = 1
+	assert_false(weapon.is_on_grid(BAR * 2 + TIMEBASE, TIMEBASE))
