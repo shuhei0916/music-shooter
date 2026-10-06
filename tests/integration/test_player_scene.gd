@@ -26,3 +26,8 @@ func test_shoot9を呼ぶとch9の弾丸がシーンに追加される():
 func test_未割り当てchannelではshootしても弾丸が追加されない():
 	player.shoot(99)
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_グリッド上のノートを受け取ると対応チャンネルの武器から弾を発射する():
+	player.on_note(0, 480 * 4, 480)
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())

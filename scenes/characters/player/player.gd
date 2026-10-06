@@ -68,6 +68,10 @@ func _on_enemy_collided(enemy: Node) -> void:
 	enemy.take_damage(player_hp_before)
 
 
+func on_note(channel: int, _tick: int, _timebase: int) -> void:
+	shoot(channel)
+
+
 func shoot(channel: int = 0) -> void:
 	var weapon = _weapon_map.get(channel)
 	if weapon == null:
