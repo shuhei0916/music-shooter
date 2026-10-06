@@ -38,3 +38,8 @@ func test_Lv2の武器は8分音符位置のノートでは発射しない():
 func test_Lv3の武器は8分音符位置のノートで発射する():
 	weapon.level = 3
 	assert_true(weapon.is_on_grid(BAR * 2 + TIMEBASE / 2, TIMEBASE))
+
+
+func test_最大レベルの武器はグリッドから外れたノートでも発射する():
+	weapon.level = Weapon.MAX_LEVEL
+	assert_true(weapon.is_on_grid(BAR * 2 + 7, TIMEBASE))
