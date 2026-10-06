@@ -24,3 +24,18 @@ func test_スタートタイマー経過後にワールドが動き出す():
 	main._on_start_timer_timeout()
 	main._process(0.016)
 	assert_true(world_obj.global_position.z > initial_z)
+
+
+func _emit_note_on_at(tick: int, channel_number: int) -> void:
+	var event := SMF.MIDIEventNoteOn.new(60, 100)
+	main.midi_player.smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
+	main.midi_player.track_status.events.assign(
+		[SMF.MIDIEventChunk.new(tick, channel_number, event)]
+	)
+	main.midi_player.track_status.event_pointer = 1
+	main._on_midi_event(MidiPlayer.GodotMIDIPlayerChannelStatus.new(channel_number), event)
+
+
+func test_グリッド外のtickのノートでは弾が発射されない():
+	_emit_note_on_at(480, 0)
+	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
