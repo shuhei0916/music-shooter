@@ -68,8 +68,10 @@ func _on_enemy_collided(enemy: Node) -> void:
 	enemy.take_damage(player_hp_before)
 
 
-func on_note(channel: int, _tick: int, _timebase: int) -> void:
-	shoot(channel)
+func on_note(channel: int, tick: int, timebase: int) -> void:
+	var weapon = _weapon_map.get(channel)
+	if weapon and weapon.is_on_grid(tick, timebase):
+		shoot(channel)
 
 
 func shoot(channel: int = 0) -> void:
