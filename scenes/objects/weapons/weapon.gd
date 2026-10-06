@@ -2,7 +2,7 @@ class_name Weapon
 extends Node3D
 
 ## レベルごとの1小節（4/4拍子）の分割数
-const LEVEL_DIVISIONS: Array[int] = [1, 4]
+const LEVEL_DIVISIONS: Array[int] = [1, 4, 8]
 
 @export var channel: int = 0
 @export var color: Color = Color.WHITE
