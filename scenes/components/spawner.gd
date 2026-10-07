@@ -52,6 +52,7 @@ func _spawn_gate_row() -> void:
 	if markers.is_empty():
 		return
 	var level_up_index := randi() % markers.size()
+	var row: Array[Node] = []
 	for i in markers.size():
 		var gate = gate_scene.instantiate()
 		gate.global_transform = markers[i].global_transform
@@ -59,7 +60,16 @@ func _spawn_gate_row() -> void:
 			_set_level_up_gate_properties(gate)
 		else:
 			_set_gate_properties(gate)
+		gate.passed.connect(_on_gate_row_passed.bind(row))
+		row.append(gate)
 		main_scene.add_child(gate)
+
+
+## 列のどれか1つを通ったら、同じ列のゲートはすべて消す
+func _on_gate_row_passed(row: Array[Node]) -> void:
+	for gate in row:
+		if is_instance_valid(gate):
+			gate.queue_free()
 
 
 func _set_gate_properties(gate: Node) -> void:

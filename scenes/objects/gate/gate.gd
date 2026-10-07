@@ -1,5 +1,7 @@
 extends Area3D
 
+signal passed
+
 @export var gate_type: String = "add"  # "add", "multiply", "level_up"
 @export var value: int = 1
 ## レベルアップゲートの表示色（対象武器の色）
@@ -17,6 +19,7 @@ func _on_body_entered(body: Node) -> void:
 		return
 	if body.is_in_group("player"):
 		body.apply_gate_effect(gate_type, value)
+		passed.emit()
 		queue_free()
 
 

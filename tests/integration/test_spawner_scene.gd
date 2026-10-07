@@ -65,3 +65,15 @@ func test_レベルアップゲートには対象武器の色が設定される(
 	var gates = _spawn_gate_row()
 	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
 	assert_eq(Color.ORANGE, level_up_gate.weapon_color)
+
+
+func _player_body() -> Node:
+	var player: Node = autofree(preload("res://scenes/characters/player/player.gd").new())
+	player.add_to_group("player")
+	return player
+
+
+func test_ゲート列のうち1つを通ると同じ列の他のゲートは消える():
+	var gates = _spawn_gate_row()
+	gates[0]._on_body_entered(_player_body())
+	assert_true(gates[1].is_queued_for_deletion())
