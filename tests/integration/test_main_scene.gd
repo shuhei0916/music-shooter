@@ -33,18 +33,9 @@ func test_スタートタイマー経過後にワールドが動き出す():
 	assert_true(world_obj.global_position.z > initial_z)
 
 
-func _emit_note_on_at(tick: int, channel_number: int) -> void:
-	var event := SMF.MIDIEventNoteOn.new(60, 100)
-	main.midi_player.smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
-	main.midi_player.track_status.events.assign(
-		[SMF.MIDIEventChunk.new(tick, channel_number, event)]
-	)
-	main.midi_player.track_status.event_pointer = 1
-	main._on_midi_event(MidiPlayer.GodotMIDIPlayerChannelStatus.new(channel_number), event)
-
-
 func test_midi_eventシグナルでは発射しない():
-	_emit_note_on_at(0, 0)
+	var event := SMF.MIDIEventNoteOn.new(60, 100)
+	main._on_midi_event(MidiPlayer.GodotMIDIPlayerChannelStatus.new(0), event)
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
 
 
