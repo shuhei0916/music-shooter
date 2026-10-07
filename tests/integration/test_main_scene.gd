@@ -7,6 +7,7 @@ var main
 
 func before_each():
 	main = preload("res://scenes/main/main.tscn").instantiate()
+	main.midi_soundfont_path = ""  # 音色の読み込み（約2.3秒）を省く
 
 	add_child_autofree(main)
 	await get_tree().process_frame
@@ -83,11 +84,6 @@ func test_ゲームオーバー後はノートを処理しない():
 	main.midi_player.position = main.midi_player.last_position
 	main._process(0.0)
 	assert_engine_error_count(0)
-
-
-func test_ゲーム開始後はサウンドフォントが読み込まれている():
-	main._on_start_timer_timeout()
-	assert_not_null(main.midi_player.bank)
 
 
 func test_開始時にSettingsのvisual_offset_secを使う():

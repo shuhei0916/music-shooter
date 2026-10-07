@@ -1,11 +1,20 @@
 extends GutTest
 
 const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
-const SOUNDFONT = "res://assets/audio/GeneralUser-GS.sf2"
+const SOUNDFONT = "res://test_only/fake.sf2"
+
+
+## 実際の音色読み込み（約2.3秒）の代わりに、読み込むたびに新しいバンクを作るMidiPlayer
+class FakeLoadingMidiPlayer:
+	extends MidiPlayer
+
+	func set_soundfont(path: String) -> void:
+		soundfont = path
+		bank = Bank.new()
 
 
 func _midi_player() -> MidiPlayer:
-	var midi_player: MidiPlayer = autofree(MidiPlayer.new())
+	var midi_player: MidiPlayer = autofree(FakeLoadingMidiPlayer.new())
 	midi_player._used_program_numbers.assign([0])
 	return midi_player
 
