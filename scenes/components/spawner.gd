@@ -46,16 +46,24 @@ func _on_spawn_timer_timeout() -> void:
 func _spawn_gate_row() -> void:
 	if markers.is_empty():
 		return
-	for marker in markers:
+	var level_up_index := randi() % markers.size()
+	for i in markers.size():
 		var gate = gate_scene.instantiate()
-		gate.global_transform = marker.global_transform
-		_set_gate_properties(gate)
+		gate.global_transform = markers[i].global_transform
+		if i == level_up_index:
+			_set_level_up_gate_properties(gate)
+		else:
+			_set_gate_properties(gate)
 		main_scene.add_child(gate)
 
 
 func _set_gate_properties(gate: Node) -> void:
 	gate.gate_type = "add"
 	gate.value = randi_range(5, 20)
+
+
+func _set_level_up_gate_properties(gate: Node) -> void:
+	gate.gate_type = "level_up"
 
 
 func _maybe_spawn_enemy() -> void:
