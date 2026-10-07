@@ -19,4 +19,4 @@ func pop_due(tick_limit: float) -> Array[SMF.MIDIEventChunk]:
 
 
 func _is_sounding_note_on(event: SMF.MIDIEvent) -> bool:
-	return event.velocity > 0
+	return event.type == SMF.MIDIEventType.note_on and event.velocity > 0

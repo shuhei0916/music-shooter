@@ -32,3 +32,9 @@ func test_一度返したノートを再び返さない():
 func test_velocity0のnote_onを返さない():
 	var scheduler := _scheduler([_note_on(100, 0)])
 	assert_eq(0, scheduler.pop_due(100).size())
+
+
+func test_note_on以外のイベントを返さない():
+	var note_off := SMF.MIDIEventChunk.new(100, 0, SMF.MIDIEventNoteOff.new(60, 64))
+	var scheduler := _scheduler([note_off])
+	assert_eq(0, scheduler.pop_due(100).size())
