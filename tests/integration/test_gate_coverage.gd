@@ -25,9 +25,12 @@ func _player_width() -> float:
 	return player.get_node("CollisionShape3D").shape.radius * 2.0
 
 
-func test_Playerの当たり判定の幅はゲートどうしのすき間より広い():
-	var gap := _lane_spacing() - _gate_width()
-	assert_gt(_player_width(), gap)
+func _gap() -> float:
+	return _lane_spacing() - _gate_width()
+
+
+func test_Playerの当たり判定の幅はゲートのすき間以下で二重取りできない():
+	assert_lte(_player_width(), _gap())
 
 
 func test_ゲートの見た目の幅と当たり判定の幅が一致する():

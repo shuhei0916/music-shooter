@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/kenney_animated-characters-protagonists/Skins/skaterMaleA.png" id="4_skin"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-radius = 1.0
+radius = 0.475
 
 [node name="Player" type="CharacterBody3D" unique_id=606577689 groups=["player"]]
 collision_mask = 12
