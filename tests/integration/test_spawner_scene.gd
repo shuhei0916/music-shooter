@@ -77,3 +77,12 @@ func test_ゲート列のうち1つを通ると同じ列の他のゲートは消
 	var gates = _spawn_gate_row()
 	gates[0]._on_body_entered(_player_body())
 	assert_true(gates[1].is_queued_for_deletion())
+
+
+func test_同じ列のゲートを通った後に別のゲートに触れても効果は得られない():
+	var add_gates = _spawn_gate_row().filter(func(g): return g.gate_type == "add")
+	var player := _player_body()
+	add_gates[0]._on_body_entered(player)  # 同じフレームで2つのゲートに触れた場合
+	var hp_after_first: int = player.hp
+	add_gates[1]._on_body_entered(player)
+	assert_eq(hp_after_first, player.hp)

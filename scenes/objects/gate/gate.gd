@@ -15,7 +15,8 @@ func _ready():
 
 
 func _on_body_entered(body: Node) -> void:
-	if not body:
+	# 同じ列の別ゲートを通過済み（queue_freeは遅延するので同じフレームで触れうる）
+	if not body or is_queued_for_deletion():
 		return
 	if body.is_in_group("player"):
 		body.apply_gate_effect(gate_type, value)
