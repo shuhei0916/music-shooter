@@ -73,6 +73,7 @@ func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
 	spawner.start()
 	midi_player.play()
+	_note_scheduler = NoteScheduler.new(midi_player.track_status.events)
 	start_timer.stop()
 	game_ui.update_countdown("")
 	spawner.set_weapon_colors(player.get_weapon_colors())

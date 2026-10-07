@@ -67,3 +67,10 @@ func test_visual_offset秒より先のノートではまだ発射しない():
 	_schedule_note_at(1920, 1439)
 	main._process(0.0)
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_ゲーム開始後は曲のノートで弾が発射される():
+	main._on_start_timer_timeout()
+	main.midi_player.position = main.midi_player.last_position
+	main._process(0.0)
+	assert_gt(get_tree().get_nodes_in_group("bullet").size(), 0)
