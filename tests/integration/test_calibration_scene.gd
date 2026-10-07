@@ -80,3 +80,7 @@ func test_EscではSettingsを変えない():
 func test_クリックに合わせて発射する():
 	calibration._process(0.0)  # 再生開始直後は1拍目（tick 0）のクリックが到達済み
 	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_開始時にサウンドフォントが読み込まれている():
+	assert_not_null(calibration.get_node("MidiPlayer").bank)
