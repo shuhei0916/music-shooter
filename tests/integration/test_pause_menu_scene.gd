@@ -50,3 +50,7 @@ func test_ゲームを終了でアプリの終了を要求する():
 	watch_signals(pause_menu)
 	pause_menu.get_node("%QuitButton").pressed.emit()
 	assert_signal_emitted(pause_menu, "quit_requested")
+
+
+func test_開いたとき再開にフォーカスがある():
+	assert_true(pause_menu.get_node("%ResumeButton").has_focus())
