@@ -37,3 +37,9 @@ func test_一時停止中にEscを押すと再開する():
 func test_タイトルへ戻るとき一時停止を解除する():
 	pause_menu.get_node("%TitleButton").pressed.emit()
 	assert_false(get_tree().paused)
+
+
+func test_タイトルへ戻るでタイトル画面へ移る():
+	watch_signals(pause_menu)
+	pause_menu.get_node("%TitleButton").pressed.emit()
+	assert_signal_emitted(pause_menu, "title_requested")
