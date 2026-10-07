@@ -65,3 +65,12 @@ func test_レベルアップゲートの効果で対象チャンネルの武器�
 
 	player.apply_gate_effect("level_up", 9)
 	assert_eq(2, weapon.level)
+
+
+func test_最大レベルの武器はレベルアップゲートを通ってもレベルが上がらない() -> void:
+	var weapon: Weapon = autofree(Weapon.new())
+	weapon.level = Weapon.MAX_LEVEL
+	player._weapon_map[9] = weapon
+
+	player.apply_gate_effect("level_up", 9)
+	assert_eq(Weapon.MAX_LEVEL, weapon.level)

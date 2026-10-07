@@ -8,7 +8,9 @@ const MAX_LEVEL := 4
 
 @export var channel: int = 0
 @export var color: Color = Color.WHITE
-@export var level: int = 1
+@export var level: int = 1:
+	set(value):
+		level = mini(value, MAX_LEVEL)
 
 
 func is_on_grid(tick: int, timebase: int) -> bool:
