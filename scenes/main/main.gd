@@ -1,10 +1,15 @@
 extends Node3D
 
 const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
+const NoteScheduler = preload("res://scripts/note_scheduler.gd")
 
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
+## 映像（発射）を音より何秒先行させるか。映像の表示遅延が音声の出力遅延より大きいため
+@export var visual_offset_sec: float = 0.04
+
+var _note_scheduler: NoteScheduler
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
@@ -22,11 +27,23 @@ func _ready():
 func _process(delta: float) -> void:
 	_move_world_objects(delta)
 	_update_song_progress()
+	_fire_due_notes()
 
 
 func _move_world_objects(delta: float):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, world_speed * delta))
+
+
+func _fire_due_notes() -> void:
+	if _note_scheduler == null:
+		return
+	var timebase: int = midi_player.smf_data.timebase
+	var lookahead_ticks: float = (
+		visual_offset_sec * midi_player.seconds_to_timebase * timebase * midi_player.play_speed
+	)
+	for chunk in _note_scheduler.pop_due(midi_player.position + lookahead_ticks):
+		player.on_note(chunk.channel_number, chunk.time, timebase)
 
 
 func _end_game(is_win: bool) -> void:

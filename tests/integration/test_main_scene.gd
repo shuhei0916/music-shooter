@@ -1,5 +1,7 @@
 extends GutTest
 
+const NoteScheduler = preload("res://scripts/note_scheduler.gd")
+
 var main
 
 
@@ -10,6 +12,11 @@ func before_each():
 	await get_tree().process_frame
 	#add_child_autofree(player)
 	#add_child_autofree(enemy)
+
+
+func after_each():
+	for bullet in get_tree().get_nodes_in_group("bullet"):
+		bullet.free()
 
 
 func test_スタートタイマー経過後にワールドが動き出す():
@@ -44,3 +51,21 @@ func test_グリッド外のtickのノートでは弾が発射されない():
 func test_ゲーム開始時にPlayerの武器の色がスポーナーに渡される():
 	main._on_start_timer_timeout()
 	assert_eq_deep(main.spawner._weapon_colors.keys(), [0, 9])
+
+
+## テンポ120（1拍=0.5秒=480tick）で再生位置positionにいる状態を作り、tickのノートを予約する
+func _schedule_note_at(tick: int, position: float) -> void:
+	main.midi_player.smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
+	main.midi_player.seconds_to_timebase = 2.0
+	main.midi_player.position = position
+	var events: Array[SMF.MIDIEventChunk] = [
+		SMF.MIDIEventChunk.new(tick, 0, SMF.MIDIEventNoteOn.new(60, 100))
+	]
+	main._note_scheduler = NoteScheduler.new(events)
+
+
+func test_再生位置よりvisual_offset秒先までのノートで発射する():
+	main.visual_offset_sec = 0.5  # 480tick先まで
+	_schedule_note_at(1920, 1440)
+	main._process(0.0)
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
