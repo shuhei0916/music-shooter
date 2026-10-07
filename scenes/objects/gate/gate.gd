@@ -1,6 +1,6 @@
 extends Area3D
 
-@export var gate_type: String = "add"  # "add", "multiply"
+@export var gate_type: String = "add"  # "add", "multiply", "level_up"
 @export var value: int = 1
 
 
@@ -24,6 +24,8 @@ func update_label():
 				label.text = "❤️ +" + str(value)
 			"multiply":
 				label.text = "💕 x" + str(value)
+			"level_up":
+				label.text = "🔫 Lv UP"
 
 
 func _on_visible_on_screen_notifier_3d_screen_exited() -> void:
