@@ -2,14 +2,10 @@
 
 [ext_resource type="Script" uid="uid://ccqrk60asdt1" path="res://scenes/characters/player/player.gd" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://dniw4g2b7emm3" path="res://scenes/objects/weapons/handgun/handgun.tscn" id="2_t61fv"]
+[ext_resource type="Script" path="res://scenes/characters/character_model/character_model.gd" id="3_model"]
+[ext_resource type="Texture2D" path="res://assets/kenney_animated-characters-protagonists/Skins/skaterMaleA.png" id="4_skin"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player"]
-albedo_color = Color(0.305882, 0.85098, 1, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-material = SubResource("StandardMaterial3D_player")
 
 [node name="Player" type="CharacterBody3D" unique_id=606577689 groups=["player"]]
 collision_mask = 12
@@ -18,8 +14,10 @@ script = ExtResource("1_player")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2115158575]
 shape = SubResource("CapsuleShape3D_player")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=178321220]
-mesh = SubResource("CapsuleMesh_player")
+[node name="CharacterModel" type="Node3D" parent="." unique_id=178321220]
+transform = Transform3D(-0.65, 0, 0, 0, 0.65, 0, 0, 0, -0.65, 0, -1, 0)
+script = ExtResource("3_model")
+skin = ExtResource("4_skin")
 
 [node name="HPLabel" type="Label3D" parent="." unique_id=466701705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

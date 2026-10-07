@@ -34,3 +34,8 @@ func test_武器が割り当てられていないチャンネルのノートで�
 func test_グリッド上のノートを受け取ると武器のマズルフラッシュが光る():
 	player.on_note(0, BAR, TIMEBASE)
 	assert_gt(player._weapon_map[0]._flash.light_energy, 0.0)
+
+
+func test_スケーター男性のスキンで走るモデルを表示する():
+	var model = player.get_node("CharacterModel")
+	assert_eq(["run", "skaterMaleA.png"], [model.animation, model.skin.resource_path.get_file()])
