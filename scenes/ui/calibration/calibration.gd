@@ -9,6 +9,8 @@ const Metronome = preload("res://scripts/metronome.gd")
 const OFFSET_STEP_SEC = 0.005
 const CLICK_BPM = 120.0
 const CLICK_BEATS = 600  # 5分ぶん
+## play()後に設定し、使う音色だけを読み込む（mainと同じ理由）
+const SOUNDFONT_PATH = "res://assets/audio/GeneralUser-GS.sf2"
 
 ## 調整を終えたときに戻るシーン（空ならシーンを切り替えない）
 @export_file("*.tscn") var return_scene := "res://scenes/main/main.tscn"
@@ -32,6 +34,7 @@ func _ready() -> void:
 		weapon.level = weapon.MAX_LEVEL  # クリックのたびに撃つ
 	_midi_player.smf_data = Metronome.build(CLICK_BPM, CLICK_BEATS)
 	_midi_player.play()
+	_midi_player.soundfont = SOUNDFONT_PATH
 	_note_scheduler = NoteScheduler.new(_midi_player.track_status.events)
 
 
