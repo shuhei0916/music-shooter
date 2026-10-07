@@ -1,16 +1,24 @@
 extends GutTest
 
+const CALIBRATION_SCENE = preload("res://scenes/ui/calibration/calibration.tscn")
+
 var calibration
+var _saved_offset: float
 
 
 func before_each():
-	calibration = load("res://scenes/ui/calibration/calibration.tscn").instantiate()
-	add_child_autofree(calibration)
+	_saved_offset = Settings.visual_offset_sec
+	calibration = _spawn()
 
 
 func after_each():
+	Settings.visual_offset_sec = _saved_offset
 	for bullet in get_tree().get_nodes_in_group("bullet"):
 		bullet.free()
+
+
+func _spawn():
+	return add_child_autofree(CALIBRATION_SCENE.instantiate())
 
 
 func _press(action: String) -> void:
@@ -36,3 +44,8 @@ func test_現在のオフセットをmsで表示する():
 	calibration.offset_sec = 0.04
 	_press("ui_right")
 	assert_string_contains(calibration.get_node("UI/OffsetLabel").text, "+45 ms")
+
+
+func test_開始時はSettingsの値から始まる():
+	Settings.visual_offset_sec = 0.06
+	assert_eq(0.06, _spawn().offset_sec)

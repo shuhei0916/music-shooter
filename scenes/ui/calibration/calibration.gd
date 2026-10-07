@@ -11,6 +11,10 @@ var offset_sec := 0.0:
 @onready var _offset_label: Label = $UI/OffsetLabel
 
 
+func _ready() -> void:
+	offset_sec = Settings.visual_offset_sec
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_right"):
 		offset_sec += OFFSET_STEP_SEC

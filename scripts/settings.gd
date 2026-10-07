@@ -6,6 +6,10 @@ var path := "user://settings.cfg"
 var visual_offset_sec := 0.04
 
 
+func _ready() -> void:
+	load_from_file()
+
+
 func save_to_file() -> void:
 	var config := ConfigFile.new()
 	config.set_value("timing", "visual_offset_sec", visual_offset_sec)
