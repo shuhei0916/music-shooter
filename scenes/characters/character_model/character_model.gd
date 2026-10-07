@@ -26,6 +26,8 @@ func _ready() -> void:
 func _load_animation(anim_name: String) -> Animation:
 	var source: Node = ANIMATIONS[anim_name][0].instantiate()
 	var source_player: AnimationPlayer = source.find_children("*", "AnimationPlayer")[0]
-	var result: Animation = source_player.get_animation(ANIMATIONS[anim_name][1])
+	# インポートした共有リソースを書き換えないよう複製してからループさせる
+	var result: Animation = source_player.get_animation(ANIMATIONS[anim_name][1]).duplicate()
+	result.loop_mode = Animation.LOOP_LINEAR
 	source.free()
 	return result

@@ -73,7 +73,7 @@
 ### 見た目
 - [ ] キャラクター（プレイヤー・敵）の3D素材を追加する（Kenney Animated Characters Protagonists）
 	- [x] CharacterModelは指定したアニメーションを再生する
-	- [ ] CharacterModelのアニメーションはループする
+	- [x] CharacterModelのアニメーションはループする
 	- [ ] CharacterModelは指定したスキンのテクスチャをメッシュに適用する
 	- [ ] Playerはスケーター男性のスキンで走るモデルを表示する（カプセルのメッシュを置き換える）
 	- [ ] 敵は悪役のスキンでプレイヤー側を向いたモデルを表示する
