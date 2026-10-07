@@ -12,6 +12,7 @@ signal calibration_requested
 func _ready() -> void:
 	%PlayButton.pressed.connect(_go.bind(play_requested, "song_select_scene"))
 	%CalibrationButton.pressed.connect(_on_calibration_pressed)
+	%PlayButton.grab_focus()
 
 
 func _on_calibration_pressed() -> void:

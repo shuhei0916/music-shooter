@@ -33,3 +33,7 @@ func test_タイミング調整で調整画面へ移る():
 func test_調整画面を開くとき戻り先としてタイトルを記録する():
 	title.get_node("%CalibrationButton").pressed.emit()
 	assert_eq("res://scenes/ui/title/title.tscn", Session.calibration_return_scene)
+
+
+func test_開いたときプレイにフォーカスがある():
+	assert_true(title.get_node("%PlayButton").has_focus())
