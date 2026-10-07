@@ -53,7 +53,7 @@
 - [x] Settingsはvisual_offset_secの初期値0.04を持つ
 - [x] Settingsは保存した値を次回読み込める
 - [x] Settingsは保存ファイルがなければ初期値のまま
-- [ ] Metronomeは指定拍数ぶん、1拍ごとにnote_onを持つSMFを作る
+- [x] Metronomeは指定拍数ぶん、1拍ごとにnote_onを持つSMFを作る
 - [ ] Metronomeが作るSMFは指定テンポのテンポイベントを持つ
 - [ ] キャリブレーション画面は→でオフセットを5ms増やす
 - [ ] キャリブレーション画面は←でオフセットを5ms減らす
