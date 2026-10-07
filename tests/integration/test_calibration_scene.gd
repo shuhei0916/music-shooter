@@ -75,3 +75,8 @@ func test_EscではSettingsを変えない():
 	calibration.offset_sec = 0.07
 	_press("ui_cancel")
 	assert_eq(0.04, Settings.visual_offset_sec)
+
+
+func test_クリックに合わせて発射する():
+	calibration._process(0.0)  # 再生開始直後は1拍目（tick 0）のクリックが到達済み
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())

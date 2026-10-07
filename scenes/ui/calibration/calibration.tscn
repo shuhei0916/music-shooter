@@ -1,9 +1,36 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/calibration/calibration.gd" id="1_calib"]
+[ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="2_midi"]
+[ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="3_player"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
+albedo_color = Color(0.670588, 0.631373, 0.627451, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+material = SubResource("StandardMaterial3D_ground")
+size = Vector2(10, 100)
 
 [node name="Calibration" type="Node3D"]
 script = ExtResource("1_calib")
+
+[node name="MidiPlayer" type="Node" parent="."]
+script = ExtResource("2_midi")
+soundfont = "res://assets/audio/GeneralUser-GS.sf2"
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965925, 0, -0.965925, 0.258819, 0, 10, 2)
+light_color = Color(1, 0.956863, 0.839216, 1)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.70710695, 0.70710695, 0, -0.70710695, 0.70710695, 0, 7, 3)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ground")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
