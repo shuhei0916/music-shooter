@@ -37,3 +37,10 @@ func test_調整画面を開くとき戻り先としてタイトルを記録す�
 
 func test_開いたときプレイにフォーカスがある():
 	assert_true(title.get_node("%PlayButton").has_focus())
+
+
+func test_起動時のシーンはタイトル画面():
+	var main_scene: String = ProjectSettings.get_setting("application/run/main_scene")
+	if main_scene.begins_with("uid://"):
+		main_scene = ResourceUID.get_id_path(ResourceUID.text_to_id(main_scene))
+	assert_eq("res://scenes/ui/title/title.tscn", main_scene)
