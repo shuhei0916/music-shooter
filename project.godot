@@ -26,6 +26,7 @@ driver/output_latency=8
 [autoload]
 
 Settings="*res://scripts/settings.gd"
+Session="*res://scripts/session.gd"
 
 [editor_plugins]
 

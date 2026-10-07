@@ -77,6 +77,8 @@ func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
 	visual_offset_sec = Settings.visual_offset_sec
 	spawner.start()
+	if Session.song_path:
+		midi_player.file = Session.song_path
 	midi_player.play()
 	SoundfontCache.load_into(midi_player, midi_soundfont_path)
 	_note_scheduler = NoteScheduler.new(midi_player.track_status.events)

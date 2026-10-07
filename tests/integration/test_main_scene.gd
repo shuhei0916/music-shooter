@@ -114,3 +114,11 @@ func test_ゲーム開始後はCキーでタイミング調整画面を開かな
 	watch_signals(main)
 	_press("calibrate")
 	assert_signal_not_emitted(main, "calibration_requested")
+
+
+func test_Sessionで選ばれた曲を再生する():
+	var saved_song: String = Session.song_path
+	Session.song_path = "res://assets/audio/Jump!.mid"
+	main._on_start_timer_timeout()
+	Session.song_path = saved_song
+	assert_eq("res://assets/audio/Jump!.mid", main.midi_player.file)
