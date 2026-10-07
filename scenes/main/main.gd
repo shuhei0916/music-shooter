@@ -1,5 +1,8 @@
 extends Node3D
 
+## カウントダウン中にタイミング調整画面を開くよう要求されたとき
+signal calibration_requested
+
 const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
 const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
@@ -8,6 +11,8 @@ const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
+## タイミング調整画面（空ならシーンを切り替えない）
+@export_file("*.tscn") var calibration_scene := "res://scenes/ui/calibration/calibration.tscn"
 ## 映像（発射）を音より何秒先行させるか。開始時にSettings（タイミング調整画面で設定）から読む
 var visual_offset_sec: float
 
@@ -97,6 +102,14 @@ func _unhandled_input(event):
 		get_tree().reload_current_scene()
 	if event.is_action_pressed("debug_toggle"):
 		game_ui.toggle_debug()
+	if event.is_action_pressed("calibrate"):
+		_open_calibration()
+
+
+func _open_calibration() -> void:
+	calibration_requested.emit()
+	if calibration_scene:
+		get_tree().change_scene_to_file(calibration_scene)
 
 
 func _update_song_progress():

@@ -96,3 +96,17 @@ func test_開始時にSettingsのvisual_offset_secを使う():
 	main._on_start_timer_timeout()
 	Settings.visual_offset_sec = saved_offset
 	assert_eq(0.09, main.visual_offset_sec)
+
+
+func _press(action: String) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	main._unhandled_input(event)
+
+
+func test_カウントダウン中にCキーでタイミング調整画面を開く():
+	main.calibration_scene = ""  # テスト中にシーンを切り替えない
+	watch_signals(main)
+	_press("calibrate")
+	assert_signal_emitted(main, "calibration_requested")
