@@ -1,14 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cuecnhmhkeac"]
+[gd_scene format=3 uid="uid://cuecnhmhkeac"]
 
 [ext_resource type="Script" uid="uid://dsi7rylmr6i8g" path="res://scenes/characters/enemy/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scenes/characters/character_model/character_model.gd" id="2_model"]
+[ext_resource type="Texture2D" path="res://assets/kenney_animated-characters-protagonists/Skins/criminalMaleA.png" id="3_skin"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_enemy"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
-albedo_color = Color(1, 0.2, 0.2, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_enemy"]
-material = SubResource("StandardMaterial3D_enemy")
 
 [node name="Enemy" type="Area3D" groups=["enemy", "world_objects"]]
 collision_layer = 8
@@ -18,8 +14,10 @@ script = ExtResource("1_enemy")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_enemy")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_enemy")
+[node name="CharacterModel" type="Node3D" parent="."]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 0, -1, 0)
+script = ExtResource("2_model")
+skin = ExtResource("3_skin")
 
 [node name="HPLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
