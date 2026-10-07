@@ -9,3 +9,7 @@ static func list_songs(dir: String) -> Array[String]:
 			songs.append(dir.path_join(file))
 	songs.sort()
 	return songs
+
+
+static func display_name(song_path: String) -> String:
+	return song_path.get_file().get_basename()

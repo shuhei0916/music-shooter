@@ -27,3 +27,7 @@ func test_フォルダ内のMIDIファイルを名前順に一覧にする():
 func test_MIDI以外のファイルを一覧に含めない():
 	_create_files(["song.mid", "GeneralUser-GS.sf2", "song.mid.import"])
 	assert_eq_deep(SongLibrary.list_songs(TEST_DIR), [TEST_DIR + "/song.mid"])
+
+
+func test_曲の表示名はファイル名から拡張子を除いたもの():
+	assert_eq("Jump!", SongLibrary.display_name("res://assets/audio/Jump!.mid"))
