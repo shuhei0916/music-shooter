@@ -18,3 +18,16 @@ func after_each():
 func test_再開でゲームが再開する():
 	pause_menu.get_node("%ResumeButton").pressed.emit()
 	assert_false(get_tree().paused)
+
+
+func test_再開でメニューが閉じる():
+	pause_menu.get_node("%ResumeButton").pressed.emit()
+	assert_false(pause_menu.visible)
+
+
+func test_一時停止中にEscを押すと再開する():
+	var event := InputEventAction.new()
+	event.action = "ui_cancel"
+	event.pressed = true
+	pause_menu._unhandled_input(event)
+	assert_false(get_tree().paused)
