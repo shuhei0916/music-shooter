@@ -69,3 +69,10 @@ func test_再生位置よりvisual_offset秒先までのノートで発射する
 	_schedule_note_at(1920, 1440)
 	main._process(0.0)
 	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_visual_offset秒より先のノートではまだ発射しない():
+	main.visual_offset_sec = 0.5  # 480tick先まで
+	_schedule_note_at(1920, 1439)
+	main._process(0.0)
+	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
