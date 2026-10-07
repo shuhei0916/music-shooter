@@ -22,3 +22,8 @@ func _create_files(names: Array) -> void:
 func test_フォルダ内のMIDIファイルを名前順に一覧にする():
 	_create_files(["b.mid", "a.mid"])
 	assert_eq_deep(SongLibrary.list_songs(TEST_DIR), [TEST_DIR + "/a.mid", TEST_DIR + "/b.mid"])
+
+
+func test_MIDI以外のファイルを一覧に含めない():
+	_create_files(["song.mid", "GeneralUser-GS.sf2", "song.mid.import"])
+	assert_eq_deep(SongLibrary.list_songs(TEST_DIR), [TEST_DIR + "/song.mid"])
