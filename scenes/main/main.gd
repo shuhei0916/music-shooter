@@ -102,7 +102,7 @@ func _unhandled_input(event):
 		get_tree().reload_current_scene()
 	if event.is_action_pressed("debug_toggle"):
 		game_ui.toggle_debug()
-	if event.is_action_pressed("calibrate"):
+	if event.is_action_pressed("calibrate") and not start_timer.is_stopped():
 		_open_calibration()
 
 

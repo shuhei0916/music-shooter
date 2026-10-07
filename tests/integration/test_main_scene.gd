@@ -110,3 +110,11 @@ func test_カウントダウン中にCキーでタイミング調整画面を開
 	watch_signals(main)
 	_press("calibrate")
 	assert_signal_emitted(main, "calibration_requested")
+
+
+func test_ゲーム開始後はCキーでタイミング調整画面を開かない():
+	main.calibration_scene = ""
+	main._on_start_timer_timeout()
+	watch_signals(main)
+	_press("calibrate")
+	assert_signal_not_emitted(main, "calibration_requested")
