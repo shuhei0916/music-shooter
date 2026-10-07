@@ -51,3 +51,10 @@ func _spawn_gate_row() -> Array:
 func test_ゲート列のうち1つはレベルアップゲートになる():
 	var gates = _spawn_gate_row()
 	assert_eq(1, gates.filter(func(g): return g.gate_type == "level_up").size())
+
+
+func test_レベルアップゲートの対象チャンネルは武器のあるチャンネルから選ばれる():
+	spawner.set_weapon_channels([9])
+	var gates = _spawn_gate_row()
+	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
+	assert_eq(9, level_up_gate.value)
