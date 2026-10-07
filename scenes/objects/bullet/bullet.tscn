@@ -15,6 +15,7 @@ collision_mask = 8
 script = ExtResource("1_ds4j2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+cast_shadow = 0
 mesh = SubResource("SphereMesh_uafn7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
