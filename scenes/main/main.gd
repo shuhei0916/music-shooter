@@ -2,6 +2,8 @@ extends Node3D
 
 ## カウントダウン中にタイミング調整画面を開くよう要求されたとき
 signal calibration_requested
+## リザルト画面から曲選択画面に戻るよう要求されたとき
+signal song_select_requested
 
 const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
@@ -13,6 +15,8 @@ const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 @export var initial_world_speed: float = 5.0
 ## タイミング調整画面（空ならシーンを切り替えない）
 @export_file("*.tscn") var calibration_scene := "res://scenes/ui/calibration/calibration.tscn"
+## 曲選択画面（空ならシーンを切り替えない）
+@export_file("*.tscn") var song_select_scene := "res://scenes/ui/song_select/song_select.tscn"
 ## 映像（発射）を音より何秒先行させるか。開始時にSettings（タイミング調整画面で設定）から読む
 var visual_offset_sec: float
 
@@ -102,6 +106,10 @@ func _setup_growth_curve() -> void:
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and game_ui.result_panel.visible:
 		get_tree().reload_current_scene()
+	if event.is_action_pressed("ui_cancel") and game_ui.result_panel.visible:
+		song_select_requested.emit()
+		if song_select_scene:
+			get_tree().change_scene_to_file(song_select_scene)
 	if event.is_action_pressed("debug_toggle"):
 		game_ui.toggle_debug()
 	if event.is_action_pressed("calibrate") and not start_timer.is_stopped():

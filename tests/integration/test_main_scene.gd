@@ -131,3 +131,11 @@ func test_調整画面を開くとき戻り先としてゲームを記録する(
 	var recorded: String = Session.calibration_return_scene
 	Session.calibration_return_scene = saved_return_scene
 	assert_eq("res://scenes/main/main.tscn", recorded)
+
+
+func test_リザルト画面でEscを押すと曲選択画面に戻る():
+	main.song_select_scene = ""  # テスト中にシーンを切り替えない
+	main.game_ui.show_result(true)
+	watch_signals(main)
+	_press("ui_cancel")
+	assert_signal_emitted(main, "song_select_requested")
