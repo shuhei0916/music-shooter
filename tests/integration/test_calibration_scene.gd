@@ -24,3 +24,9 @@ func test_右キーでオフセットを5ms増やす():
 	var before: float = calibration.offset_sec
 	_press("ui_right")
 	assert_almost_eq(calibration.offset_sec, before + 0.005, 0.0001)
+
+
+func test_左キーでオフセットを5ms減らす():
+	var before: float = calibration.offset_sec
+	_press("ui_left")
+	assert_almost_eq(calibration.offset_sec, before - 0.005, 0.0001)
