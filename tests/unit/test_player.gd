@@ -2,6 +2,7 @@ extends GutTest
 
 const Player = preload("res://scenes/characters/player/player.gd")
 const Enemy = preload("res://scenes/characters/enemy/enemy.gd")
+const Weapon = preload("res://scenes/objects/weapons/weapon.gd")
 
 var player: Player
 var enemy
@@ -56,3 +57,11 @@ func test_敵との衝突でお互いにダメージを与える() -> void:
 	enemy.hp = 7
 	player._on_enemy_collided(enemy)  # 将来的には FakeEnemy に差し替える余地アリ
 	assert_eq(3, player.hp)
+
+
+func test_レベルアップゲートの効果で対象チャンネルの武器のレベルが1上がる() -> void:
+	var weapon: Weapon = autofree(Weapon.new())
+	player._weapon_map[9] = weapon
+
+	player.apply_gate_effect("level_up", 9)
+	assert_eq(2, weapon.level)

@@ -38,6 +38,8 @@ func apply_gate_effect(gate_type: String, value: int):
 			self.hp += value
 		"multiply":
 			self.hp *= value
+		"level_up":  # valueは対象の武器のチャンネル
+			_weapon_map[value].level += 1
 
 
 func clamp_horizontal_position():
