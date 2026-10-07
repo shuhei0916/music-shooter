@@ -14,3 +14,11 @@ func _note_on_ticks(smf: SMF.SMFData) -> Array:
 func test_指定拍数ぶん1拍ごとにnote_onを持つ():
 	var smf := Metronome.build(120.0, 3)
 	assert_eq_deep(_note_on_ticks(smf), [0, smf.timebase, smf.timebase * 2])
+
+
+func test_指定テンポのテンポイベントを持つ():
+	var smf := Metronome.build(90.0, 1)
+	var tempo_events = smf.tracks[0].events.filter(
+		func(chunk): return chunk.event.type == SMF.MIDIEventType.system_event
+	)
+	assert_eq(90.0, tempo_events[0].event.args.bpm)

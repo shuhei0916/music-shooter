@@ -6,8 +6,11 @@ const CHANNEL = 9  # ドラムチャンネル
 const NOTE = 37  # サイドスティック
 
 
-static func build(_bpm: float, beats: int) -> SMF.SMFData:
-	var events: Array[SMF.MIDIEventChunk] = []
+static func build(bpm: float, beats: int) -> SMF.SMFData:
+	var tempo := SMF.MIDIEventSystemEvent.new(
+		{"type": SMF.MIDISystemEventType.set_tempo, "bpm": bpm}
+	)
+	var events: Array[SMF.MIDIEventChunk] = [SMF.MIDIEventChunk.new(0, 0, tempo)]
 	for beat in beats:
 		events.append(
 			SMF.MIDIEventChunk.new(beat * TIMEBASE, CHANNEL, SMF.MIDIEventNoteOn.new(NOTE, 100))
