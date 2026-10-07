@@ -7,6 +7,7 @@ var pause_menu
 
 func before_each():
 	pause_menu = PAUSE_MENU_SCENE.instantiate()
+	pause_menu.title_scene = ""  # テスト中にシーンを切り替えない
 	add_child_autofree(pause_menu)
 	pause_menu.open()
 
@@ -30,4 +31,9 @@ func test_一時停止中にEscを押すと再開する():
 	event.action = "ui_cancel"
 	event.pressed = true
 	pause_menu._unhandled_input(event)
+	assert_false(get_tree().paused)
+
+
+func test_タイトルへ戻るとき一時停止を解除する():
+	pause_menu.get_node("%TitleButton").pressed.emit()
 	assert_false(get_tree().paused)
