@@ -1,6 +1,9 @@
 ## 映像と音のずれを合わせるタイミング調整画面
 extends Node3D
 
+## 調整を終えて画面を閉じたとき（保存の有無によらず）
+signal closed
+
 const OFFSET_STEP_SEC = 0.005
 
 ## 調整を終えたときに戻るシーン（空ならシーンを切り替えない）
@@ -24,12 +27,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_left"):
 		offset_sec -= OFFSET_STEP_SEC
 	elif event.is_action_pressed("ui_accept"):
-		_save_and_return()
+		Settings.visual_offset_sec = offset_sec
+		Settings.save_to_file()
+		_close()
+	elif event.is_action_pressed("ui_cancel"):
+		_close()
 
 
-func _save_and_return() -> void:
-	Settings.visual_offset_sec = offset_sec
-	Settings.save_to_file()
+func _close() -> void:
+	closed.emit()
 	if return_scene:
 		get_tree().change_scene_to_file(return_scene)
 

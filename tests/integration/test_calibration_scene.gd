@@ -62,3 +62,16 @@ func test_決定でSettingsにオフセットを保存する():
 	calibration.offset_sec = 0.07
 	_press("ui_accept")
 	assert_eq(0.07, Settings.visual_offset_sec)
+
+
+func test_Escで画面を閉じる():
+	watch_signals(calibration)
+	_press("ui_cancel")
+	assert_signal_emitted(calibration, "closed")
+
+
+func test_EscではSettingsを変えない():
+	Settings.visual_offset_sec = 0.04
+	calibration.offset_sec = 0.07
+	_press("ui_cancel")
+	assert_eq(0.04, Settings.visual_offset_sec)
