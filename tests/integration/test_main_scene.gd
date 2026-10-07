@@ -145,3 +145,8 @@ func test_リザルト画面でEscを押すと曲選択画面に戻る():
 func test_プレイ中にEscを押すと一時停止メニューが表示される():
 	_press("ui_cancel")
 	assert_true(main.get_node("PauseMenu").visible)
+
+
+func test_プレイ中にEscを押すとゲームが一時停止する():
+	_press("ui_cancel")
+	assert_true(get_tree().paused)

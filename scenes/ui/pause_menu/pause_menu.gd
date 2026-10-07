@@ -4,3 +4,4 @@ extends CanvasLayer
 
 func open() -> void:
 	visible = true
+	get_tree().paused = true
