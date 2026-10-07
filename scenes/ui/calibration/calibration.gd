@@ -30,6 +30,8 @@ var _note_scheduler: NoteScheduler
 
 func _ready() -> void:
 	offset_sec = Settings.visual_offset_sec
+	if Session.calibration_return_scene:
+		return_scene = Session.calibration_return_scene
 	_player.set_physics_process(false)  # ←→はオフセット調整に使うので移動させない
 	for weapon in _player.get_children().filter(func(n): return n.is_in_group("weapon")):
 		weapon.level = weapon.MAX_LEVEL  # クリックのたびに撃つ

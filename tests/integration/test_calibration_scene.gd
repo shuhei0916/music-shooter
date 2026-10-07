@@ -6,11 +6,13 @@ const TEST_SETTINGS_PATH = "user://test_calibration_settings.cfg"
 var calibration
 var _saved_offset: float
 var _saved_path: String
+var _saved_return_scene: String
 
 
 func before_each():
 	_saved_offset = Settings.visual_offset_sec
 	_saved_path = Settings.path
+	_saved_return_scene = Session.calibration_return_scene
 	Settings.path = TEST_SETTINGS_PATH  # 実際の設定ファイルを上書きしない
 	calibration = _spawn()
 	calibration.return_scene = ""  # テスト中にシーンを切り替えない
@@ -19,6 +21,7 @@ func before_each():
 func after_each():
 	Settings.visual_offset_sec = _saved_offset
 	Settings.path = _saved_path
+	Session.calibration_return_scene = _saved_return_scene
 	DirAccess.remove_absolute(TEST_SETTINGS_PATH)
 	for bullet in get_tree().get_nodes_in_group("bullet"):
 		bullet.free()
@@ -82,3 +85,8 @@ func test_EscではSettingsを変えない():
 func test_クリックに合わせて発射する():
 	calibration._process(0.0)  # 再生開始直後は1拍目（tick 0）のクリックが到達済み
 	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_開いた画面に戻る():
+	Session.calibration_return_scene = "res://scenes/ui/title/title.tscn"
+	assert_eq("res://scenes/ui/title/title.tscn", _spawn().return_scene)
