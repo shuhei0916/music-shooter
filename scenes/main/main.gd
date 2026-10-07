@@ -8,8 +8,8 @@ const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
-## 映像（発射）を音より何秒先行させるか。映像の表示遅延が音声の出力遅延より大きいため
-@export var visual_offset_sec: float = 0.04
+## 映像（発射）を音より何秒先行させるか。開始時にSettings（タイミング調整画面で設定）から読む
+var visual_offset_sec: float
 
 var _note_scheduler: NoteScheduler
 
@@ -70,6 +70,7 @@ func _on_midi_finished() -> void:
 
 func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
+	visual_offset_sec = Settings.visual_offset_sec
 	spawner.start()
 	midi_player.play()
 	SoundfontCache.load_into(midi_player, midi_soundfont_path)

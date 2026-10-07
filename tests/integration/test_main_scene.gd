@@ -88,3 +88,11 @@ func test_ゲームオーバー後はノートを処理しない():
 func test_ゲーム開始後はサウンドフォントが読み込まれている():
 	main._on_start_timer_timeout()
 	assert_not_null(main.midi_player.bank)
+
+
+func test_開始時にSettingsのvisual_offset_secを使う():
+	var saved_offset: float = Settings.visual_offset_sec
+	Settings.visual_offset_sec = 0.09
+	main._on_start_timer_timeout()
+	Settings.visual_offset_sec = saved_offset
+	assert_eq(0.09, main.visual_offset_sec)
