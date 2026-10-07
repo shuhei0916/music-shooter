@@ -51,7 +51,7 @@
 ### タイミング調整（キャリブレーション）画面
 本番と同じ経路（MidiPlayer＋サウンドフォント、Playerの武器＋NoteSchedulerの先行発射）で、1拍ごとのクリックと発射を合わせる。←→で±5ms調整、Enterで保存してゲームへ戻る、Escで保存せず戻る。カウントダウン中にCキーで開く。
 - [x] Settingsはvisual_offset_secの初期値0.04を持つ
-- [ ] Settingsは保存した値を次回読み込める
+- [x] Settingsは保存した値を次回読み込める
 - [ ] Settingsは保存ファイルがなければ初期値のまま
 - [ ] Metronomeは指定拍数ぶん、1拍ごとにnote_onを持つSMFを作る
 - [ ] Metronomeが作るSMFは指定テンポのテンポイベントを持つ
