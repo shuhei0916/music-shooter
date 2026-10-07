@@ -30,3 +30,9 @@ func test_左キーでオフセットを5ms減らす():
 	var before: float = calibration.offset_sec
 	_press("ui_left")
 	assert_almost_eq(calibration.offset_sec, before - 0.005, 0.0001)
+
+
+func test_現在のオフセットをmsで表示する():
+	calibration.offset_sec = 0.04
+	_press("ui_right")
+	assert_string_contains(calibration.get_node("UI/OffsetLabel").text, "+45 ms")
