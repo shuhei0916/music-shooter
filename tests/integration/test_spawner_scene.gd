@@ -37,3 +37,31 @@ func test_敵を倒すと宝箱がシーンに追加される():
 	enemy.take_damage(enemy.hp)
 	var chests_after = get_tree().get_nodes_in_group("chest").size()
 	assert_eq(chests_before + 1, chests_after)
+
+
+func _spawn_gate_row() -> Array:
+	spawner.spawn_counter = 4  # 次のタイムアウトがゲート列のターンになる
+	spawner._on_spawn_timer_timeout()
+	var gates = get_children().filter(func(n): return "gate_type" in n)
+	for gate in gates:
+		autofree(gate)
+	return gates
+
+
+func test_ゲート列のうち1つはレベルアップゲートになる():
+	var gates = _spawn_gate_row()
+	assert_eq(1, gates.filter(func(g): return g.gate_type == "level_up").size())
+
+
+func test_レベルアップゲートの対象チャンネルは武器のあるチャンネルから選ばれる():
+	spawner.set_weapon_colors({9: Color.ORANGE})
+	var gates = _spawn_gate_row()
+	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
+	assert_eq(9, level_up_gate.value)
+
+
+func test_レベルアップゲートには対象武器の色が設定される():
+	spawner.set_weapon_colors({9: Color.ORANGE})
+	var gates = _spawn_gate_row()
+	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
+	assert_eq(Color.ORANGE, level_up_gate.weapon_color)

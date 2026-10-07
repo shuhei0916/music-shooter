@@ -2,6 +2,7 @@ extends GutTest
 
 const Player = preload("res://scenes/characters/player/player.gd")
 const Enemy = preload("res://scenes/characters/enemy/enemy.gd")
+const Weapon = preload("res://scenes/objects/weapons/weapon.gd")
 
 var player: Player
 var enemy
@@ -58,11 +59,23 @@ func test_敵との衝突でお互いにダメージを与える() -> void:
 	assert_eq(3, player.hp)
 
 
-func test_trigger_flashがweapon_mapの対応する武器のtrigger_flashを呼ぶ():
-	var fake_weapon = preload("res://scenes/objects/weapons/handgun/handgun.tscn").instantiate()
-	add_child_autofree(fake_weapon)
-	player._weapon_map[0] = fake_weapon
+func test_レベルアップゲートの効果で対象チャンネルの武器のレベルが1上がる() -> void:
+	var weapon: Weapon = autofree(Weapon.new())
+	player._weapon_map[9] = weapon
 
-	player.trigger_flash(0)
+	player.apply_gate_effect("level_up", 9)
+	assert_eq(2, weapon.level)
 
-	assert_gt(fake_weapon._flash.light_energy, 0.0)
+
+func test_最大レベルの武器はレベルアップゲートを通ってもレベルが上がらない() -> void:
+	var weapon: Weapon = autofree(Weapon.new())
+	weapon.level = Weapon.MAX_LEVEL
+	player._weapon_map[9] = weapon
+
+	player.apply_gate_effect("level_up", 9)
+	assert_eq(Weapon.MAX_LEVEL, weapon.level)
+
+
+func test_武器のないチャンネルのレベルアップゲートを通ってもエラーにならない() -> void:
+	player.apply_gate_effect("level_up", 99)
+	assert_engine_error_count(0)

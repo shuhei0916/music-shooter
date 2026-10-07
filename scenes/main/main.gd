@@ -46,8 +46,13 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
 		var ch_num = channel_status.number
 		game_ui.notify_midi_event(ch_num, channel_status.track_name, event.note, event.velocity)
-		player.trigger_flash(ch_num)
-		player.shoot(ch_num)
+		player.on_note(ch_num, _current_event_tick(), midi_player.smf_data.timebase)
+
+
+## midi_eventシグナルはイベントポインタを進めた直後に発火するため、直前のイベントが現在のイベント
+func _current_event_tick() -> int:
+	var track = midi_player.track_status
+	return track.events[track.event_pointer - 1].time
 
 
 func _on_midi_finished() -> void:
@@ -60,13 +65,14 @@ func _on_start_timer_timeout() -> void:
 	midi_player.play()
 	start_timer.stop()
 	game_ui.update_countdown("")
+	spawner.set_weapon_colors(player.get_weapon_colors())
 	_setup_growth_curve()
 
 
 func _setup_growth_curve() -> void:
 	if midi_player.smf_data == null:
 		return
-	var used_channels: Array = player._weapon_map.keys()
+	var used_channels: Array = player.get_weapon_channels()
 	var analyzer = SongAnalyzerScript.new()
 	var points: PackedVector2Array = analyzer.compute_cumulative_counts(
 		midi_player.smf_data, midi_player.timebase_to_seconds, used_channels

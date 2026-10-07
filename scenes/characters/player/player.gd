@@ -38,6 +38,10 @@ func apply_gate_effect(gate_type: String, value: int):
 			self.hp += value
 		"multiply":
 			self.hp *= value
+		"level_up":  # valueは対象の武器のチャンネル
+			var weapon = _weapon_map.get(value)
+			if weapon:
+				weapon.level += 1
 
 
 func clamp_horizontal_position():
@@ -68,15 +72,19 @@ func _on_enemy_collided(enemy: Node) -> void:
 	enemy.take_damage(player_hp_before)
 
 
-func shoot(channel: int = 0) -> void:
-	var weapon = _weapon_map.get(channel)
-	if weapon == null:
-		return
-	weapon.fire()
+func get_weapon_channels() -> Array:
+	return _weapon_map.keys()
 
 
-func trigger_flash(channel: int = 0) -> void:
+func get_weapon_colors() -> Dictionary:
+	var colors := {}
+	for channel in _weapon_map:
+		colors[channel] = _weapon_map[channel].color
+	return colors
+
+
+func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
-	if weapon == null:
-		return
-	weapon.trigger_flash()
+	if weapon and weapon.is_on_grid(tick, timebase):
+		weapon.trigger_flash()
+		weapon.fire()
