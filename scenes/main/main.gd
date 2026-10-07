@@ -38,12 +38,8 @@ func _move_world_objects(delta: float):
 func _fire_due_notes() -> void:
 	if _note_scheduler == null:
 		return
-	var timebase: int = midi_player.smf_data.timebase
-	var lookahead_ticks: float = (
-		visual_offset_sec * midi_player.seconds_to_timebase * timebase * midi_player.play_speed
-	)
-	for chunk in _note_scheduler.pop_due(midi_player.position + lookahead_ticks):
-		player.on_note(chunk.channel_number, chunk.time, timebase)
+	for chunk in _note_scheduler.pop_due_ahead(midi_player, visual_offset_sec):
+		player.on_note(chunk.channel_number, chunk.time, midi_player.smf_data.timebase)
 
 
 func _end_game(is_win: bool) -> void:
