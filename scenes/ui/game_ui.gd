@@ -8,7 +8,7 @@ extends Control
 func show_result(is_win: bool):
 	result_panel.visible = true
 	result_label.text = "Run Completed!" if is_win else "Game Over"
-	result_label.text += "\nPress Enter to retry."
+	result_label.text += "\nEnter: リトライ　Esc: 曲選択へ"
 
 
 func update_progress(current_time, total_time):
