@@ -4,12 +4,18 @@ const SongLibrary = preload("res://scripts/song_library.gd")
 const SONG_SELECT_SCENE = preload("res://scenes/ui/song_select/song_select.tscn")
 
 var song_select
+var _saved_song: String
 
 
 func before_each():
+	_saved_song = Session.song_path
 	song_select = SONG_SELECT_SCENE.instantiate()
 	song_select.next_scene = ""  # テスト中にシーンを切り替えない
 	add_child_autofree(song_select)
+
+
+func after_each():
+	Session.song_path = _saved_song
 
 
 func _song_buttons() -> Array:
@@ -20,3 +26,8 @@ func test_曲の一覧をボタンとして表示する():
 	var names := _song_buttons().map(func(button): return button.text)
 	var expected := SongLibrary.list_songs(song_select.songs_dir).map(SongLibrary.display_name)
 	assert_eq_deep(names, expected)
+
+
+func test_曲を選ぶとSessionに記録する():
+	_song_buttons()[1].pressed.emit()
+	assert_eq(SongLibrary.list_songs(song_select.songs_dir)[1], Session.song_path)
