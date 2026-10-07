@@ -15,4 +15,4 @@ func save_to_file() -> void:
 func load_from_file() -> void:
 	var config := ConfigFile.new()
 	config.load(path)
-	visual_offset_sec = config.get_value("timing", "visual_offset_sec")
+	visual_offset_sec = config.get_value("timing", "visual_offset_sec", visual_offset_sec)

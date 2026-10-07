@@ -27,3 +27,8 @@ func test_保存した値を次回読み込める():
 	reloaded.path = TEST_PATH
 	reloaded.load_from_file()
 	assert_eq(0.07, reloaded.visual_offset_sec)
+
+
+func test_保存ファイルがなければ初期値のまま():
+	settings.load_from_file()
+	assert_eq(0.04, settings.visual_offset_sec)
