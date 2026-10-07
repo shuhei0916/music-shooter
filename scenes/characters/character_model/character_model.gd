@@ -10,17 +10,28 @@ const ANIMATIONS = {
 }
 
 @export_enum("run", "idle") var animation := "run"
+## 見た目のテクスチャ（ASSET_DIR/Skins/ 内のいずれか）
+@export var skin: Texture2D
 
 
 func _ready() -> void:
 	var model := MODEL.instantiate()
 	add_child(model)
+	if skin:
+		_apply_skin(model)
 	var animation_player := AnimationPlayer.new()
 	model.add_child(animation_player)
 	var library := AnimationLibrary.new()
 	library.add_animation(animation, _load_animation(animation))
 	animation_player.add_animation_library("", library)
 	animation_player.play(animation)
+
+
+func _apply_skin(model: Node) -> void:
+	var mesh: MeshInstance3D = model.find_children("*", "MeshInstance3D")[0]
+	var material: StandardMaterial3D = mesh.get_active_material(0).duplicate()
+	material.albedo_texture = skin
+	mesh.set_surface_override_material(0, material)
 
 
 func _load_animation(anim_name: String) -> Animation:
