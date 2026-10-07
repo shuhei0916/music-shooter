@@ -12,6 +12,11 @@ func _init(events: Array[SMF.MIDIEventChunk]) -> void:
 func pop_due(tick_limit: float) -> Array[SMF.MIDIEventChunk]:
 	var due: Array[SMF.MIDIEventChunk] = []
 	while _pointer < _events.size() and _events[_pointer].time <= tick_limit:
-		due.append(_events[_pointer])
+		if _is_sounding_note_on(_events[_pointer].event):
+			due.append(_events[_pointer])
 		_pointer += 1
 	return due
+
+
+func _is_sounding_note_on(event: SMF.MIDIEvent) -> bool:
+	return event.velocity > 0

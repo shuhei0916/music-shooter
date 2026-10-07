@@ -39,7 +39,7 @@
 - [x] NoteSchedulerは指定tick以下のノートを返す
 - [x] NoteSchedulerは指定tickより後のノートを返さない
 - [x] NoteSchedulerは一度返したノートを再び返さない
-- [ ] NoteSchedulerはvelocity0のnote_onを返さない
+- [x] NoteSchedulerはvelocity0のnote_onを返さない
 - [ ] NoteSchedulerはnote_on以外のイベントを返さない
 - [ ] mainは再生位置よりvisual_offset秒先までのノートで発射する
 - [ ] mainはvisual_offset秒より先のノートではまだ発射しない

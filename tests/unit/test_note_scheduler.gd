@@ -27,3 +27,8 @@ func test_一度返したノートを再び返さない():
 	var scheduler := _scheduler([_note_on(100)])
 	scheduler.pop_due(100)
 	assert_eq(0, scheduler.pop_due(150).size())
+
+
+func test_velocity0のnote_onを返さない():
+	var scheduler := _scheduler([_note_on(100, 0)])
+	assert_eq(0, scheduler.pop_due(100).size())
