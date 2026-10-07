@@ -43,7 +43,7 @@
 - [x] NoteSchedulerはnote_on以外のイベントを返さない
 - [x] mainは再生位置よりvisual_offset秒先までのノートで発射する
 - [x] mainはvisual_offset秒より先のノートではまだ発射しない
-- [ ] midi_eventシグナルでは発射しない（二重発射の防止）
+- [x] midi_eventシグナルでは発射しない（二重発射の防止）
 - [ ] ゲーム終了後（ゲームオーバー・クリア）はノートを処理しない
 - [ ] 体感でずれが解消されたか確認し、visual_offsetの初期値を決める
 - [ ] シーク・ループ時にNoteSchedulerの位置を合わせる（現状ループ再生は未使用）

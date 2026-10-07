@@ -63,13 +63,6 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
 		var ch_num = channel_status.number
 		game_ui.notify_midi_event(ch_num, channel_status.track_name, event.note, event.velocity)
-		player.on_note(ch_num, _current_event_tick(), midi_player.smf_data.timebase)
-
-
-## midi_eventシグナルはイベントポインタを進めた直後に発火するため、直前のイベントが現在のイベント
-func _current_event_tick() -> int:
-	var track = midi_player.track_status
-	return track.events[track.event_pointer - 1].time
 
 
 func _on_midi_finished() -> void:
