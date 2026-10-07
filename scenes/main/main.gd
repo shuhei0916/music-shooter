@@ -2,6 +2,7 @@ extends Node3D
 
 const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
+const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 
 ## MidiPlayerのsoundfontはplay()後に設定する。シーンに直接書くと曲の解析前に全音色を読み込み、生成が数秒かかるため
 @export_file("*.sf2") var midi_soundfont_path: String
@@ -71,7 +72,7 @@ func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
 	spawner.start()
 	midi_player.play()
-	midi_player.soundfont = midi_soundfont_path
+	SoundfontCache.load_into(midi_player, midi_soundfont_path)
 	_note_scheduler = NoteScheduler.new(midi_player.track_status.events)
 	start_timer.stop()
 	game_ui.update_countdown("")

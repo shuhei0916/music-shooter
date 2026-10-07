@@ -6,6 +6,7 @@ signal closed
 
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
 const Metronome = preload("res://scripts/metronome.gd")
+const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 const OFFSET_STEP_SEC = 0.005
 const CLICK_BPM = 120.0
 const CLICK_BEATS = 600  # 5分ぶん
@@ -34,7 +35,7 @@ func _ready() -> void:
 		weapon.level = weapon.MAX_LEVEL  # クリックのたびに撃つ
 	_midi_player.smf_data = Metronome.build(CLICK_BPM, CLICK_BEATS)
 	_midi_player.play()
-	_midi_player.soundfont = SOUNDFONT_PATH
+	SoundfontCache.load_into(_midi_player, SOUNDFONT_PATH)
 	_note_scheduler = NoteScheduler.new(_midi_player.track_status.events)
 
 
