@@ -27,6 +27,7 @@ var _note_scheduler: NoteScheduler
 @onready var game_ui = get_node_or_null("GameUI")
 @onready var start_timer = get_node_or_null("StartTimer")
 @onready var spawner = get_node_or_null("Spawner")
+@onready var pause_menu = $PauseMenu
 
 
 func _ready():
@@ -106,10 +107,13 @@ func _setup_growth_curve() -> void:
 func _unhandled_input(event):
 	if event.is_action_pressed("ui_accept") and game_ui.result_panel.visible:
 		get_tree().reload_current_scene()
-	if event.is_action_pressed("ui_cancel") and game_ui.result_panel.visible:
-		song_select_requested.emit()
-		if song_select_scene:
-			get_tree().change_scene_to_file(song_select_scene)
+	if event.is_action_pressed("ui_cancel"):
+		if game_ui.result_panel.visible:
+			song_select_requested.emit()
+			if song_select_scene:
+				get_tree().change_scene_to_file(song_select_scene)
+		else:
+			pause_menu.open()
 	if event.is_action_pressed("debug_toggle"):
 		game_ui.toggle_debug()
 	if event.is_action_pressed("calibrate") and not start_timer.is_stopped():

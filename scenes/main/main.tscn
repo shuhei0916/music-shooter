@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bspawnrscene1" path="res://scenes/components/spawner.tscn" id="3_spawner"]
 [ext_resource type="Script" uid="uid://bwch5nk77teaf" path="res://addons/midi/MidiPlayer.gd" id="6_blune"]
 [ext_resource type="PackedScene" uid="uid://b5w2w5g5h5j5h" path="res://scenes/characters/player/player.tscn" id="7_th5th"]
+[ext_resource type="PackedScene" path="res://scenes/ui/pause_menu/pause_menu.tscn" id="8_pause"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(10, 1, 100)
@@ -58,6 +59,8 @@ mesh = SubResource("PlaneMesh_ground")
 wait_time = 3.0
 one_shot = true
 autostart = true
+
+[node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
 
 [connection signal="finished" from="MidiPlayer" to="." method="_on_midi_finished"]
 [connection signal="midi_event" from="MidiPlayer" to="." method="_on_midi_event"]

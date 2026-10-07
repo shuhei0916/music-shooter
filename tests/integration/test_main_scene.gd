@@ -16,6 +16,7 @@ func before_each():
 
 
 func after_each():
+	get_tree().paused = false  # 一時停止のテストでツリーを止めたままにしない
 	for bullet in get_tree().get_nodes_in_group("bullet"):
 		bullet.free()
 
@@ -139,3 +140,8 @@ func test_リザルト画面でEscを押すと曲選択画面に戻る():
 	watch_signals(main)
 	_press("ui_cancel")
 	assert_signal_emitted(main, "song_select_requested")
+
+
+func test_プレイ中にEscを押すと一時停止メニューが表示される():
+	_press("ui_cancel")
+	assert_true(main.get_node("PauseMenu").visible)
