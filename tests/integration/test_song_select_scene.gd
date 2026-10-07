@@ -41,3 +41,7 @@ func test_Escでタイトルに戻る():
 	event.pressed = true
 	song_select._unhandled_input(event)
 	assert_signal_emitted(song_select, "back_requested")
+
+
+func test_開いたとき最初の曲にフォーカスがある():
+	assert_true(_song_buttons()[0].has_focus())

@@ -21,6 +21,8 @@ func _ready() -> void:
 		button.text = SongLibrary.display_name(song_path)
 		button.pressed.connect(_on_song_chosen.bind(song_path))
 		_song_list.add_child(button)
+	if _song_list.get_child_count() > 0:
+		_song_list.get_child(0).grab_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
