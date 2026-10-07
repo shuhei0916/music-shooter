@@ -16,8 +16,8 @@ func after_each():
 	DirAccess.remove_absolute(TEST_PATH)
 
 
-func test_visual_offset_secの初期値は0_04():
-	assert_eq(0.04, settings.visual_offset_sec)
+func test_visual_offset_secの初期値は0_15():
+	assert_eq(0.15, settings.visual_offset_sec)
 
 
 func test_保存した値を次回読み込める():
@@ -31,4 +31,4 @@ func test_保存した値を次回読み込める():
 
 func test_保存ファイルがなければ初期値のまま():
 	settings.load_from_file()
-	assert_eq(0.04, settings.visual_offset_sec)
+	assert_eq(0.15, settings.visual_offset_sec)
