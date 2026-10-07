@@ -109,6 +109,7 @@ func _unhandled_input(event):
 
 
 func _open_calibration() -> void:
+	Session.calibration_return_scene = scene_file_path
 	calibration_requested.emit()
 	if calibration_scene:
 		get_tree().change_scene_to_file(calibration_scene)

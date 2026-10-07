@@ -122,3 +122,12 @@ func test_Sessionで選ばれた曲を再生する():
 	main._on_start_timer_timeout()
 	Session.song_path = saved_song
 	assert_eq("res://assets/audio/Jump!.mid", main.midi_player.file)
+
+
+func test_調整画面を開くとき戻り先としてゲームを記録する():
+	var saved_return_scene: String = Session.calibration_return_scene
+	main.calibration_scene = ""
+	_press("calibrate")
+	var recorded: String = Session.calibration_return_scene
+	Session.calibration_return_scene = saved_return_scene
+	assert_eq("res://scenes/main/main.tscn", recorded)
