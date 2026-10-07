@@ -10,17 +10,12 @@ signal calibration_requested
 
 
 func _ready() -> void:
-	%PlayButton.pressed.connect(_on_play_pressed)
-	%CalibrationButton.pressed.connect(_on_calibration_pressed)
+	%PlayButton.pressed.connect(_go.bind(play_requested, "song_select_scene"))
+	%CalibrationButton.pressed.connect(_go.bind(calibration_requested, "calibration_scene"))
 
 
-func _on_play_pressed() -> void:
-	play_requested.emit()
-	if song_select_scene:
-		get_tree().change_scene_to_file(song_select_scene)
-
-
-func _on_calibration_pressed() -> void:
-	calibration_requested.emit()
-	if calibration_scene:
-		get_tree().change_scene_to_file(calibration_scene)
+func _go(requested: Signal, scene_property: StringName) -> void:
+	requested.emit()
+	var scene: String = get(scene_property)
+	if scene:
+		get_tree().change_scene_to_file(scene)
