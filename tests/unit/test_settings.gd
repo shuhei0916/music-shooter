@@ -1,13 +1,13 @@
 extends GutTest
 
-const Settings = preload("res://scripts/settings.gd")
+const SettingsScript = preload("res://scripts/settings.gd")
 const TEST_PATH = "user://test_settings.cfg"
 
-var settings: Settings
+var settings: SettingsScript
 
 
 func before_each():
-	settings = Settings.new()
+	settings = SettingsScript.new()
 	settings.path = TEST_PATH
 
 
@@ -23,7 +23,7 @@ func test_visual_offset_secの初期値は0_04():
 func test_保存した値を次回読み込める():
 	settings.visual_offset_sec = 0.07
 	settings.save_to_file()
-	var reloaded: Settings = autofree(Settings.new())
+	var reloaded: SettingsScript = autofree(SettingsScript.new())
 	reloaded.path = TEST_PATH
 	reloaded.load_from_file()
 	assert_eq(0.07, reloaded.visual_offset_sec)
