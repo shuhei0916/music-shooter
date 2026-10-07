@@ -2,14 +2,18 @@
 extends CanvasLayer
 
 signal title_requested
+signal quit_requested
 
 ## タイトル画面（空ならシーンを切り替えない）
 @export_file("*.tscn") var title_scene := "res://scenes/ui/title/title.tscn"
+## falseならアプリを終了せず、quit_requestedの発火だけ行う
+@export var quit_on_request := true
 
 
 func _ready() -> void:
 	%ResumeButton.pressed.connect(close)
 	%TitleButton.pressed.connect(_on_title_pressed)
+	%QuitButton.pressed.connect(_on_quit_pressed)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -34,3 +38,9 @@ func _on_title_pressed() -> void:
 	title_requested.emit()
 	if title_scene:
 		get_tree().change_scene_to_file(title_scene)
+
+
+func _on_quit_pressed() -> void:
+	quit_requested.emit()
+	if quit_on_request:
+		get_tree().quit()

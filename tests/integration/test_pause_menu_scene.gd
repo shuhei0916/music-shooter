@@ -8,6 +8,7 @@ var pause_menu
 func before_each():
 	pause_menu = PAUSE_MENU_SCENE.instantiate()
 	pause_menu.title_scene = ""  # テスト中にシーンを切り替えない
+	pause_menu.quit_on_request = false  # テスト中にアプリを終了しない
 	add_child_autofree(pause_menu)
 	pause_menu.open()
 
@@ -43,3 +44,9 @@ func test_タイトルへ戻るでタイトル画面へ移る():
 	watch_signals(pause_menu)
 	pause_menu.get_node("%TitleButton").pressed.emit()
 	assert_signal_emitted(pause_menu, "title_requested")
+
+
+func test_ゲームを終了でアプリの終了を要求する():
+	watch_signals(pause_menu)
+	pause_menu.get_node("%QuitButton").pressed.emit()
+	assert_signal_emitted(pause_menu, "quit_requested")
