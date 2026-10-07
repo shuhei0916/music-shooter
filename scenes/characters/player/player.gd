@@ -76,6 +76,13 @@ func get_weapon_channels() -> Array:
 	return _weapon_map.keys()
 
 
+func get_weapon_colors() -> Dictionary:
+	var colors := {}
+	for channel in _weapon_map:
+		colors[channel] = _weapon_map[channel].color
+	return colors
+
+
 func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
 	if weapon and weapon.is_on_grid(tick, timebase):

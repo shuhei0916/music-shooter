@@ -12,7 +12,7 @@ const CHEST_SPAWN_OFFSET_Z := -5.0
 var spawn_counter := 0
 var markers: Array = []
 var _growth_curve := PackedVector2Array()
-var _weapon_channels: Array = []
+var _weapon_colors: Dictionary = {}  # チャンネル -> 武器の色
 
 @onready var anchor_root: Node3D = $AnchorRoot
 @onready var spawn_timer: Timer = $SpawnTimer
@@ -36,8 +36,8 @@ func set_growth_curve(points: PackedVector2Array) -> void:
 	_growth_curve = points
 
 
-func set_weapon_channels(channels: Array) -> void:
-	_weapon_channels = channels
+func set_weapon_colors(weapon_colors: Dictionary) -> void:
+	_weapon_colors = weapon_colors
 
 
 func _on_spawn_timer_timeout() -> void:
@@ -69,8 +69,10 @@ func _set_gate_properties(gate: Node) -> void:
 
 func _set_level_up_gate_properties(gate: Node) -> void:
 	gate.gate_type = "level_up"
-	if not _weapon_channels.is_empty():
-		gate.value = _weapon_channels.pick_random()
+	if not _weapon_colors.is_empty():
+		var channel: int = _weapon_colors.keys().pick_random()
+		gate.value = channel
+		gate.weapon_color = _weapon_colors[channel]
 
 
 func _maybe_spawn_enemy() -> void:

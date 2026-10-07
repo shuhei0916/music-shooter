@@ -41,6 +41,6 @@ func test_グリッド外のtickのノートでは弾が発射されない():
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
 
 
-func test_ゲーム開始時にPlayerの武器チャンネルがスポーナーに渡される():
+func test_ゲーム開始時にPlayerの武器の色がスポーナーに渡される():
 	main._on_start_timer_timeout()
-	assert_eq_deep(main.spawner._weapon_channels, [0, 9])
+	assert_eq_deep(main.spawner._weapon_colors.keys(), [0, 9])

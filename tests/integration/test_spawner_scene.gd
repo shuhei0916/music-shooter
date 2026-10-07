@@ -54,7 +54,14 @@ func test_ゲート列のうち1つはレベルアップゲートになる():
 
 
 func test_レベルアップゲートの対象チャンネルは武器のあるチャンネルから選ばれる():
-	spawner.set_weapon_channels([9])
+	spawner.set_weapon_colors({9: Color.ORANGE})
 	var gates = _spawn_gate_row()
 	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
 	assert_eq(9, level_up_gate.value)
+
+
+func test_レベルアップゲートには対象武器の色が設定される():
+	spawner.set_weapon_colors({9: Color.ORANGE})
+	var gates = _spawn_gate_row()
+	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
+	assert_eq(Color.ORANGE, level_up_gate.weapon_color)

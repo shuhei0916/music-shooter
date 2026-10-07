@@ -65,7 +65,7 @@ func _on_start_timer_timeout() -> void:
 	midi_player.play()
 	start_timer.stop()
 	game_ui.update_countdown("")
-	spawner.set_weapon_channels(player.get_weapon_channels())
+	spawner.set_weapon_colors(player.get_weapon_colors())
 	_setup_growth_curve()
 
 
