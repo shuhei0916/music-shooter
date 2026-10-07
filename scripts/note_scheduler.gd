@@ -8,5 +8,5 @@ func _init(events: Array[SMF.MIDIEventChunk]) -> void:
 	_events = events
 
 
-func pop_due(_tick_limit: float) -> Array[SMF.MIDIEventChunk]:
-	return _events
+func pop_due(tick_limit: float) -> Array[SMF.MIDIEventChunk]:
+	return _events.filter(func(chunk): return chunk.time <= tick_limit)

@@ -37,7 +37,7 @@
 方針: 弾の出る位置を体の外に出し、ノート処理（弾＋フラッシュ）全体を visual_offset 秒だけ先行させる。（前回のルックアヘッドはフラッシュだけ先行させて弾とずれたためrevertされた）
 - [x] 弾の発射位置（Muzzle）をプレイヤーの体の外に出す（目視確認）
 - [x] NoteSchedulerは指定tick以下のノートを返す
-- [ ] NoteSchedulerは指定tickより後のノートを返さない
+- [x] NoteSchedulerは指定tickより後のノートを返さない
 - [ ] NoteSchedulerは一度返したノートを再び返さない
 - [ ] NoteSchedulerはvelocity0のnote_onを返さない
 - [ ] NoteSchedulerはnote_on以外のイベントを返さない
