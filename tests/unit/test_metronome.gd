@@ -21,4 +21,5 @@ func test_指定テンポのテンポイベントを持つ():
 	var tempo_events = smf.tracks[0].events.filter(
 		func(chunk): return chunk.event.type == SMF.MIDIEventType.system_event
 	)
-	assert_eq(90.0, tempo_events[0].event.args.bpm)
+	# SMFのset_tempoの"bpm"キーは名前に反して1拍あたりのマイクロ秒を持つ
+	assert_eq(60000000.0 / 90.0, tempo_events[0].event.args.bpm)
