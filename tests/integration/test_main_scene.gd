@@ -150,3 +150,10 @@ func test_プレイ中にEscを押すと一時停止メニューが表示され�
 func test_プレイ中にEscを押すとゲームが一時停止する():
 	_press("ui_cancel")
 	assert_true(get_tree().paused)
+
+
+func test_リザルト画面が出ているときのEscでは一時停止しない():
+	main.song_select_scene = ""
+	main.game_ui.show_result(false)
+	_press("ui_cancel")
+	assert_false(get_tree().paused)
