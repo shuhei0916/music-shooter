@@ -74,3 +74,8 @@ func test_最大レベルの武器はレベルアップゲートを通っても�
 
 	player.apply_gate_effect("level_up", 9)
 	assert_eq(Weapon.MAX_LEVEL, weapon.level)
+
+
+func test_武器のないチャンネルのレベルアップゲートを通ってもエラーにならない() -> void:
+	player.apply_gate_effect("level_up", 99)
+	assert_engine_error_count(0)
