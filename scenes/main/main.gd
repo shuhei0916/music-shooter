@@ -48,6 +48,7 @@ func _fire_due_notes() -> void:
 
 func _end_game(is_win: bool) -> void:
 	world_speed = 0.0
+	_note_scheduler = null
 	spawner.stop()
 	midi_player.stop()
 	game_ui.show_result(is_win)

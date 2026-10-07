@@ -74,3 +74,12 @@ func test_ゲーム開始後は曲のノートで弾が発射される():
 	main.midi_player.position = main.midi_player.last_position
 	main._process(0.0)
 	assert_gt(get_tree().get_nodes_in_group("bullet").size(), 0)
+
+
+func test_ゲームオーバー後はノートを処理しない():
+	main._on_start_timer_timeout()
+	main._on_player_game_over()
+	await get_tree().process_frame  # playerのqueue_freeを反映させる
+	main.midi_player.position = main.midi_player.last_position
+	main._process(0.0)
+	assert_engine_error_count(0)
