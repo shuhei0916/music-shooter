@@ -39,3 +39,8 @@ func _emit_note_on_at(tick: int, channel_number: int) -> void:
 func test_グリッド外のtickのノートでは弾が発射されない():
 	_emit_note_on_at(480, 0)
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_ゲーム開始時にPlayerの武器チャンネルがスポーナーに渡される():
+	main._on_start_timer_timeout()
+	assert_eq_deep(main.spawner._weapon_channels, [0, 9])

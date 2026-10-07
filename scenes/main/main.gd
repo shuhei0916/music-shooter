@@ -65,13 +65,14 @@ func _on_start_timer_timeout() -> void:
 	midi_player.play()
 	start_timer.stop()
 	game_ui.update_countdown("")
+	spawner.set_weapon_channels(player.get_weapon_channels())
 	_setup_growth_curve()
 
 
 func _setup_growth_curve() -> void:
 	if midi_player.smf_data == null:
 		return
-	var used_channels: Array = player._weapon_map.keys()
+	var used_channels: Array = player.get_weapon_channels()
 	var analyzer = SongAnalyzerScript.new()
 	var points: PackedVector2Array = analyzer.compute_cumulative_counts(
 		midi_player.smf_data, midi_player.timebase_to_seconds, used_channels
