@@ -1,0 +1,20 @@
+## タイミング調整用に、1拍ごとにクリック音を鳴らすMIDIデータを作る
+extends RefCounted
+
+const TIMEBASE = 480
+const CHANNEL = 9  # ドラムチャンネル
+const NOTE = 37  # サイドスティック
+
+
+static func build(bpm: float, beats: int) -> SMF.SMFData:
+	var tempo := SMF.MIDIEventSystemEvent.new(
+		# "bpm"キーは名前に反して1拍あたりのマイクロ秒を持つ（SMF.gdの仕様）
+		{"type": SMF.MIDISystemEventType.set_tempo, "bpm": 60000000.0 / bpm}
+	)
+	var events: Array[SMF.MIDIEventChunk] = [SMF.MIDIEventChunk.new(0, 0, tempo)]
+	for beat in beats:
+		events.append(
+			SMF.MIDIEventChunk.new(beat * TIMEBASE, CHANNEL, SMF.MIDIEventNoteOn.new(NOTE, 100))
+		)
+	var tracks: Array[SMF.MIDITrack] = [SMF.MIDITrack.new(0, events)]
+	return SMF.SMFData.new(SMF.SMFFormat.format_0, 1, TIMEBASE, tracks)

@@ -1,10 +1,22 @@
 extends Node3D
 
-const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
+## カウントダウン中にタイミング調整画面を開くよう要求されたとき
+signal calibration_requested
 
+const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
+const NoteScheduler = preload("res://scripts/note_scheduler.gd")
+const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
+
+## MidiPlayerのsoundfontはplay()後に設定する。シーンに直接書くと曲の解析前に全音色を読み込み、生成が数秒かかるため
 @export_file("*.sf2") var midi_soundfont_path: String
 @export var world_speed: float = 5.0
 @export var initial_world_speed: float = 5.0
+## タイミング調整画面（空ならシーンを切り替えない）
+@export_file("*.tscn") var calibration_scene := "res://scenes/ui/calibration/calibration.tscn"
+## 映像（発射）を音より何秒先行させるか。開始時にSettings（タイミング調整画面で設定）から読む
+var visual_offset_sec: float
+
+var _note_scheduler: NoteScheduler
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
@@ -22,6 +34,7 @@ func _ready():
 func _process(delta: float) -> void:
 	_move_world_objects(delta)
 	_update_song_progress()
+	_fire_due_notes()
 
 
 func _move_world_objects(delta: float):
@@ -29,8 +42,16 @@ func _move_world_objects(delta: float):
 		obj.global_translate(Vector3(0, 0, world_speed * delta))
 
 
+func _fire_due_notes() -> void:
+	if _note_scheduler == null:
+		return
+	for chunk in _note_scheduler.pop_due_ahead(midi_player, visual_offset_sec):
+		player.on_note(chunk.channel_number, chunk.time, midi_player.smf_data.timebase)
+
+
 func _end_game(is_win: bool) -> void:
 	world_speed = 0.0
+	_note_scheduler = null
 	spawner.stop()
 	midi_player.stop()
 	game_ui.show_result(is_win)
@@ -46,13 +67,6 @@ func _on_midi_event(channel: Variant, event: Variant) -> void:
 		var channel_status = channel as MidiPlayer.GodotMIDIPlayerChannelStatus
 		var ch_num = channel_status.number
 		game_ui.notify_midi_event(ch_num, channel_status.track_name, event.note, event.velocity)
-		player.on_note(ch_num, _current_event_tick(), midi_player.smf_data.timebase)
-
-
-## midi_eventシグナルはイベントポインタを進めた直後に発火するため、直前のイベントが現在のイベント
-func _current_event_tick() -> int:
-	var track = midi_player.track_status
-	return track.events[track.event_pointer - 1].time
 
 
 func _on_midi_finished() -> void:
@@ -61,8 +75,11 @@ func _on_midi_finished() -> void:
 
 func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
+	visual_offset_sec = Settings.visual_offset_sec
 	spawner.start()
 	midi_player.play()
+	SoundfontCache.load_into(midi_player, midi_soundfont_path)
+	_note_scheduler = NoteScheduler.new(midi_player.track_status.events)
 	start_timer.stop()
 	game_ui.update_countdown("")
 	spawner.set_weapon_colors(player.get_weapon_colors())
@@ -85,6 +102,14 @@ func _unhandled_input(event):
 		get_tree().reload_current_scene()
 	if event.is_action_pressed("debug_toggle"):
 		game_ui.toggle_debug()
+	if event.is_action_pressed("calibrate") and not start_timer.is_stopped():
+		_open_calibration()
+
+
+func _open_calibration() -> void:
+	calibration_requested.emit()
+	if calibration_scene:
+		get_tree().change_scene_to_file(calibration_scene)
 
 
 func _update_song_progress():

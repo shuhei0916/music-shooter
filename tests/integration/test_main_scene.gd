@@ -1,5 +1,7 @@
 extends GutTest
 
+const NoteScheduler = preload("res://scripts/note_scheduler.gd")
+
 var main
 
 
@@ -10,6 +12,11 @@ func before_each():
 	await get_tree().process_frame
 	#add_child_autofree(player)
 	#add_child_autofree(enemy)
+
+
+func after_each():
+	for bullet in get_tree().get_nodes_in_group("bullet"):
+		bullet.free()
 
 
 func test_スタートタイマー経過後にワールドが動き出す():
@@ -26,21 +33,88 @@ func test_スタートタイマー経過後にワールドが動き出す():
 	assert_true(world_obj.global_position.z > initial_z)
 
 
-func _emit_note_on_at(tick: int, channel_number: int) -> void:
+func test_midi_eventシグナルでは発射しない():
 	var event := SMF.MIDIEventNoteOn.new(60, 100)
-	main.midi_player.smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
-	main.midi_player.track_status.events.assign(
-		[SMF.MIDIEventChunk.new(tick, channel_number, event)]
-	)
-	main.midi_player.track_status.event_pointer = 1
-	main._on_midi_event(MidiPlayer.GodotMIDIPlayerChannelStatus.new(channel_number), event)
-
-
-func test_グリッド外のtickのノートでは弾が発射されない():
-	_emit_note_on_at(480, 0)
+	main._on_midi_event(MidiPlayer.GodotMIDIPlayerChannelStatus.new(0), event)
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
 
 
 func test_ゲーム開始時にPlayerの武器の色がスポーナーに渡される():
 	main._on_start_timer_timeout()
 	assert_eq_deep(main.spawner._weapon_colors.keys(), [0, 9])
+
+
+## テンポ120（1拍=0.5秒=480tick）で再生位置positionにいる状態を作り、tickのノートを予約する
+func _schedule_note_at(tick: int, position: float) -> void:
+	main.midi_player.smf_data = SMF.SMFData.new(SMF.SMFFormat.format_0, 1, 480)
+	main.midi_player.seconds_to_timebase = 2.0
+	main.midi_player.position = position
+	var events: Array[SMF.MIDIEventChunk] = [
+		SMF.MIDIEventChunk.new(tick, 0, SMF.MIDIEventNoteOn.new(60, 100))
+	]
+	main._note_scheduler = NoteScheduler.new(events)
+
+
+func test_再生位置よりvisual_offset秒先までのノートで発射する():
+	main.visual_offset_sec = 0.5  # 480tick先まで
+	_schedule_note_at(1920, 1440)
+	main._process(0.0)
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_visual_offset秒より先のノートではまだ発射しない():
+	main.visual_offset_sec = 0.5  # 480tick先まで
+	_schedule_note_at(1920, 1439)
+	main._process(0.0)
+	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_ゲーム開始後は曲のノートで弾が発射される():
+	main._on_start_timer_timeout()
+	main.midi_player.position = main.midi_player.last_position
+	main._process(0.0)
+	assert_gt(get_tree().get_nodes_in_group("bullet").size(), 0)
+
+
+func test_ゲームオーバー後はノートを処理しない():
+	main._on_start_timer_timeout()
+	main._on_player_game_over()
+	await get_tree().process_frame  # playerのqueue_freeを反映させる
+	main.midi_player.position = main.midi_player.last_position
+	main._process(0.0)
+	assert_engine_error_count(0)
+
+
+func test_ゲーム開始後はサウンドフォントが読み込まれている():
+	main._on_start_timer_timeout()
+	assert_not_null(main.midi_player.bank)
+
+
+func test_開始時にSettingsのvisual_offset_secを使う():
+	var saved_offset: float = Settings.visual_offset_sec
+	Settings.visual_offset_sec = 0.09
+	main._on_start_timer_timeout()
+	Settings.visual_offset_sec = saved_offset
+	assert_eq(0.09, main.visual_offset_sec)
+
+
+func _press(action: String) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = true
+	main._unhandled_input(event)
+
+
+func test_カウントダウン中にCキーでタイミング調整画面を開く():
+	main.calibration_scene = ""  # テスト中にシーンを切り替えない
+	watch_signals(main)
+	_press("calibrate")
+	assert_signal_emitted(main, "calibration_requested")
+
+
+func test_ゲーム開始後はCキーでタイミング調整画面を開かない():
+	main.calibration_scene = ""
+	main._on_start_timer_timeout()
+	watch_signals(main)
+	_press("calibrate")
+	assert_signal_not_emitted(main, "calibration_requested")
