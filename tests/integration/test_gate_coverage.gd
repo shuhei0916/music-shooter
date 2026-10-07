@@ -36,3 +36,7 @@ func test_Playerの当たり判定の幅はゲートのすき間以下で二重�
 func test_ゲートの見た目の幅と当たり判定の幅が一致する():
 	var mesh_width: float = _gate().get_node("Pivot/MeshInstance3D").mesh.size.x
 	assert_eq(mesh_width, _gate_width())
+
+
+func test_Playerの当たり判定の幅とゲートのすき間の差はわずかですり抜けにくい():
+	assert_lt(_gap() - _player_width(), 0.1)
