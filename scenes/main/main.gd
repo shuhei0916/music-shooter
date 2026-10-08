@@ -32,8 +32,19 @@ var _note_scheduler: NoteScheduler
 
 func _ready():
 	world_speed = 0.0
+	_load_song_soundfont()
 	if start_timer:
 		start_timer.start()
+
+
+## サウンドフォントの読み込み（約2.3秒）を、再生開始時ではなくカウントダウン中に済ませる
+func _load_song_soundfont() -> void:
+	var result := SMF.new().read_file(midi_player.file)
+	if result.error != OK:
+		return
+	midi_player.smf_data = result.data
+	midi_player._prepare_to_play()  # 曲で使う音色（_used_program_numbers）を解析する
+	SoundfontCache.load_into(midi_player, midi_soundfont_path)
 
 
 func _process(delta: float) -> void:

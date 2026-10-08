@@ -1,12 +1,13 @@
 extends GutTest
 
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
+const MainScene = preload("res://scenes/main/main.tscn")
 
 var main
 
 
 func before_each():
-	main = preload("res://scenes/main/main.tscn").instantiate()
+	main = MainScene.instantiate()
 	main.midi_soundfont_path = ""  # 音色の読み込み（約2.3秒）を省く
 
 	add_child_autofree(main)
@@ -157,3 +158,15 @@ func test_リザルト画面が出ているときのEscでは一時停止しな�
 	main.game_ui.show_result(false)
 	_press("ui_cancel")
 	assert_false(get_tree().paused)
+
+
+## 実際のサウンドフォントを読み込むシーン（約2.3秒かかる。同じ音色構成なら2回目からはキャッシュが使われる）
+func _main_with_soundfont() -> Node:
+	var scene = MainScene.instantiate()
+	add_child_autofree(scene)
+	return scene
+
+
+func test_カウントダウン中に曲のサウンドフォントが読み込まれている():
+	var scene = _main_with_soundfont()
+	assert_not_null(scene.midi_player.bank)
