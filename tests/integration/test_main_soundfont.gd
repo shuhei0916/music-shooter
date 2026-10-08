@@ -31,3 +31,11 @@ func test_Sessionで選ばれた曲もカウントダウン中に読み込んだ
 	scene._on_start_timer_timeout()
 	Session.song_path = saved_song
 	assert_same(preloaded_bank, scene.midi_player.bank)
+
+
+func test_カウントダウン中に読み込んでも曲は再生されない():
+	var scene = MainScene.instantiate()
+	scene.midi_soundfont_path = ""
+	add_child_autofree(scene)
+	await get_tree().process_frame
+	assert_false(scene.midi_player.playing)
