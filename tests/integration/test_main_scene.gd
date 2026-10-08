@@ -170,3 +170,10 @@ func _main_with_soundfont() -> Node:
 func test_カウントダウン中に曲のサウンドフォントが読み込まれている():
 	var scene = _main_with_soundfont()
 	assert_not_null(scene.midi_player.bank)
+
+
+func test_カウントダウン終了時はカウントダウン中に読み込んだサウンドフォントを使う():
+	var scene = _main_with_soundfont()
+	var preloaded_bank = scene.midi_player.bank
+	scene._on_start_timer_timeout()
+	assert_same(preloaded_bank, scene.midi_player.bank)
