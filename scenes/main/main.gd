@@ -39,6 +39,8 @@ func _ready():
 
 ## サウンドフォントの読み込み（約2.3秒）を、再生開始時ではなくカウントダウン中に済ませる
 func _load_song_soundfont() -> void:
+	if Session.song_path:
+		midi_player.file = Session.song_path
 	var result := SMF.new().read_file(midi_player.file)
 	if result.error != OK:
 		return
@@ -93,8 +95,6 @@ func _on_start_timer_timeout() -> void:
 	world_speed = initial_world_speed
 	visual_offset_sec = Settings.visual_offset_sec
 	spawner.start()
-	if Session.song_path:
-		midi_player.file = Session.song_path
 	midi_player.play()
 	SoundfontCache.load_into(midi_player, midi_soundfont_path)
 	_note_scheduler = NoteScheduler.new(midi_player.track_status.events)

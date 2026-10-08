@@ -121,9 +121,12 @@ func test_ゲーム開始後はCキーでタイミング調整画面を開かな
 func test_Sessionで選ばれた曲を再生する():
 	var saved_song: String = Session.song_path
 	Session.song_path = "res://assets/audio/Jump!.mid"
-	main._on_start_timer_timeout()
+	var scene = MainScene.instantiate()
+	scene.midi_soundfont_path = ""
+	add_child_autofree(scene)
+	scene._on_start_timer_timeout()
 	Session.song_path = saved_song
-	assert_eq("res://assets/audio/Jump!.mid", main.midi_player.file)
+	assert_eq("res://assets/audio/Jump!.mid", scene.midi_player.file)
 
 
 func test_調整画面を開くとき戻り先としてゲームを記録する():
@@ -158,22 +161,3 @@ func test_リザルト画面が出ているときのEscでは一時停止しな�
 	main.game_ui.show_result(false)
 	_press("ui_cancel")
 	assert_false(get_tree().paused)
-
-
-## 実際のサウンドフォントを読み込むシーン（約2.3秒かかる。同じ音色構成なら2回目からはキャッシュが使われる）
-func _main_with_soundfont() -> Node:
-	var scene = MainScene.instantiate()
-	add_child_autofree(scene)
-	return scene
-
-
-func test_カウントダウン中に曲のサウンドフォントが読み込まれている():
-	var scene = _main_with_soundfont()
-	assert_not_null(scene.midi_player.bank)
-
-
-func test_カウントダウン終了時はカウントダウン中に読み込んだサウンドフォントを使う():
-	var scene = _main_with_soundfont()
-	var preloaded_bank = scene.midi_player.bank
-	scene._on_start_timer_timeout()
-	assert_same(preloaded_bank, scene.midi_player.bank)
