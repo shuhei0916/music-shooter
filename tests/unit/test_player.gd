@@ -40,6 +40,11 @@ func test_加算ゲートの効果でHPが加算される() -> void:
 	assert_eq(15, player.hp)
 
 
+func test_マイナスのゲートの効果でHPが減る() -> void:
+	player.apply_gate_effect("add", -3)
+	assert_eq(7, player.hp)
+
+
 func test_乗算ゲートの効果でHPが乗算される() -> void:
 	player.apply_gate_effect("multiply", 2)
 	assert_eq(20, player.hp)
