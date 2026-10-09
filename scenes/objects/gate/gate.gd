@@ -25,7 +25,7 @@ func update_label():
 	if label:
 		match gate_type:
 			"add":
-				label.text = "❤️ +" + str(value)
+				label.text = "❤️ %+d" % value
 			"multiply":
 				label.text = "💕 x" + str(value)
 			"level_up":
