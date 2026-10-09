@@ -65,3 +65,20 @@ func test_レベルアップゲートには対象武器の色が設定される(
 	var gates = _spawn_gate_row()
 	var level_up_gate = gates.filter(func(g): return g.gate_type == "level_up")[0]
 	assert_eq(Color.ORANGE, level_up_gate.weapon_color)
+
+
+func _non_level_up_gates() -> Array:
+	return _spawn_gate_row().filter(func(g): return g.gate_type != "level_up")
+
+
+func test_マイナスゲートの確率が100パーセントならレベルアップ以外のゲートはマイナスになる():
+	spawner.minus_gate_probability = 1.0
+	var gates := _non_level_up_gates()
+	assert_false(gates.is_empty())
+	assert_true(gates.all(func(g): return g.gate_type == "add" and g.value < 0))
+
+
+func test_マイナスゲートの確率が0パーセントならマイナスのゲートは出ない():
+	spawner.minus_gate_probability = 0.0
+	var gates := _non_level_up_gates()
+	assert_true(gates.all(func(g): return g.value > 0))

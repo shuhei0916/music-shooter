@@ -6,6 +6,8 @@ const CHEST_SPAWN_OFFSET_Z := -5.0
 @export var enemy_scene: PackedScene
 @export var chest_scene: PackedScene
 @export var enemy_spawn_probability: float = 0.1
+## ゲート列のうちレベルアップ以外のゲートがマイナスになる確率（1列に必ずレベルアップゲートがあるので、全部がマイナスにはならない）
+@export_range(0.0, 1.0) var minus_gate_probability: float = 0.3
 @export_range(1, 100) var enemy_hp_min: int = 5
 @export_range(1, 100) var enemy_hp_max: int = 20
 
@@ -65,6 +67,8 @@ func _spawn_gate_row() -> void:
 func _set_gate_properties(gate: Node) -> void:
 	gate.gate_type = "add"
 	gate.value = randi_range(5, 20)
+	if randf() < minus_gate_probability:
+		gate.value = -gate.value
 
 
 func _set_level_up_gate_properties(gate: Node) -> void:
