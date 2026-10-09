@@ -35,7 +35,10 @@ func _physics_process(_delta):
 func apply_gate_effect(gate_type: String, value: int):
 	match gate_type:
 		"add":
-			self.hp += value
+			if value < 0:  # マイナスのゲート
+				take_damage(-value)
+			else:
+				self.hp += value
 		"multiply":
 			self.hp *= value
 		"level_up":  # valueは対象の武器のチャンネル

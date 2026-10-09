@@ -45,6 +45,12 @@ func test_マイナスのゲートの効果でHPが減る() -> void:
 	assert_eq(7, player.hp)
 
 
+func test_マイナスのゲートでHPが0以下になるとgame_overが呼ばれる() -> void:
+	watch_signals(player)
+	player.apply_gate_effect("add", -10)
+	assert_signal_emitted(player, "game_over_signal")
+
+
 func test_乗算ゲートの効果でHPが乗算される() -> void:
 	player.apply_gate_effect("multiply", 2)
 	assert_eq(20, player.hp)
