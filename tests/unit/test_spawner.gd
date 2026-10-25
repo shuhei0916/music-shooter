@@ -27,22 +27,20 @@ func test_敵のHPが範囲内に収まる():
 	assert_eq(12, enemy.hp)
 
 
-func test_成長曲線設定時にprogress0でhp_minになる():
+func test_進み具合0の敵のHPは基本の範囲に収まる():
 	spawner.enemy_hp_min = 10
 	spawner.enemy_hp_max = 20
-	spawner.set_growth_curve(PackedVector2Array([Vector2(0.0, 0.0), Vector2(10.0, 100.0)]))
-
+	spawner.inflation_end_scale = 100.0
 	spawner._set_enemy_properties(enemy, 0.0)
-	assert_eq(10, enemy.hp)
+	assert_between(enemy.hp, 10, 20)
 
 
-func test_成長曲線設定時にprogress1でhp_maxになる():
+func test_敵のHPにインフレ倍率が掛かる():
 	spawner.enemy_hp_min = 10
 	spawner.enemy_hp_max = 20
-	spawner.set_growth_curve(PackedVector2Array([Vector2(0.0, 0.0), Vector2(10.0, 100.0)]))
-
+	spawner.inflation_end_scale = 100.0
 	spawner._set_enemy_properties(enemy, 1.0)
-	assert_eq(20, enemy.hp)
+	assert_between(enemy.hp, 10 * 100, 20 * 100)
 
 
 func test_加算ゲートの値にインフレ倍率が掛かる():

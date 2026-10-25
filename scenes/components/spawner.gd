@@ -144,12 +144,7 @@ func _pick_random_marker() -> Marker3D:
 
 
 func _set_enemy_properties(enemy: Node, progress: float = -1.0) -> void:
-	var value: int
-	if _growth_curve.is_empty() or progress < 0.0:
-		value = randi_range(enemy_hp_min, enemy_hp_max)
-	else:
-		value = int(lerp(float(enemy_hp_min), float(enemy_hp_max), progress))
-	enemy.hp = value
+	enemy.hp = roundi(randi_range(enemy_hp_min, enemy_hp_max) * _inflation_scale(progress))
 
 
 func _get_spawn_progress() -> float:
