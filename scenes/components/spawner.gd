@@ -70,14 +70,17 @@ func _on_spawn_timer_timeout() -> void:
 			_spawn_gate_row()
 		"enemy_row":
 			_spawn_enemy_row()
-		_:
+		"single":
 			_maybe_spawn_enemy()
 
 
-## turn（1始まり）に何を出すか: "gate_row"、"enemy_row"、"single"（確率で敵1体）
+## turn（1始まり）に何を出すか: "gate_row"、"enemy_row"、"single"（確率で敵1体）、"none"
 func turn_kind(turn: int) -> String:
 	if turn % 5 == 0:
 		return "gate_row"
+	# ゲート列の直前の敵は、そのレーンのゲートを塞ぎ、倒すと宝箱がゲートと重なる（1ターン奥に落ちる）
+	if turn % 5 == 4:
+		return "none"
 	# HP1のまま逃げられない列に当たらないよう、敵の列は最初のゲート列の後から出す
 	if turn % 5 == ENEMY_ROW_TURN and turn > 5:
 		return "enemy_row"
