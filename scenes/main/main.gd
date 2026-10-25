@@ -21,6 +21,7 @@ const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
 var visual_offset_sec: float
 
 var _note_scheduler: NoteScheduler
+var _tempo_map: Array = []  # 曲のテンポの変化点（進捗表示でtickを秒にする）
 
 @onready var midi_player = get_node_or_null("MidiPlayer")
 @onready var player = get_node_or_null("Player")
@@ -111,6 +112,8 @@ func _on_start_timer_timeout() -> void:
 	game_ui.update_countdown("")
 	spawner.set_weapon_colors(player.get_weapon_colors())
 	_setup_growth_curve()
+	if midi_player.smf_data:
+		_tempo_map = SongAnalyzerScript.new().tempo_map(midi_player.smf_data)
 
 
 func _setup_growth_curve() -> void:
@@ -159,14 +162,8 @@ func _update_song_progress():
 	if not (midi_player.playing and midi_player.smf_data):
 		return
 
-	var current_ticks = midi_player.position
-	var total_ticks = midi_player.last_position
-
-	# Correctly convert ticks to seconds
-	var ticks_per_beat = midi_player.smf_data.timebase
-	var seconds_per_beat = midi_player.timebase_to_seconds
-
-	var current_time = (current_ticks / ticks_per_beat) * seconds_per_beat
-	var total_time = (total_ticks / ticks_per_beat) * seconds_per_beat
-
+	var analyzer = SongAnalyzerScript.new()
+	var timebase: int = midi_player.smf_data.timebase
+	var current_time := analyzer.seconds_at(_tempo_map, timebase, midi_player.position)
+	var total_time := analyzer.seconds_at(_tempo_map, timebase, midi_player.last_position)
 	game_ui.update_progress(current_time, total_time)

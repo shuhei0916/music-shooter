@@ -68,3 +68,19 @@ func test_複数トラックのノートは時刻順に累積する() -> void:
 		smf_data.tracks.append(track)
 	var result: PackedVector2Array = analyzer.compute_cumulative_counts(smf_data, [0])
 	assert_eq(result, PackedVector2Array([Vector2(480, 1), Vector2(960, 2)]))
+
+
+func _make_tempo_chunk(tick: int, bpm: float) -> SMF.MIDIEventChunk:
+	var args := {"type": SMF.MIDISystemEventType.set_tempo, "bpm": roundi(60_000_000.0 / bpm)}
+	return SMF.MIDIEventChunk.new(tick, 0, SMF.MIDIEventSystemEvent.new(args))
+
+
+func test_テンポ指定のない曲は120BPMとしてtickを秒にする() -> void:
+	var smf_data := _make_smf([])
+	assert_almost_eq(analyzer.ticks_to_seconds(smf_data, 480 * 4), 2.0, 0.001)
+
+
+func test_途中でテンポが変わる曲は区間ごとのテンポでtickを秒にする() -> void:
+	# 最初の4拍は120BPM（2秒）、その後の4拍は60BPM（4秒）
+	var smf_data := _make_smf([_make_tempo_chunk(0, 120.0), _make_tempo_chunk(480 * 4, 60.0)])
+	assert_almost_eq(analyzer.ticks_to_seconds(smf_data, 480 * 8), 6.0, 0.001)
