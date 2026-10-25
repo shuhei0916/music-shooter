@@ -8,6 +8,14 @@ const ENEMY_ROW_TURN := 3
 ## 敵の列の3体のHPの倍率（弱・中・強のどれに突っ込むかを選ばせる）。レーンへの割り当てはシャッフルする
 const ENEMY_ROW_HP_FACTORS: Array[float] = [0.5, 1.0, 2.0]
 
+
+## ゲートのノードを作らずに扱うゲートの中身（シミュレーターでも使う）
+class GateSpec:
+	var gate_type := "add"
+	var value := 0
+	var weapon_color := Color.WHITE
+
+
 @export var gate_scene: PackedScene
 @export var enemy_scene: PackedScene
 @export var chest_scene: PackedScene
@@ -74,20 +82,31 @@ func turn_kind(turn: int) -> String:
 
 
 func _spawn_gate_row() -> void:
-	if markers.is_empty():
-		return
-	var level_up_index := randi() % markers.size()
+	var specs := gate_row_specs(_get_spawn_progress(), markers.size())
 	for i in markers.size():
 		var gate = gate_scene.instantiate()
 		gate.global_transform = markers[i].global_transform
-		if i == level_up_index:
-			_set_level_up_gate_properties(gate)
-		else:
-			_set_gate_properties(gate, _get_spawn_progress())
+		gate.gate_type = specs[i].gate_type
+		gate.value = specs[i].value
+		gate.weapon_color = specs[i].weapon_color
 		main_scene.add_child(gate)
 
 
-func _set_gate_properties(gate: Node, progress: float = -1.0) -> void:
+## ゲート列の各レーンのゲートの中身。1つがレベルアップゲート、残りは加算か乗算
+func gate_row_specs(progress: float, lane_count: int) -> Array[GateSpec]:
+	var specs: Array[GateSpec] = []
+	var level_up_index := randi() % lane_count
+	for i in lane_count:
+		var spec := GateSpec.new()
+		if i == level_up_index:
+			_set_level_up_gate_properties(spec)
+		else:
+			_set_gate_properties(spec, progress)
+		specs.append(spec)
+	return specs
+
+
+func _set_gate_properties(gate: Object, progress: float = -1.0) -> void:
 	if randf() < multiply_gate_probability:
 		gate.gate_type = "multiply"
 		gate.value = randi_range(2, 3)
@@ -98,7 +117,7 @@ func _set_gate_properties(gate: Node, progress: float = -1.0) -> void:
 		gate.value = -gate.value
 
 
-func _set_level_up_gate_properties(gate: Node) -> void:
+func _set_level_up_gate_properties(gate: Object) -> void:
 	gate.gate_type = "level_up"
 	if not _weapon_colors.is_empty():
 		var channel: int = _weapon_colors.keys().pick_random()

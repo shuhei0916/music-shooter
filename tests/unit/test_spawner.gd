@@ -91,3 +91,9 @@ func test_敵の列の3体のHPは同じ基本のHPの0点5倍と1倍と2倍():
 	hps.sort()
 	assert_eq(hps[2], hps[1] * 2)
 	assert_almost_eq(hps[0] * 2, hps[1], 1)
+
+
+func test_ゲート列の中身はレーンの数だけあり1つがレベルアップゲート():
+	var specs: Array = spawner.gate_row_specs(-1.0, 3)
+	assert_eq(specs.size(), 3)
+	assert_eq(specs.filter(func(g): return g.gate_type == "level_up").size(), 1)
