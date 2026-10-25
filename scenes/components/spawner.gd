@@ -114,11 +114,21 @@ func _maybe_spawn_enemy() -> void:
 
 
 func _spawn_enemy_row() -> void:
-	var factors := ENEMY_ROW_HP_FACTORS.duplicate()
-	factors.shuffle()
+	var hps := enemy_row_hps(_get_spawn_progress())
 	for i in markers.size():
 		var enemy = _spawn_enemy_at(markers[i])
-		enemy.hp = maxi(1, roundi(enemy.hp * factors[i % factors.size()]))
+		enemy.hp = hps[i % hps.size()]
+
+
+## 敵の列の各レーンのHP。同じ基本のHPに、レーンごとにシャッフルした倍率を掛ける
+func enemy_row_hps(progress: float) -> Array[int]:
+	var base := randi_range(enemy_hp_min, enemy_hp_max) * _inflation_scale(progress)
+	var factors := ENEMY_ROW_HP_FACTORS.duplicate()
+	factors.shuffle()
+	var hps: Array[int] = []
+	for factor in factors:
+		hps.append(maxi(1, roundi(base * factor)))
+	return hps
 
 
 func _spawn_enemy() -> void:

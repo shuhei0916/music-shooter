@@ -82,3 +82,12 @@ func test_ターンの種類は5ターンごとにゲート列で最初のゲー
 	expected += ["single", "single", "enemy_row", "single", "gate_row"]
 	expected += ["single", "single", "enemy_row"]
 	assert_eq(kinds, expected)
+
+
+func test_敵の列の3体のHPは同じ基本のHPの0点5倍と1倍と2倍():
+	spawner.enemy_hp_min = 1
+	spawner.enemy_hp_max = 1000
+	var hps: Array = spawner.enemy_row_hps(-1.0)
+	hps.sort()
+	assert_eq(hps[2], hps[1] * 2)
+	assert_almost_eq(hps[0] * 2, hps[1], 1)
