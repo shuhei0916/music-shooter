@@ -170,3 +170,12 @@ func test_プレイ中は今のインフレ倍率が弾のダメージになる(
 	main._process(0.016)
 	for weapon in main.player.get_children().filter(func(n): return n.is_in_group("weapon")):
 		assert_eq(50, weapon.damage)
+
+
+func test_インフレの進み具合はテンポによらず再生位置のtickで決まる():
+	main.spawner.set_growth_curve(
+		PackedVector2Array([Vector2(0, 0), Vector2(100, 50), Vector2(200, 100)])
+	)
+	main.midi_player.position = 100
+	main.midi_player.timebase_to_seconds = 0.26  # テンポ230相当
+	assert_almost_eq(main.spawner._get_spawn_progress(), 0.5, 0.001)

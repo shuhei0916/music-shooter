@@ -2,9 +2,8 @@ class_name SongAnalyzer
 extends RefCounted
 
 
-func compute_cumulative_counts(
-	smf_data: SMF.SMFData, timebase_to_seconds: float, used_channels: Array
-) -> PackedVector2Array:
+## used_channelsのノートの累積数を、(tick, そのtickまでの累積数)の点として時刻順に返す
+func compute_cumulative_counts(smf_data: SMF.SMFData, used_channels: Array) -> PackedVector2Array:
 	var result := PackedVector2Array()
 	if smf_data == null or smf_data.tracks.is_empty():
 		return result
@@ -26,6 +25,6 @@ func compute_cumulative_counts(
 	var cumulative := 0
 	for tick in note_ticks:
 		cumulative += 1
-		result.append(Vector2(tick * timebase_to_seconds, cumulative))
+		result.append(Vector2(tick, cumulative))
 
 	return result

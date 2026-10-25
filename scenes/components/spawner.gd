@@ -215,11 +215,9 @@ func _set_enemy_properties(enemy: Node, progress: float = -1.0) -> void:
 func _get_spawn_progress() -> float:
 	if _growth_curve.is_empty() or _growth_curve[-1].y == 0.0:
 		return -1.0
-	var current_time: float = (
-		main_scene.midi_player.position * main_scene.midi_player.timebase_to_seconds
-	)
+	var current_tick: float = main_scene.midi_player.position
 	var max_count: float = _growth_curve[-1].y
 	for i in range(_growth_curve.size() - 1, -1, -1):
-		if _growth_curve[i].x <= current_time:
+		if _growth_curve[i].x <= current_tick:
 			return _growth_curve[i].y / max_count
 	return 0.0

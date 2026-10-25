@@ -119,7 +119,7 @@ func _setup_growth_curve() -> void:
 	var used_channels: Array = player.get_weapon_channels()
 	var analyzer = SongAnalyzerScript.new()
 	var points: PackedVector2Array = analyzer.compute_cumulative_counts(
-		midi_player.smf_data, midi_player.timebase_to_seconds, used_channels
+		midi_player.smf_data, used_channels
 	)
 	spawner.set_growth_curve(points)
 
