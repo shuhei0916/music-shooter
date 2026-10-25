@@ -13,7 +13,7 @@ class FakeSpawner:
 	func turn_kind(turn: int) -> String:
 		return kinds.get(turn, "single")
 
-	func gate_row_specs(_progress: float, _lane_count: int) -> Array:
+	func gate_row_specs(_turn: int, _progress: float, _lane_count: int) -> Array:
 		return gates
 
 	func enemy_row_hps(_progress: float) -> Array[int]:

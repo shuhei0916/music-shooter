@@ -94,6 +94,21 @@ func test_敵の列の3体のHPは同じ基本のHPの0点5倍と1倍と2倍():
 
 
 func test_ゲート列の中身はレーンの数だけあり1つがレベルアップゲート():
-	var specs: Array = spawner.gate_row_specs(-1.0, 3)
+	var specs: Array = spawner.gate_row_specs(10, -1.0, 3)
 	assert_eq(specs.size(), 3)
 	assert_eq(specs.filter(func(g): return g.gate_type == "level_up").size(), 1)
+
+
+func _plus_gates(turn: int) -> Array:
+	spawner.minus_gate_probability = 1.0
+	spawner.multiply_gate_probability = 1.0
+	var specs: Array = spawner.gate_row_specs(turn, -1.0, 3)
+	return specs.filter(func(g): return g.gate_type == "add" and g.value > 0)
+
+
+func test_最初のゲート列には必ずプラスの加算ゲートが1つ含まれる():
+	assert_eq(_plus_gates(5).size(), 1)
+
+
+func test_2回目以降のゲート列にはプラスのゲートは保証されない():
+	assert_eq(_plus_gates(10).size(), 0)

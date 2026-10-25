@@ -40,7 +40,7 @@ func test_敵を倒すと宝箱がシーンに追加される():
 
 
 func _spawn_gate_row() -> Array:
-	spawner.spawn_counter = 4  # 次のタイムアウトがゲート列のターンになる
+	spawner.spawn_counter = 9  # 次のタイムアウトが2回目のゲート列のターンになる（最初の列はプラスが保証される）
 	spawner._on_spawn_timer_timeout()
 	var gates = get_children().filter(func(n): return "gate_type" in n)
 	for gate in gates:

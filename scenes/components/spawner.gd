@@ -82,7 +82,7 @@ func turn_kind(turn: int) -> String:
 
 
 func _spawn_gate_row() -> void:
-	var specs := gate_row_specs(_get_spawn_progress(), markers.size())
+	var specs := gate_row_specs(spawn_counter, _get_spawn_progress(), markers.size())
 	for i in markers.size():
 		var gate = gate_scene.instantiate()
 		gate.global_transform = markers[i].global_transform
@@ -92,18 +92,26 @@ func _spawn_gate_row() -> void:
 		main_scene.add_child(gate)
 
 
-## ゲート列の各レーンのゲートの中身。1つがレベルアップゲート、残りは加算か乗算
-func gate_row_specs(progress: float, lane_count: int) -> Array[GateSpec]:
+## turnに出すゲート列の各レーンのゲートの中身。1つがレベルアップゲート、残りは加算か乗算。
+## 最初のゲート列には、HP1のまま次の敵の列で運悪く死なないよう、プラスの加算ゲートを1つ含める
+func gate_row_specs(turn: int, progress: float, lane_count: int) -> Array[GateSpec]:
 	var specs: Array[GateSpec] = []
 	var level_up_index := randi() % lane_count
+	var plus_index := (level_up_index + 1) % lane_count if _is_first_gate_row(turn) else -1
 	for i in lane_count:
 		var spec := GateSpec.new()
 		if i == level_up_index:
 			_set_level_up_gate_properties(spec)
+		elif i == plus_index:
+			_set_plus_gate_properties(spec, progress)
 		else:
 			_set_gate_properties(spec, progress)
 		specs.append(spec)
 	return specs
+
+
+func _is_first_gate_row(turn: int) -> bool:
+	return range(1, turn).all(func(t): return turn_kind(t) != "gate_row")
 
 
 func _set_gate_properties(gate: Object, progress: float = -1.0) -> void:
@@ -111,10 +119,14 @@ func _set_gate_properties(gate: Object, progress: float = -1.0) -> void:
 		gate.gate_type = "multiply"
 		gate.value = randi_range(2, 3)
 		return
-	gate.gate_type = "add"
-	gate.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
+	_set_plus_gate_properties(gate, progress)
 	if randf() < minus_gate_probability:
 		gate.value = -gate.value
+
+
+func _set_plus_gate_properties(gate: Object, progress: float) -> void:
+	gate.gate_type = "add"
+	gate.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
 
 
 func _set_level_up_gate_properties(gate: Object) -> void:

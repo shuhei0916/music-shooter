@@ -14,7 +14,7 @@ static func run(spawner, turns: int, choose: Callable) -> int:
 		var progress := float(turn) / turns
 		match spawner.turn_kind(turn):
 			"gate_row":
-				var specs: Array = spawner.gate_row_specs(progress, LANE_COUNT)
+				var specs: Array = spawner.gate_row_specs(turn, progress, LANE_COUNT)
 				hp = choose.call(specs.map(func(g): return _apply_gate(hp, g)))
 			"enemy_row":
 				var hps: Array = spawner.enemy_row_hps(progress)
