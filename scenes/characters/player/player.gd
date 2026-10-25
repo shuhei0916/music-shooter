@@ -86,6 +86,12 @@ func get_weapon_colors() -> Dictionary:
 	return colors
 
 
+## 弾1発のダメージ（基本1）にインフレ倍率を掛ける
+func set_damage_scale(scale: float) -> void:
+	for weapon in _weapon_map.values():
+		weapon.damage = maxi(1, roundi(scale))
+
+
 func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
 	if weapon and weapon.is_on_grid(tick, timebase):

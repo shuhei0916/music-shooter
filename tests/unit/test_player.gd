@@ -90,3 +90,12 @@ func test_最大レベルの武器はレベルアップゲートを通っても�
 func test_武器のないチャンネルのレベルアップゲートを通ってもエラーにならない() -> void:
 	player.apply_gate_effect("level_up", 99)
 	assert_engine_error_count(0)
+
+
+func test_インフレ倍率を受け取るとすべての武器の弾のダメージが倍率になる() -> void:
+	var weapons: Array[Weapon] = [autofree(Weapon.new()), autofree(Weapon.new())]
+	player._weapon_map[0] = weapons[0]
+	player._weapon_map[9] = weapons[1]
+
+	player.set_damage_scale(1000.4)
+	assert_eq([1000, 1000], weapons.map(func(w): return w.damage))
