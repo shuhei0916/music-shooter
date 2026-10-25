@@ -46,6 +46,7 @@ func test_敵のHPにインフレ倍率が掛かる():
 func test_加算ゲートの値にインフレ倍率が掛かる():
 	var gate = autofree(Gate.new())
 	spawner.inflation_end_scale = 100.0
+	spawner.multiply_gate_probability = 0.0
 	spawner.minus_gate_probability = 0.0
 	spawner._set_gate_properties(gate, 1.0)
 	assert_between(gate.value, 5 * 100, 20 * 100)
@@ -54,6 +55,7 @@ func test_加算ゲートの値にインフレ倍率が掛かる():
 func test_マイナスのゲートの値にもインフレ倍率が掛かる():
 	var gate = autofree(Gate.new())
 	spawner.inflation_end_scale = 100.0
+	spawner.multiply_gate_probability = 0.0
 	spawner.minus_gate_probability = 1.0
 	spawner._set_gate_properties(gate, 1.0)
 	assert_between(gate.value, -20 * 100, -5 * 100)
@@ -64,3 +66,11 @@ func test_宝箱の値にインフレ倍率が掛かる():
 	spawner.inflation_end_scale = 100.0
 	spawner._set_chest_properties(chest, 1.0)
 	assert_between(chest.value, 5 * 100, 20 * 100)
+
+
+func test_乗算ゲートの確率が100パーセントならx2かx3の乗算ゲートになる():
+	var gate = autofree(Gate.new())
+	spawner.multiply_gate_probability = 1.0
+	spawner._set_gate_properties(gate, 1.0)
+	assert_eq("multiply", gate.gate_type)
+	assert_between(gate.value, 2, 3)

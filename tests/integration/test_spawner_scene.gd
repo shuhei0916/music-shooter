@@ -72,6 +72,7 @@ func _non_level_up_gates() -> Array:
 
 
 func test_マイナスゲートの確率が100パーセントならレベルアップ以外のゲートはマイナスになる():
+	spawner.multiply_gate_probability = 0.0
 	spawner.minus_gate_probability = 1.0
 	var gates := _non_level_up_gates()
 	assert_false(gates.is_empty())
@@ -79,6 +80,7 @@ func test_マイナスゲートの確率が100パーセントならレベルア�
 
 
 func test_マイナスゲートの確率が0パーセントならマイナスのゲートは出ない():
+	spawner.multiply_gate_probability = 0.0
 	spawner.minus_gate_probability = 0.0
 	var gates := _non_level_up_gates()
 	assert_true(gates.all(func(g): return g.value > 0))

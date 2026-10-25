@@ -14,6 +14,8 @@ const ENEMY_ROW_HP_FACTORS: Array[float] = [0.5, 1.0, 2.0]
 @export var enemy_spawn_probability: float = 0.1
 ## ゲート列のうちレベルアップ以外のゲートがマイナスになる確率（1列に必ずレベルアップゲートがあるので、全部がマイナスにはならない）
 @export_range(0.0, 1.0) var minus_gate_probability: float = 0.3
+## ゲート列のうちレベルアップ以外のゲートが乗算ゲート（×2か×3）になる確率。積み重ねで序盤の選択が最後まで効く
+@export_range(0.0, 1.0) var multiply_gate_probability: float = 0.15
 ## 曲の終わり（進み具合1）でゲートの値・敵のHP・弾のダメージに掛かる倍率
 @export var inflation_end_scale: float = 1e8
 @export_range(1, 100) var enemy_hp_min: int = 5
@@ -76,6 +78,10 @@ func _spawn_gate_row() -> void:
 
 
 func _set_gate_properties(gate: Node, progress: float = -1.0) -> void:
+	if randf() < multiply_gate_probability:
+		gate.gate_type = "multiply"
+		gate.value = randi_range(2, 3)
+		return
 	gate.gate_type = "add"
 	gate.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
 	if randf() < minus_gate_probability:
