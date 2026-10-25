@@ -82,3 +82,20 @@ func test_マイナスゲートの確率が0パーセントならマイナスの
 	spawner.minus_gate_probability = 0.0
 	var gates := _non_level_up_gates()
 	assert_true(gates.all(func(g): return g.value > 0))
+
+
+func _spawn_enemy_row() -> Array:
+	var before = get_children()
+	spawner.spawn_counter = 2  # 次のタイムアウトが敵の列のターンになる
+	spawner._on_spawn_timer_timeout()
+	var enemies = get_children().filter(func(n): return n.is_in_group("enemy") and n not in before)
+	for enemy in enemies:
+		autofree(enemy)
+	return enemies
+
+
+func test_敵の列のターンには3レーンすべてに敵が出る():
+	spawner.enemy_spawn_probability = 0.0
+	var lanes_x = _spawn_enemy_row().map(func(e): return e.global_position.x)
+	lanes_x.sort()
+	assert_eq(lanes_x, [-3.0, 0.0, 3.0])

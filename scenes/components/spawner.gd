@@ -1,6 +1,8 @@
 extends Node
 
 const CHEST_SPAWN_OFFSET_Z := -5.0
+## 5ターン周期のうち、ゲート列（0ターン目）の間に逃げられない敵の列を出すターン
+const ENEMY_ROW_TURN := 3
 
 @export var gate_scene: PackedScene
 @export var enemy_scene: PackedScene
@@ -46,6 +48,8 @@ func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
 	if spawn_counter % 5 == 0:
 		_spawn_gate_row()
+	elif spawn_counter % 5 == ENEMY_ROW_TURN:
+		_spawn_enemy_row()
 	else:
 		_maybe_spawn_enemy()
 
@@ -86,9 +90,18 @@ func _maybe_spawn_enemy() -> void:
 		_spawn_enemy()
 
 
+func _spawn_enemy_row() -> void:
+	for marker in markers:
+		_spawn_enemy_at(marker)
+
+
 func _spawn_enemy() -> void:
+	_spawn_enemy_at(_pick_random_marker())
+
+
+func _spawn_enemy_at(marker: Marker3D) -> void:
 	var enemy = enemy_scene.instantiate()
-	enemy.global_transform = _pick_random_marker().global_transform
+	enemy.global_transform = marker.global_transform
 	_set_enemy_properties(enemy, _get_spawn_progress())
 	enemy.died.connect(_on_enemy_died.bind(enemy))
 	main_scene.add_child(enemy)
