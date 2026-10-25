@@ -1,5 +1,7 @@
 extends Node
 
+const Inflation = preload("res://scripts/inflation.gd")
+
 const CHEST_SPAWN_OFFSET_Z := -5.0
 ## 5ターン周期のうち、ゲート列（0ターン目）の間に逃げられない敵の列を出すターン
 const ENEMY_ROW_TURN := 3
@@ -12,6 +14,8 @@ const ENEMY_ROW_HP_FACTORS: Array[float] = [0.5, 1.0, 2.0]
 @export var enemy_spawn_probability: float = 0.1
 ## ゲート列のうちレベルアップ以外のゲートがマイナスになる確率（1列に必ずレベルアップゲートがあるので、全部がマイナスにはならない）
 @export_range(0.0, 1.0) var minus_gate_probability: float = 0.3
+## 曲の終わり（進み具合1）でゲートの値・敵のHP・弾のダメージに掛かる倍率
+@export var inflation_end_scale: float = 1e8
 @export_range(1, 100) var enemy_hp_min: int = 5
 @export_range(1, 100) var enemy_hp_max: int = 20
 
@@ -67,13 +71,13 @@ func _spawn_gate_row() -> void:
 		if i == level_up_index:
 			_set_level_up_gate_properties(gate)
 		else:
-			_set_gate_properties(gate)
+			_set_gate_properties(gate, _get_spawn_progress())
 		main_scene.add_child(gate)
 
 
-func _set_gate_properties(gate: Node) -> void:
+func _set_gate_properties(gate: Node, progress: float = -1.0) -> void:
 	gate.gate_type = "add"
-	gate.value = randi_range(5, 20)
+	gate.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
 	if randf() < minus_gate_probability:
 		gate.value = -gate.value
 
@@ -122,6 +126,11 @@ func _on_enemy_died(enemy: Node) -> void:
 	chest.value = randi_range(5, 20)
 	main_scene.add_child(chest)
 	chest.global_position = enemy.global_position + Vector3(0, 0, CHEST_SPAWN_OFFSET_Z)
+
+
+## progressが負（成長曲線なし）なら倍率1
+func _inflation_scale(progress: float) -> float:
+	return Inflation.scale_at(maxf(progress, 0.0), inflation_end_scale)
 
 
 func _pick_random_marker() -> Marker3D:

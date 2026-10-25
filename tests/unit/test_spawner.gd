@@ -2,6 +2,7 @@ extends GutTest
 
 const Spawner = preload("res://scenes/components/spawner.gd")
 const Enemy = preload("res://scenes/characters/enemy/enemy.gd")
+const Gate = preload("res://scenes/objects/gate/gate.gd")
 
 var spawner
 var enemy
@@ -42,3 +43,19 @@ func test_成長曲線設定時にprogress1でhp_maxになる():
 
 	spawner._set_enemy_properties(enemy, 1.0)
 	assert_eq(20, enemy.hp)
+
+
+func test_加算ゲートの値にインフレ倍率が掛かる():
+	var gate = autofree(Gate.new())
+	spawner.inflation_end_scale = 100.0
+	spawner.minus_gate_probability = 0.0
+	spawner._set_gate_properties(gate, 1.0)
+	assert_between(gate.value, 5 * 100, 20 * 100)
+
+
+func test_マイナスのゲートの値にもインフレ倍率が掛かる():
+	var gate = autofree(Gate.new())
+	spawner.inflation_end_scale = 100.0
+	spawner.minus_gate_probability = 1.0
+	spawner._set_gate_properties(gate, 1.0)
+	assert_between(gate.value, -20 * 100, -5 * 100)
