@@ -25,6 +25,20 @@ grow_horizontal = 2
 text = "00:00/00:00"
 horizontal_alignment = 1
 
+[node name="CalibrationHintLabel" type="Label" parent="." unique_id=1377757612]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 36.0
+offset_right = 150.0
+offset_bottom = 59.0
+grow_horizontal = 2
+text = "C: タイミング調整"
+horizontal_alignment = 1
+
 [node name="ResultPanel" type="Panel" parent="." unique_id=917158636]
 visible = false
 layout_mode = 1

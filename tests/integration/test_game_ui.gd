@@ -49,3 +49,15 @@ func test_notify_midi_event同一チャンネルを2回呼んでも行が増え�
 	var after_first = vbox.get_child_count()
 	game_ui.notify_midi_event(0, "Track A", 62, 90)
 	assert_eq(after_first, vbox.get_child_count())
+
+
+func test_カウントダウン中はタイミング調整の案内を表示する():
+	game_ui.update_countdown("3")
+	var hint = game_ui.get_node("CalibrationHintLabel")
+	assert_eq([true, "C: タイミング調整"], [hint.visible, hint.text])
+
+
+func test_カウントダウンが終わるとタイミング調整の案内を消す():
+	game_ui.update_countdown("3")
+	game_ui.update_countdown("")
+	assert_false(game_ui.get_node("CalibrationHintLabel").visible)

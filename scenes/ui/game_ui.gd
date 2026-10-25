@@ -18,8 +18,10 @@ func update_progress(current_time, total_time):
 	$SongProgressLabel.text = str(time_str)
 
 
+## カウントダウン中（textが空でない間）は、タイミング調整画面を開くキーの案内も表示する
 func update_countdown(text: String) -> void:
 	$SongProgressLabel.text = text
+	$CalibrationHintLabel.visible = not text.is_empty()
 
 
 func toggle_debug() -> void:
