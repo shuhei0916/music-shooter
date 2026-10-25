@@ -54,13 +54,23 @@ func set_weapon_colors(weapon_colors: Dictionary) -> void:
 
 func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
-	if spawn_counter % 5 == 0:
-		_spawn_gate_row()
+	match turn_kind(spawn_counter):
+		"gate_row":
+			_spawn_gate_row()
+		"enemy_row":
+			_spawn_enemy_row()
+		_:
+			_maybe_spawn_enemy()
+
+
+## turn（1始まり）に何を出すか: "gate_row"、"enemy_row"、"single"（確率で敵1体）
+func turn_kind(turn: int) -> String:
+	if turn % 5 == 0:
+		return "gate_row"
 	# HP1のまま逃げられない列に当たらないよう、敵の列は最初のゲート列の後から出す
-	elif spawn_counter % 5 == ENEMY_ROW_TURN and spawn_counter > 5:
-		_spawn_enemy_row()
-	else:
-		_maybe_spawn_enemy()
+	if turn % 5 == ENEMY_ROW_TURN and turn > 5:
+		return "enemy_row"
+	return "single"
 
 
 func _spawn_gate_row() -> void:

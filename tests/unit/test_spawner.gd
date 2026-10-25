@@ -74,3 +74,11 @@ func test_乗算ゲートの確率が100パーセントならx2かx3の乗算ゲ
 	spawner._set_gate_properties(gate, 1.0)
 	assert_eq("multiply", gate.gate_type)
 	assert_between(gate.value, 2, 3)
+
+
+func test_ターンの種類は5ターンごとにゲート列で最初のゲート列の後はその3ターン後に敵の列():
+	var kinds = range(1, 14).map(func(turn): return spawner.turn_kind(turn))
+	var expected = ["single", "single", "single", "single", "gate_row"]
+	expected += ["single", "single", "enemy_row", "single", "gate_row"]
+	expected += ["single", "single", "enemy_row"]
+	assert_eq(kinds, expected)
