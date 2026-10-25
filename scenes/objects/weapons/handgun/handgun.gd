@@ -11,6 +11,7 @@ func fire() -> void:
 		return
 	var bullet = bullet_scene.instantiate()
 	bullet.color = color
+	bullet.damage = damage
 	get_tree().root.add_child(bullet)
 	bullet.global_transform = $Muzzle.global_transform
 

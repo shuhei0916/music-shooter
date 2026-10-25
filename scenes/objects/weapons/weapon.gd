@@ -11,6 +11,8 @@ const MAX_LEVEL := 4
 @export var level: int = 1:
 	set(value):
 		level = mini(value, MAX_LEVEL)
+## 発射する弾1発のダメージ（インフレ倍率に合わせてPlayerが更新する）
+var damage: int = 1
 
 
 func is_on_grid(tick: int, timebase: int) -> bool:
