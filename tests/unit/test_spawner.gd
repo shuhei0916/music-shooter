@@ -59,3 +59,10 @@ func test_マイナスのゲートの値にもインフレ倍率が掛かる():
 	spawner.minus_gate_probability = 1.0
 	spawner._set_gate_properties(gate, 1.0)
 	assert_between(gate.value, -20 * 100, -5 * 100)
+
+
+func test_宝箱の値にインフレ倍率が掛かる():
+	var chest = autofree(Gate.new())
+	spawner.inflation_end_scale = 100.0
+	spawner._set_chest_properties(chest, 1.0)
+	assert_between(chest.value, 5 * 100, 20 * 100)

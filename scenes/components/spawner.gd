@@ -122,8 +122,7 @@ func _on_enemy_died(enemy: Node) -> void:
 	if chest_scene == null:
 		return
 	var chest = chest_scene.instantiate()
-	chest.gate_type = "add"
-	chest.value = randi_range(5, 20)
+	_set_chest_properties(chest, _get_spawn_progress())
 	main_scene.add_child(chest)
 	chest.global_position = enemy.global_position + Vector3(0, 0, CHEST_SPAWN_OFFSET_Z)
 
@@ -131,6 +130,11 @@ func _on_enemy_died(enemy: Node) -> void:
 ## progressが負（成長曲線なし）なら倍率1
 func _inflation_scale(progress: float) -> float:
 	return Inflation.scale_at(maxf(progress, 0.0), inflation_end_scale)
+
+
+func _set_chest_properties(chest: Node, progress: float = -1.0) -> void:
+	chest.gate_type = "add"
+	chest.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
 
 
 func _pick_random_marker() -> Marker3D:
