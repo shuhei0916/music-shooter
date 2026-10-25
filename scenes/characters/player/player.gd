@@ -14,6 +14,7 @@ var hp = 1:
 		_update_hp_label()
 
 var _weapon_map: Dictionary = {}
+var _last_fired_ticks: Dictionary = {}  # チャンネル -> 最後に発射したノートのtick
 
 
 func _ready() -> void:
@@ -95,5 +96,9 @@ func set_damage_scale(scale: float) -> void:
 
 func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
-	if weapon and weapon.is_on_grid(tick, timebase):
-		weapon.fire()
+	if weapon == null or not weapon.is_on_grid(tick, timebase):
+		return
+	if _last_fired_ticks.get(channel) == tick:  # 同じtickの和音（キック＋ハイハット等）は1発にまとめる
+		return
+	_last_fired_ticks[channel] = tick
+	weapon.fire()
