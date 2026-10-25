@@ -20,6 +20,9 @@ class GateSpec:
 @export var enemy_scene: PackedScene
 @export var chest_scene: PackedScene
 @export var enemy_spawn_probability: float = 0.1
+## 加算ゲートの値の基本の範囲（インフレ倍率を掛ける前）。難易度はtests/unit/test_balance.gdで確かめる
+@export var gate_value_min: int = 20
+@export var gate_value_max: int = 60
 ## ゲート列のうちレベルアップ以外のゲートがマイナスになる確率（1列に必ずレベルアップゲートがあるので、全部がマイナスにはならない）
 @export_range(0.0, 1.0) var minus_gate_probability: float = 0.3
 ## ゲート列のうちレベルアップ以外のゲートが乗算ゲート（×2か×3）になる確率。積み重ねで序盤の選択が最後まで効く
@@ -126,7 +129,7 @@ func _set_gate_properties(gate: Object, progress: float = -1.0) -> void:
 
 func _set_plus_gate_properties(gate: Object, progress: float) -> void:
 	gate.gate_type = "add"
-	gate.value = roundi(randi_range(5, 20) * _inflation_scale(progress))
+	gate.value = roundi(randi_range(gate_value_min, gate_value_max) * _inflation_scale(progress))
 
 
 func _set_level_up_gate_properties(gate: Object) -> void:
