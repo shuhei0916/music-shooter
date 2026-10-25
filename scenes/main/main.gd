@@ -39,6 +39,8 @@ func _ready():
 
 ## サウンドフォントの読み込み（約2.3秒）を、再生開始時ではなくカウントダウン中に済ませる
 func _load_song_soundfont() -> void:
+	if midi_player == null:
+		return
 	if Session.song_path:
 		midi_player.file = Session.song_path
 	var result := SMF.new().read_file(midi_player.file)
