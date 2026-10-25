@@ -161,3 +161,12 @@ func test_リザルト画面が出ているときのEscでは一時停止しな�
 	main.game_ui.show_result(false)
 	_press("ui_cancel")
 	assert_false(get_tree().paused)
+
+
+func test_プレイ中は今のインフレ倍率が弾のダメージになる():
+	main._on_start_timer_timeout()
+	main.spawner.inflation_end_scale = 50.0
+	main.spawner.set_growth_curve(PackedVector2Array([Vector2(0.0, 100.0)]))  # 再生位置0で進み具合1
+	main._process(0.016)
+	for weapon in main.player.get_children().filter(func(n): return n.is_in_group("weapon")):
+		assert_eq(50, weapon.damage)

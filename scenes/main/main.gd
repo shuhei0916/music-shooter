@@ -54,12 +54,19 @@ func _load_song_soundfont() -> void:
 func _process(delta: float) -> void:
 	_move_world_objects(delta)
 	_update_song_progress()
+	_update_damage_scale()
 	_fire_due_notes()
 
 
 func _move_world_objects(delta: float):
 	for obj in get_tree().get_nodes_in_group("world_objects"):
 		obj.global_translate(Vector3(0, 0, world_speed * delta))
+
+
+func _update_damage_scale() -> void:
+	if _note_scheduler == null:  # プレイ中のみ
+		return
+	player.set_damage_scale(spawner.current_inflation_scale())
 
 
 func _fire_due_notes() -> void:

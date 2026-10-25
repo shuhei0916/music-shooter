@@ -127,6 +127,11 @@ func _on_enemy_died(enemy: Node) -> void:
 	chest.global_position = enemy.global_position + Vector3(0, 0, CHEST_SPAWN_OFFSET_Z)
 
 
+## 今の再生位置でのインフレ倍率
+func current_inflation_scale() -> float:
+	return _inflation_scale(_get_spawn_progress())
+
+
 ## progressが負（成長曲線なし）なら倍率1
 func _inflation_scale(progress: float) -> float:
 	return Inflation.scale_at(maxf(progress, 0.0), inflation_end_scale)
