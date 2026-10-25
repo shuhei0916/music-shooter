@@ -2,6 +2,7 @@ class_name DebugOverlay
 extends Control
 
 var _channel_labels: Dictionary = {}
+var _note_counts: Dictionary = {}  # チャンネル -> これまでに受け取ったノート数
 
 @onready var _vbox: VBoxContainer = $VBoxContainer
 
@@ -9,11 +10,11 @@ var _channel_labels: Dictionary = {}
 func notify_midi_event(ch_num: int, track_name: String, note: int, velocity: int) -> void:
 	if ch_num not in _channel_labels:
 		_add_channel_row(ch_num)
+	_note_counts[ch_num] = _note_counts.get(ch_num, 0) + 1
 	var label: Label = _channel_labels[ch_num]
 	var bar := _make_vel_bar(velocity)
-	label.text = (
-		"ch%02d  %-20s  note=%-3d  vel=%-3d  %s" % [ch_num, track_name, note, velocity, bar]
-	)
+	var values := [ch_num, track_name, note, velocity, bar, _note_counts[ch_num]]
+	label.text = "ch%02d  %-20s  note=%-3d  vel=%-3d  %s  notes=%d" % values
 	_flash_label(label)
 
 

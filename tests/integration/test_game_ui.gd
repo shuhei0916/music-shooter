@@ -61,3 +61,10 @@ func test_カウントダウンが終わるとタイミング調整の案内を�
 	game_ui.update_countdown("3")
 	game_ui.update_countdown("")
 	assert_false(game_ui.get_node("CalibrationHintLabel").visible)
+
+
+func test_デバッグ表示にチャンネルごとのこれまでのノート数を表示する():
+	for note in [60, 62, 64]:
+		game_ui.notify_midi_event(0, "Track A", note, 80)
+	var label: Label = game_ui.debug_overlay.get_node("VBoxContainer").get_child(0)
+	assert_string_contains(label.text, "notes=3")
