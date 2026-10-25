@@ -3,8 +3,12 @@ extends Node
 const Inflation = preload("res://scripts/inflation.gd")
 
 const CHEST_SPAWN_OFFSET_Z := -5.0
-## 5ターン周期のうち、ゲート列（0ターン目）の間に逃げられない敵の列を出すターン
+## ターンの周期。周期の0ターン目にゲート列を出す
+const TURNS_PER_CYCLE := 5
+## 周期のうち、ゲート列の間に逃げられない敵の列を出すターン
 const ENEMY_ROW_TURN := 3
+## 周期のうち、何も出さないターン（ゲート列の直前）
+const EMPTY_TURN := 4
 ## 敵の列の3体のHPの倍率（弱・中・強のどれに突っ込むかを選ばせる）。レーンへの割り当てはシャッフルする
 const ENEMY_ROW_HP_FACTORS: Array[float] = [0.5, 1.0, 2.0]
 
@@ -76,13 +80,14 @@ func _on_spawn_timer_timeout() -> void:
 
 ## turn（1始まり）に何を出すか: "gate_row"、"enemy_row"、"single"（確率で敵1体）、"none"
 func turn_kind(turn: int) -> String:
-	if turn % 5 == 0:
+	var turn_in_cycle := turn % TURNS_PER_CYCLE
+	if turn_in_cycle == 0:
 		return "gate_row"
 	# ゲート列の直前の敵は、そのレーンのゲートを塞ぎ、倒すと宝箱がゲートと重なる（1ターン奥に落ちる）
-	if turn % 5 == 4:
+	if turn_in_cycle == EMPTY_TURN:
 		return "none"
 	# HP1のまま逃げられない列に当たらないよう、敵の列は最初のゲート列の後から出す
-	if turn % 5 == ENEMY_ROW_TURN and turn > 5:
+	if turn_in_cycle == ENEMY_ROW_TURN and turn > TURNS_PER_CYCLE:
 		return "enemy_row"
 	return "single"
 
