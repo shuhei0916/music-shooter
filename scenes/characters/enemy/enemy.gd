@@ -2,6 +2,8 @@ extends Area3D
 
 signal died
 
+const NumberFormat = preload("res://scripts/number_format.gd")
+
 @export var hp: int = 5:
 	set(value):
 		hp = value
@@ -26,7 +28,7 @@ func _on_area_entered(area: Area3D) -> void:
 func update_label():
 	var label := get_node_or_null("HPLabel")
 	if label:
-		label.text = str(hp)
+		label.text = NumberFormat.abbreviate(hp)
 
 
 func take_damage(damage):

@@ -39,3 +39,8 @@ func test_グリッド上のノートを受け取ると武器のマズルフラ�
 func test_スケーター男性のスキンで走るモデルを表示する():
 	var model = player.get_node("CharacterModel")
 	assert_eq(["run", "skaterMaleA.png"], [model.animation, model.skin.resource_path.get_file()])
+
+
+func test_HPのラベルは単位つきで表示する():
+	player.hp = 1500
+	assert_eq("1.5k", player.get_node("HPLabel").text)

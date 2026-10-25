@@ -1,5 +1,6 @@
 extends Area3D
 
+const NumberFormat = preload("res://scripts/number_format.gd")
 const MINUS_GATE_COLOR := Color.RED
 
 @export var gate_type: String = "add"  # "add", "multiply", "level_up"
@@ -29,7 +30,7 @@ func update_label():
 	if label:
 		match gate_type:
 			"add":
-				label.text = "❤️ %+d" % value
+				label.text = "❤️ " + ("+" if value >= 0 else "") + NumberFormat.abbreviate(value)
 			"multiply":
 				label.text = "💕 x" + str(value)
 			"level_up":

@@ -10,3 +10,8 @@ func before_each():
 
 func test_悪役のスキンでモデルを表示する():
 	assert_eq("criminalMaleA.png", enemy.get_node("CharacterModel").skin.resource_path.get_file())
+
+
+func test_HPのラベルは単位つきで表示する():
+	enemy.hp = 35_000_000
+	assert_eq("35M", enemy.get_node("HPLabel").text)

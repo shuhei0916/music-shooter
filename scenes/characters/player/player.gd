@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 signal game_over_signal
 
+const NumberFormat = preload("res://scripts/number_format.gd")
 const SPEED = 5.0
 
 @export var horizontal_limit_min: float = -4.0
@@ -65,7 +66,7 @@ func game_over():
 func _update_hp_label() -> void:
 	var label := get_node_or_null("HPLabel")
 	if label:
-		label.text = str(hp)
+		label.text = NumberFormat.abbreviate(hp)
 
 
 func _on_enemy_collided(enemy: Node) -> void:
