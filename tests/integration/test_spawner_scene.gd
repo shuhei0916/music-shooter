@@ -84,9 +84,9 @@ func test_マイナスゲートの確率が0パーセントならマイナスの
 	assert_true(gates.all(func(g): return g.value > 0))
 
 
-func _spawn_enemy_row() -> Array:
+func _spawn_enemy_row(spawn_counter := 7) -> Array:
 	var before = get_children()
-	spawner.spawn_counter = 2  # 次のタイムアウトが敵の列のターンになる
+	spawner.spawn_counter = spawn_counter  # 7なら、次のタイムアウトが2周目の敵の列のターンになる
 	spawner._on_spawn_timer_timeout()
 	var enemies = get_children().filter(func(n): return n.is_in_group("enemy") and n not in before)
 	for enemy in enemies:
@@ -110,3 +110,8 @@ func test_敵の列の3体のHPはすべて異なる():
 	for hp in hps:
 		unique_hps[hp] = true
 	assert_eq(unique_hps.size(), 3)
+
+
+func test_最初のゲート列より前には敵の列を出さない():
+	spawner.enemy_spawn_probability = 0.0
+	assert_eq(_spawn_enemy_row(2).size(), 0)

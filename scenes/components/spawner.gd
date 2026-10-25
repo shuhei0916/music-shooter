@@ -50,7 +50,8 @@ func _on_spawn_timer_timeout() -> void:
 	spawn_counter += 1
 	if spawn_counter % 5 == 0:
 		_spawn_gate_row()
-	elif spawn_counter % 5 == ENEMY_ROW_TURN:
+	# HP1のまま逃げられない列に当たらないよう、敵の列は最初のゲート列の後から出す
+	elif spawn_counter % 5 == ENEMY_ROW_TURN and spawn_counter > 5:
 		_spawn_enemy_row()
 	else:
 		_maybe_spawn_enemy()
