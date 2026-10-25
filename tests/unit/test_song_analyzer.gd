@@ -58,3 +58,13 @@ func test_空のSMFは空配列を返す() -> void:
 	var smf_data := SMF.SMFData.new(SMF.SMFFormat.format_0, 0, 480)
 	var result: PackedVector2Array = analyzer.compute_cumulative_counts(smf_data, 1.0 / 480.0, [0])
 	assert_eq(result.size(), 0)
+
+
+func test_複数トラックのノートは時刻順に累積する() -> void:
+	var smf_data := SMF.SMFData.new(SMF.SMFFormat.format_1, 2, 480)
+	for tick in [960, 480]:  # 1本目のトラックのほうが後ろの時刻
+		var track := SMF.MIDITrack.new()
+		track.events.append(_make_note_on_chunk(tick, 0, 100))
+		smf_data.tracks.append(track)
+	var result: PackedVector2Array = analyzer.compute_cumulative_counts(smf_data, 1.0, [0])
+	assert_eq(result, PackedVector2Array([Vector2(480, 1), Vector2(960, 2)]))
