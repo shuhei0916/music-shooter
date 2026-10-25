@@ -99,3 +99,14 @@ func test_敵の列のターンには3レーンすべてに敵が出る():
 	var lanes_x = _spawn_enemy_row().map(func(e): return e.global_position.x)
 	lanes_x.sort()
 	assert_eq(lanes_x, [-3.0, 0.0, 3.0])
+
+
+func test_敵の列の3体のHPはすべて異なる():
+	spawner.enemy_spawn_probability = 0.0
+	spawner.enemy_hp_min = 10
+	spawner.enemy_hp_max = 10
+	var hps = _spawn_enemy_row().map(func(e): return e.hp)
+	var unique_hps = {}
+	for hp in hps:
+		unique_hps[hp] = true
+	assert_eq(unique_hps.size(), 3)

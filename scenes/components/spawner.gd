@@ -3,6 +3,8 @@ extends Node
 const CHEST_SPAWN_OFFSET_Z := -5.0
 ## 5ターン周期のうち、ゲート列（0ターン目）の間に逃げられない敵の列を出すターン
 const ENEMY_ROW_TURN := 3
+## 敵の列の3体のHPの倍率（弱・中・強のどれに突っ込むかを選ばせる）。レーンへの割り当てはシャッフルする
+const ENEMY_ROW_HP_FACTORS: Array[float] = [0.5, 1.0, 2.0]
 
 @export var gate_scene: PackedScene
 @export var enemy_scene: PackedScene
@@ -91,20 +93,24 @@ func _maybe_spawn_enemy() -> void:
 
 
 func _spawn_enemy_row() -> void:
-	for marker in markers:
-		_spawn_enemy_at(marker)
+	var factors := ENEMY_ROW_HP_FACTORS.duplicate()
+	factors.shuffle()
+	for i in markers.size():
+		var enemy = _spawn_enemy_at(markers[i])
+		enemy.hp = maxi(1, roundi(enemy.hp * factors[i % factors.size()]))
 
 
 func _spawn_enemy() -> void:
 	_spawn_enemy_at(_pick_random_marker())
 
 
-func _spawn_enemy_at(marker: Marker3D) -> void:
+func _spawn_enemy_at(marker: Marker3D) -> Node:
 	var enemy = enemy_scene.instantiate()
 	enemy.global_transform = marker.global_transform
 	_set_enemy_properties(enemy, _get_spawn_progress())
 	enemy.died.connect(_on_enemy_died.bind(enemy))
 	main_scene.add_child(enemy)
+	return enemy
 
 
 func _on_enemy_died(enemy: Node) -> void:
