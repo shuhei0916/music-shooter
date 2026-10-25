@@ -24,7 +24,3 @@ func is_on_grid(tick: int, timebase: int) -> bool:
 
 func fire() -> void:
 	pass
-
-
-func trigger_flash() -> void:
-	pass

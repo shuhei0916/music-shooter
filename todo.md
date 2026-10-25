@@ -50,7 +50,6 @@
 
 ### 見た目・演出
 - [ ] 武器を手の骨（BoneAttachment3D）に持たせ、ブラスター素材（assets/kenney_blaster-kit_2.1）を使う（参考: feature/blaster-kit-assetsブランチ）
-- [ ] 弾の発射時のフラッシュ（handgunのMuzzle/FlashLight）をなくす
 - [ ] 弾の見た目を変える（今はただの球体でつまらない）
 - [ ] 武器発射エフェクトとプレイヤーアニメーションを追加する（発射時の見た目改善）
 - [ ] PlayerのHPが変化したとき、「-18」などのエフェクトをHPLabelの上に表示する

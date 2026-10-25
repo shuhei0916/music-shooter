@@ -96,5 +96,4 @@ func set_damage_scale(scale: float) -> void:
 func on_note(channel: int, tick: int, timebase: int) -> void:
 	var weapon = _weapon_map.get(channel)
 	if weapon and weapon.is_on_grid(tick, timebase):
-		weapon.trigger_flash()
 		weapon.fire()

@@ -31,9 +31,9 @@ func test_武器が割り当てられていないチャンネルのノートで�
 	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
 
 
-func test_グリッド上のノートを受け取ると武器のマズルフラッシュが光る():
-	player.on_note(0, BAR, TIMEBASE)
-	assert_gt(player._weapon_map[0]._flash.light_energy, 0.0)
+func test_武器は発射時に光るマズルフラッシュを持たない():
+	var lights = player._weapon_map.values().map(func(w): return w.find_children("*", "Light3D"))
+	assert_eq(lights.filter(func(found): return not found.is_empty()), [])
 
 
 func test_スケーター男性のスキンで走るモデルを表示する():
