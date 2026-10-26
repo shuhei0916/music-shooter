@@ -32,3 +32,22 @@ func test_指定したスキンのテクスチャをメッシュに適用する(
 	add_child_autofree(model)
 	var mesh: MeshInstance3D = model.find_children("*", "MeshInstance3D", true, false)[0]
 	assert_eq(skin, mesh.get_active_material(0).albedo_texture)
+
+
+func _material() -> StandardMaterial3D:
+	var mesh: MeshInstance3D = model.find_children("*", "MeshInstance3D", true, false)[0]
+	return mesh.get_active_material(0)
+
+
+func test_被弾演出を再生するとモデルが白く光る():
+	add_child_autofree(model)
+	model.play_hit()
+	assert_true(_material().emission_enabled)
+	assert_gt(_material().emission_energy_multiplier, 0.0)
+
+
+func test_被弾演出の光は時間がたつと消える():
+	add_child_autofree(model)
+	model.play_hit()
+	await wait_seconds(CharacterModel.HIT_DURATION + 0.1)
+	assert_eq(_material().emission_energy_multiplier, 0.0)
