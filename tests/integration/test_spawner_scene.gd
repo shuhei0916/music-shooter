@@ -1,6 +1,7 @@
 extends GutTest
 
 const SPAWNER_SCENE := preload("res://scenes/components/spawner.tscn")
+const CHEST_SCENE := preload("res://scenes/objects/chest/chest.tscn")
 var spawner
 
 
@@ -22,7 +23,7 @@ func test_敵スポーン確率が100パーセントならゲート非発生タ�
 
 
 func test_敵を倒すと宝箱がシーンに追加される():
-	spawner.chest_scene = preload("res://scenes/objects/chest/chest.tscn")
+	spawner.chest_scene = CHEST_SCENE
 	spawner.enemy_spawn_probability = 1.0
 	spawner.spawn_counter = 0
 
@@ -37,6 +38,21 @@ func test_敵を倒すと宝箱がシーンに追加される():
 	enemy.take_damage(enemy.hp)
 	var chests_after = get_tree().get_nodes_in_group("chest").size()
 	assert_eq(chests_before + 1, chests_after)
+
+
+func test_宝箱は倒した敵のその場に落ちる():
+	spawner.chest_scene = CHEST_SCENE
+	spawner.enemy_spawn_probability = 1.0
+	spawner.spawn_counter = 0
+
+	var before = get_children()
+	spawner._on_spawn_timer_timeout()
+	var enemy = get_children().filter(func(n): return n.is_in_group("enemy") and n not in before)[0]
+	var enemy_position: Vector3 = enemy.global_position
+
+	enemy.take_damage(enemy.hp)
+	var chest = get_children().filter(func(n): return n.is_in_group("chest") and n not in before)[0]
+	assert_eq(chest.global_position, enemy_position)
 
 
 func _spawn_gate_row() -> Array:

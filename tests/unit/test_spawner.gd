@@ -88,12 +88,6 @@ func test_ターンの種類は5ターンごとにゲート列で最初のゲー
 	assert_eq(kinds, expected)
 
 
-func test_敵が出るターンの1ターン後はゲート列ではない():
-	# 宝箱は倒れた敵の1ターン奥（CHEST_SPAWN_OFFSET_Z）に落ちるので、ゲートと重なってしまう
-	var turns = range(1, 30).filter(func(t): return spawner.turn_kind(t) in ["single", "enemy_row"])
-	assert_false(turns.any(func(t): return spawner.turn_kind(t + 1) == "gate_row"))
-
-
 func test_ゲート列の1ターン前は何も出さない():
 	# 単体の敵がゲートの手前に出ると、そのレーンのゲートを塞いでしまう
 	var turns = range(1, 30).filter(func(t): return spawner.turn_kind(t + 1) == "gate_row")

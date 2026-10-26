@@ -2,7 +2,6 @@ extends Node
 
 const Inflation = preload("res://scripts/inflation.gd")
 
-const CHEST_SPAWN_OFFSET_Z := -5.0
 ## ターンの周期。周期の0ターン目にゲート列を出す
 const TURNS_PER_CYCLE := 5
 ## 周期のうち、ゲート列の間に逃げられない敵の列を出すターン
@@ -83,7 +82,7 @@ func turn_kind(turn: int) -> String:
 	var turn_in_cycle := turn % TURNS_PER_CYCLE
 	if turn_in_cycle == 0:
 		return "gate_row"
-	# ゲート列の直前の敵は、そのレーンのゲートを塞ぎ、倒すと宝箱がゲートと重なる（1ターン奥に落ちる）
+	# ゲート列の直前の敵は、そのレーンのゲートを塞いでしまう
 	if turn_in_cycle == EMPTY_TURN:
 		return "none"
 	# HP1のまま逃げられない列に当たらないよう、敵の列は最初のゲート列の後から出す
@@ -192,7 +191,7 @@ func _on_enemy_died(enemy: Node) -> void:
 	var chest = chest_scene.instantiate()
 	_set_chest_properties(chest, _get_spawn_progress())
 	main_scene.add_child(chest)
-	chest.global_position = enemy.global_position + Vector3(0, 0, CHEST_SPAWN_OFFSET_Z)
+	chest.global_position = enemy.global_position
 
 
 ## 今の再生位置でのインフレ倍率
