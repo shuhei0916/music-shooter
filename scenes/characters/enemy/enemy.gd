@@ -36,3 +36,7 @@ func take_damage(damage):
 	if hp <= 0:
 		died.emit()
 		queue_free()
+		return
+	var model := get_node_or_null("CharacterModel")
+	if model:
+		model.play_hit()
