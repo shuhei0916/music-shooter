@@ -8,8 +8,10 @@ const ANIMATIONS = {
 	"run": [preload(ASSET_DIR + "Animations/run.fbx"), "Root|Run"],
 	"idle": [preload(ASSET_DIR + "Animations/idle.fbx"), "Root|Idle"],
 }
-## 被弾演出（白く光る）が消えるまでの秒数
+## 被弾演出（白く光る・のけぞる）が終わるまでの秒数
 const HIT_DURATION := 0.15
+## 被弾したときに奥（-Z）へのけぞる距離
+const HIT_KNOCKBACK := 0.3
 
 @export_enum("run", "idle") var animation := "run"
 ## 見た目のテクスチャ（ASSET_DIR/Skins/ 内のいずれか）
@@ -17,9 +19,11 @@ const HIT_DURATION := 0.15
 
 var _material: StandardMaterial3D
 var _hit_tween: Tween
+var _base_position: Vector3
 
 
 func _ready() -> void:
+	_base_position = position
 	var model := MODEL.instantiate()
 	add_child(model)
 	_override_material(model)
@@ -47,8 +51,10 @@ func play_hit() -> void:
 		_hit_tween.kill()
 	_material.emission_enabled = true
 	_material.emission_energy_multiplier = 1.0
-	_hit_tween = create_tween()
+	position = _base_position + Vector3(0, 0, -HIT_KNOCKBACK)
+	_hit_tween = create_tween().set_parallel()
 	_hit_tween.tween_property(_material, "emission_energy_multiplier", 0.0, HIT_DURATION)
+	_hit_tween.tween_property(self, "position", _base_position, HIT_DURATION)
 
 
 func _load_animation(anim_name: String) -> Animation:

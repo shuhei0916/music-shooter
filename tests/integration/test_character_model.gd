@@ -51,3 +51,26 @@ func test_被弾演出の光は時間がたつと消える():
 	model.play_hit()
 	await wait_seconds(CharacterModel.HIT_DURATION + 0.1)
 	assert_eq(_material().emission_energy_multiplier, 0.0)
+
+
+func test_被弾演出を再生するとモデルが奥にのけぞる():
+	add_child_autofree(model)
+	var z_before := model.position.z
+	model.play_hit()
+	assert_lt(model.position.z, z_before)
+
+
+func test_被弾演出ののけぞりは時間がたつと元の位置に戻る():
+	add_child_autofree(model)
+	var position_before := model.position
+	model.play_hit()
+	await wait_seconds(CharacterModel.HIT_DURATION + 0.1)
+	assert_eq(model.position, position_before)
+
+
+func test_連続で被弾してものけぞりは元の位置からやり直す():
+	add_child_autofree(model)
+	model.play_hit()
+	var z_hit := model.position.z
+	model.play_hit()
+	assert_eq(model.position.z, z_hit)
