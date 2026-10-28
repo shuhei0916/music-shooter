@@ -27,18 +27,23 @@ func compute_cumulative_counts(smf_data: SMF.SMFData, used_channels: Array) -> P
 
 
 ## 楽器の種類を推定するための、チャンネルごとの特徴を
-## { チャンネル: { note_count, program, mean_pitch, polyphony } } として返す
-## programは最初に指定された音色の番号（指定がなければ-1）、polyphonyは同じtickに鳴る音の数の平均。
-## ノートのないチャンネルは含めない
+## { チャンネル: { note_count, program, mean_pitch, polyphony, track_name } } として返す
+## programは最初に指定された音色の番号（指定がなければ-1）、polyphonyは同じtickに鳴る音の数の平均、
+## track_nameはそのチャンネルのノートがある最初のトラックの名前（なければ空）。ノートのないチャンネルは含めない
 func channel_profiles(smf_data: SMF.SMFData) -> Dictionary:
 	var programs := _first_programs(smf_data)
+	var track_names := _channel_track_names(smf_data)
 	var pitch_sums := {}
 	var note_ticks := {}  # チャンネル -> { 音が鳴ったtick: true }
 	var profiles := {}
 	for chunk in _sounding_notes(smf_data):
 		var channel := chunk.channel_number
 		if not profiles.has(channel):
-			profiles[channel] = {"note_count": 0, "program": programs.get(channel, -1)}
+			profiles[channel] = {
+				"note_count": 0,
+				"program": programs.get(channel, -1),
+				"track_name": track_names.get(channel, ""),
+			}
 			pitch_sums[channel] = 0
 			note_ticks[channel] = {}
 		profiles[channel].note_count += 1
@@ -49,6 +54,22 @@ func channel_profiles(smf_data: SMF.SMFData) -> Dictionary:
 		profiles[channel].mean_pitch = float(pitch_sums[channel]) / note_count
 		profiles[channel].polyphony = float(note_count) / note_ticks[channel].size()
 	return profiles
+
+
+## チャンネルごとに、そのチャンネルのノートがある最初のトラックの名前
+func _channel_track_names(smf_data: SMF.SMFData) -> Dictionary:
+	var names := {}
+	for track: SMF.MIDITrack in smf_data.tracks:
+		var track_name := ""
+		for chunk: SMF.MIDIEventChunk in track.events:
+			if chunk.event is SMF.MIDIEventSystemEvent:
+				var args: Dictionary = chunk.event.args
+				if args.type == SMF.MIDISystemEventType.track_name and track_name == "":
+					track_name = args.text
+			elif chunk.event.type == SMF.MIDIEventType.note_on and track_name != "":
+				if not names.has(chunk.channel_number):
+					names[chunk.channel_number] = track_name
+	return names
 
 
 ## チャンネルごとに、いちばん早いプログラムチェンジの音色の番号

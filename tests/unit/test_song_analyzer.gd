@@ -141,3 +141,21 @@ func test_チャンネルの特徴には同じtickに鳴る音の数の平均が
 		]
 	)
 	assert_almost_eq(analyzer.channel_profiles(smf_data)[0].polyphony, 2.0, 0.001)
+
+
+func test_チャンネルの特徴にはそのチャンネルのノートがあるトラックの名前が入る() -> void:
+	var smf_data := SMF.SMFData.new(SMF.SMFFormat.format_1, 2, 480)
+	for spec in [["Drums", 9], ["Vocals", 4]]:
+		var track := SMF.MIDITrack.new(0, [])
+		var args := {"type": SMF.MIDISystemEventType.track_name, "text": spec[0]}
+		track.events.append(SMF.MIDIEventChunk.new(0, 0, SMF.MIDIEventSystemEvent.new(args)))
+		track.events.append(_make_note_chunk(0, spec[1], 60))
+		smf_data.tracks.append(track)
+	var profiles: Dictionary = analyzer.channel_profiles(smf_data)
+	assert_eq(profiles[4].track_name, "Vocals")
+	assert_eq(profiles[9].track_name, "Drums")
+
+
+func test_トラック名のないチャンネルのトラックの名前は空() -> void:
+	var smf_data := _make_smf([_make_note_chunk(0, 0, 60)])
+	assert_eq(analyzer.channel_profiles(smf_data)[0].track_name, "")
