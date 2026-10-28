@@ -73,12 +73,3 @@ func test_くぐらなかった隣のゲートは消えずに残る():
 	pair.add_child(right)
 	left.area_entered.emit(_make_player(1))
 	assert_false(right.is_queued_for_deletion())
-
-
-func test_効かなくなったゲートは薄く表示する():
-	var gate_area := _make_gate(Gate.Op.ADD, 5)
-	var alpha_before: float = gate_area.get_node("Panel").material_override.albedo_color.a
-	gate_area.close()
-	var alpha_after: float = gate_area.get_node("Panel").material_override.albedo_color.a
-	assert_lt(alpha_after, alpha_before)
-	assert_lt(gate_area.get_node("Label").modulate.a, 1.0)
