@@ -20,6 +20,15 @@ albedo_color = Color(0.35, 0.36, 0.4, 1)
 material = SubResource("StandardMaterial3D_road")
 size = Vector2(9, 400)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_goal"]
+albedo_color = Color(1, 0.85, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.8, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_goal"]
+material = SubResource("StandardMaterial3D_goal")
+size = Vector3(9, 0.1, 0.6)
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
 
@@ -33,6 +42,9 @@ shadow_enabled = true
 [node name="Road" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -190)
 mesh = SubResource("PlaneMesh_road")
+
+[node name="GoalLine" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_goal")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 
