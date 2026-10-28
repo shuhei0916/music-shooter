@@ -16,3 +16,17 @@ def find_offset(envelope, frame_rate, bpm):
     candidates = range(int(60.0 / bpm * frame_rate))
     best = max(candidates, key=lambda f: grid_score(envelope, frame_rate, bpm, f / frame_rate))
     return best / frame_rate
+
+
+def find_grid(envelope, frame_rate, bpm_range, bpm_step):
+    """bpm_range の中を bpm_step 刻みで試し、拍の格子が最もよく合う (BPM, 最初の拍の時刻) を返す"""
+    low, high = bpm_range
+    count = int(round((high - low) / bpm_step)) + 1
+    best = None
+    for i in range(count):
+        bpm = low + i * bpm_step
+        offset = find_offset(envelope, frame_rate, bpm)
+        score = grid_score(envelope, frame_rate, bpm, offset)
+        if best is None or score > best[0]:
+            best = (score, bpm, offset)
+    return best[1], best[2]
