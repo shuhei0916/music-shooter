@@ -31,3 +31,13 @@ func test_頭の上に今のHPを表示する():
 	player.health.hp = 15
 	simulate(player, 1, 0.1)
 	assert_eq(player.get_node("HpLabel").text, "15")
+
+
+func test_一定の間隔ごとに弾を撃つ():
+	var stage: Node3D = add_child_autofree(Node3D.new())
+	var player: Player = PlayerScene.instantiate()
+	player.fire_interval = 0.25
+	stage.add_child(player)
+	simulate(stage, 4, 0.1)
+	var bullets := stage.get_children().filter(func(n): return n is Bullet)
+	assert_eq(bullets.size(), 2)
