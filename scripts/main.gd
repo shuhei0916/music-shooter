@@ -15,6 +15,8 @@ const GATE_CARDS := [
 	[[Gate.Op.MULTIPLY, 2], [Gate.Op.POWER, 2], [Gate.Op.ADD, -10]],
 	[[Gate.Op.ADD, 20], [Gate.Op.ADD, -15], [Gate.Op.POWER, 1]],
 ]
+const ROAD_BEHIND := 10.0
+const ROAD_AHEAD := 60.0
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
 	Judge.Result.GAME_OVER: "GAME OVER",
@@ -69,6 +71,7 @@ func _ready() -> void:
 	_clock.start()
 	$PauseMenu.quit_requested.connect(get_tree().quit)
 	$GoalLine.position.z = -course_length
+	_fit_road()
 	if layout.is_empty():
 		layout = _build_layout()
 	for row in layout:
@@ -100,6 +103,14 @@ func _finish() -> void:
 	_message.text = MESSAGES[_result]
 	_message.visible = true
 	_hint.visible = true
+
+
+## 道をスタートの後ろ（ROAD_BEHIND）からゴールの先（ROAD_AHEAD）まで伸ばす
+func _fit_road() -> void:
+	var road: PlaneMesh = $Road.mesh.duplicate()
+	road.size.y = ROAD_BEHIND + course_length + ROAD_AHEAD
+	$Road.mesh = road
+	$Road.position.z = ROAD_BEHIND - road.size.y / 2.0
 
 
 func _build_layout() -> Array:

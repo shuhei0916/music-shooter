@@ -154,3 +154,11 @@ func test_曲のBPMに合わせてプレイヤーが弾を撃つ():
 	add_child_autofree(main)
 	simulate(main, 4, 0.25)
 	assert_eq(_find_all(main, Bullet).size(), 3)
+
+
+func test_道はスタートの後ろからゴールの先まで続く():
+	var main := _make_main(10.0, 1000.0)
+	var road: MeshInstance3D = main.get_node("Road")
+	var half_length: float = road.mesh.size.y / 2.0
+	assert_gte(road.position.z + half_length, 10.0)
+	assert_lte(road.position.z - half_length, -1000.0 - 40.0)
