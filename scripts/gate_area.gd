@@ -5,6 +5,7 @@ extends Area3D
 @export var amount := 1
 @export var good_color := Color(0.3, 0.7, 1, 0.45)
 @export var harmful_color := Color(1, 0.3, 0.3, 0.45)
+@export var closed_alpha := 0.12
 
 var _gate: Gate
 var _used := false
@@ -31,3 +32,5 @@ func _on_area_entered(area: Area3D) -> void:
 
 func close() -> void:
 	_used = true
+	$Panel.material_override.albedo_color.a = closed_alpha
+	$Label.modulate.a = 0.3
