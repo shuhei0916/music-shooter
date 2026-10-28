@@ -1,7 +1,9 @@
 class_name Health
 extends RefCounted
 
-var hp: int
+var hp: int:
+	set(value):
+		hp = maxi(value, 0)
 
 
 func _init(p_hp: int) -> void:
