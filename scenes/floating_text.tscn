@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/floating_text.gd" id="1_text"]
+
+[node name="FloatingText" type="Label3D"]
+billboard = 1
+no_depth_test = true
+text = "+1"
+font_size = 128
+outline_size = 24
+script = ExtResource("1_text")
