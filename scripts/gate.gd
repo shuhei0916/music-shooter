@@ -1,7 +1,7 @@
 class_name Gate
 extends RefCounted
 
-enum Op { ADD, MULTIPLY, POWER }
+enum Op { ADD, MULTIPLY, POWER, FIRE_RATE }
 
 var op: Op
 var amount: int
@@ -18,6 +18,8 @@ func apply(stats: PlayerStats) -> void:
 			stats.health.hp *= amount
 		Op.POWER:
 			stats.power += amount
+		Op.FIRE_RATE:
+			stats.raise_fire_level(amount)
 		_:
 			stats.health.hp += amount
 
@@ -28,6 +30,8 @@ func label() -> String:
 			return "×%d" % amount
 		Op.POWER:
 			return "威力%+d" % amount
+		Op.FIRE_RATE:
+			return "連射UP"
 		_:
 			return "%+d" % amount
 
