@@ -68,8 +68,8 @@ func test_配置どおりの位置に左右2枚のゲートを並べる():
 	assert_eq([gates[1].global_position, gates[1].amount], [Vector3(2, 0, -10), -3])
 
 
-func test_配置どおりの位置とHPで敵を並べる():
-	var main := _make_main_with_layout([{"z": 20.0, "enemies": [[1.5, 8]]}])
+func test_配置どおりのレーンとHPで敵を並べる():
+	var main := _make_main_with_layout([{"z": 20.0, "enemies": [[2, 8]]}])
 	var enemies := _find_all(main, Enemy)
 	assert_eq(enemies.size(), 1)
-	assert_eq([enemies[0].global_position, enemies[0].health.hp], [Vector3(1.5, 0, -20), 8])
+	assert_eq([enemies[0].global_position, enemies[0].health.hp], [Vector3(3, 0, -20), 8])

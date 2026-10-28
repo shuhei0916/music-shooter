@@ -4,18 +4,18 @@ extends Node3D
 const GateScene := preload("res://scenes/gate.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
 const GATE_X := 2.0
-## z: スタートからの距離、gates: 左右のゲートの [種類, 数]、enemies: 敵の [x, HP]
+## z: スタートからの距離、gates: 左右のゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
 const DEFAULT_LAYOUT := [
 	{"z": 12.0, "gates": [[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]]},
-	{"z": 25.0, "enemies": [[-2.0, 5], [2.0, 5]]},
+	{"z": 25.0, "enemies": [[0, 5], [2, 5]]},
 	{"z": 40.0, "gates": [[Gate.Op.MULTIPLY, 2], [Gate.Op.ADD, 5]]},
-	{"z": 55.0, "enemies": [[-3.0, 8], [0.0, 12], [3.0, 8]]},
+	{"z": 55.0, "enemies": [[0, 8], [1, 12], [2, 8]]},
 	{"z": 70.0, "gates": [[Gate.Op.ADD, -10], [Gate.Op.MULTIPLY, 3]]},
-	{"z": 85.0, "enemies": [[-2.0, 20], [2.0, 15]]},
+	{"z": 85.0, "enemies": [[0, 20], [2, 15]]},
 	{"z": 100.0, "gates": [[Gate.Op.ADD, 20], [Gate.Op.MULTIPLY, 2]]},
-	{"z": 115.0, "enemies": [[-3.0, 25], [0.0, 30], [3.0, 25]]},
+	{"z": 115.0, "enemies": [[0, 25], [1, 30], [2, 25]]},
 	{"z": 130.0, "gates": [[Gate.Op.ADD, -15], [Gate.Op.ADD, 10]]},
-	{"z": 142.0, "enemies": [[0.0, 40]]},
+	{"z": 142.0, "enemies": [[1, 40]]},
 ]
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
@@ -25,8 +25,11 @@ const MESSAGES := {
 @export var forward_speed := 6.0
 @export var course_length := 150.0
 @export var layout: Array = DEFAULT_LAYOUT
+@export var lane_count := 3
+@export var lane_width := 3.0
 
 var _course: Course
+var _lanes: Lanes
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -38,6 +41,7 @@ var _result := Judge.Result.PLAYING
 
 func _ready() -> void:
 	_course = Course.new(forward_speed, course_length)
+	_lanes = Lanes.new(lane_count, lane_width)
 	$GoalLine.position.z = -course_length
 	for row in layout:
 		_spawn_row(row)
@@ -81,5 +85,5 @@ func _spawn_row(row: Dictionary) -> void:
 	for spec in row.get("enemies", []):
 		var enemy: Enemy = EnemyScene.instantiate()
 		enemy.start_hp = spec[1]
-		enemy.position = Vector3(spec[0], 0, z)
+		enemy.position = Vector3(_lanes.x_of(spec[0]), 0, z)
 		add_child(enemy)
