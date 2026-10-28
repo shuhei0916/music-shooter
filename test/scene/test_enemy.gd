@@ -17,3 +17,24 @@ func test_弾が当たるとHPが1減り弾は消える():
 	enemy.area_entered.emit(bullet)
 	assert_eq(enemy.health.hp, 2)
 	assert_true(bullet.is_queued_for_deletion())
+
+
+func test_HPが0になった敵は消える():
+	var enemy := _make_enemy(1)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	assert_true(enemy.is_queued_for_deletion())
+
+
+func test_プレイヤーとぶつかるとHPを削り合う():
+	var enemy := _make_enemy(3)
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.health.hp = 10
+	enemy.area_entered.emit(player)
+	assert_eq(player.health.hp, 7)
+	assert_true(enemy.is_queued_for_deletion())
+
+
+func test_頭の上に今のHPを表示する():
+	var enemy := _make_enemy(5)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	assert_eq(enemy.get_node("HpLabel").text, "4")
