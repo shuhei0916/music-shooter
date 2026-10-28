@@ -29,6 +29,7 @@ const MESSAGES := {
 @export var lane_width := 3.0
 
 var _course: Course
+var _clock: SongClock
 var _lanes: Lanes
 var _result := Judge.Result.PLAYING
 
@@ -41,6 +42,7 @@ var _result := Judge.Result.PLAYING
 
 func _ready() -> void:
 	_course = Course.new(forward_speed, course_length)
+	_clock = TimerClock.new(course_length / forward_speed)
 	_lanes = Lanes.new(lane_count, lane_width)
 	$GoalLine.position.z = -course_length
 	for row in layout:
@@ -50,7 +52,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _result != Judge.Result.PLAYING:
 		return
-	_course.advance(delta)
+	_clock.advance(delta)
+	_course.seek(_clock.time())
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)

@@ -11,8 +11,8 @@ func _init(p_speed: float, p_length: float) -> void:
 	length = p_length
 
 
-func advance(delta: float) -> void:
-	distance = minf(distance + speed * delta, length)
+func seek(time: float) -> void:
+	distance = clampf(speed * time, 0.0, length)
 
 
 func is_finished() -> bool:
