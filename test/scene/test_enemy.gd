@@ -38,3 +38,21 @@ func test_頭の上に今のHPを表示する():
 	var enemy := _make_enemy(5)
 	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
 	assert_eq(enemy.get_node("HpLabel").text, "4")
+
+
+func _body_color(enemy: Enemy) -> Color:
+	return enemy.get_node("Body").material_override.albedo_color
+
+
+func test_弾が当たると白く光る():
+	var enemy := _make_enemy(5)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	assert_eq(_body_color(enemy), Color.WHITE)
+
+
+func test_光ったあと時間がたつと元の色に戻る():
+	var enemy := _make_enemy(5)
+	var original := _body_color(enemy)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	simulate(enemy, 3, 0.1)
+	assert_eq(_body_color(enemy), original)
