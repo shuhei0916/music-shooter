@@ -1,7 +1,7 @@
 class_name Gate
 extends RefCounted
 
-enum Op { ADD }
+enum Op { ADD, MULTIPLY }
 
 var op: Op
 var amount: int
@@ -13,4 +13,8 @@ func _init(p_op: Op, p_amount: int) -> void:
 
 
 func apply(hp: int) -> int:
-	return hp + amount
+	match op:
+		Op.MULTIPLY:
+			return hp * amount
+		_:
+			return hp + amount
