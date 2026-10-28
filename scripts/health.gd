@@ -16,3 +16,9 @@ func damage(amount: int) -> void:
 
 func is_dead() -> bool:
 	return hp == 0
+
+
+func clash(other: Health) -> void:
+	var amount := mini(hp, other.hp)
+	damage(amount)
+	other.damage(amount)
