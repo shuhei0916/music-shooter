@@ -29,3 +29,27 @@ func test_Escキーでゲームを一時停止しメニューを表示する():
 	_press_pause(menu)
 	assert_true(get_tree().paused)
 	assert_true(menu.visible)
+
+
+func test_再開ボタンを押すとゲームが再開しメニューを閉じる():
+	var menu := _make_menu()
+	_press_pause(menu)
+	menu.get_node("Box/ResumeButton").pressed.emit()
+	assert_false(get_tree().paused)
+	assert_false(menu.visible)
+
+
+func test_一時停止中にEscキーを押すと再開する():
+	var menu := _make_menu()
+	_press_pause(menu)
+	_press_pause(menu)
+	assert_false(get_tree().paused)
+	assert_false(menu.visible)
+
+
+func test_終了ボタンを押すとゲームの終了を求める():
+	var menu := _make_menu()
+	watch_signals(menu)
+	_press_pause(menu)
+	menu.get_node("Box/QuitButton").pressed.emit()
+	assert_signal_emitted(menu, "quit_requested")
