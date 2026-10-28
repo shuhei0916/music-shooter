@@ -17,9 +17,11 @@ def write_clicks(path, bpm, offset, length=12.0):
     soundfile.write(path, audio, SAMPLE_RATE)
 
 
-def test_analyze_finds_bpm_and_first_beat_of_click_track(tmp_path):
+# 最初の拍の時刻は、オンセットの強さの1フレーム（約5.8ミリ秒）ほど遅れて出ることがあるので、8ミリ秒まで許す
+@pytest.mark.parametrize("bpm, offset", [(120.0, 0.25), (97.0, 0.1)])
+def test_analyze_finds_bpm_and_first_beat_of_click_track(tmp_path, bpm, offset):
     path = tmp_path / "clicks.wav"
-    write_clicks(path, bpm=120.0, offset=0.25)
-    result = analyze(path, bpm_range=(100.0, 140.0), bpm_step=0.5)
-    assert result["bpm"] == pytest.approx(120.0)
-    assert result["offset"] == pytest.approx(0.25, abs=0.01)
+    write_clicks(path, bpm=bpm, offset=offset)
+    result = analyze(path, bpm_range=(90.0, 140.0), bpm_step=0.5)
+    assert result["bpm"] == pytest.approx(bpm)
+    assert result["offset"] == pytest.approx(offset, abs=0.008)
