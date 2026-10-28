@@ -8,6 +8,7 @@ signal song_select_requested
 const SongAnalyzerScript = preload("res://scripts/song_analyzer.gd")
 const NoteScheduler = preload("res://scripts/note_scheduler.gd")
 const SoundfontCache = preload("res://scripts/soundfont_cache.gd")
+const InstrumentClassifier = preload("res://scripts/instrument_classifier.gd")
 
 ## MidiPlayerのsoundfontはplay()後に設定する。シーンに直接書くと曲の解析前に全音色を読み込み、生成が数秒かかるため
 @export_file("*.sf2") var midi_soundfont_path: String
@@ -48,8 +49,25 @@ func _load_song_soundfont() -> void:
 	if result.error != OK:
 		return
 	midi_player.smf_data = result.data
+	_assign_weapon_channels(result.data)
 	midi_player._prepare_to_play()  # 曲で使う音色（_used_program_numbers）を解析する
 	SoundfontCache.load_into(midi_player, midi_soundfont_path)
+
+
+## 武器を曲のボーカル（メロディ担当）とドラムのチャンネルに割り当てる（見つからない楽器の武器はそのまま）
+func _assign_weapon_channels(smf_data: SMF.SMFData) -> void:
+	if player == null:
+		return
+	var kinds := InstrumentClassifier.classify(SongAnalyzerScript.new().channel_profiles(smf_data))
+	(
+		player
+		. set_weapon_channels(
+			[
+				InstrumentClassifier.channel_of(kinds, InstrumentClassifier.Instrument.VOCAL),
+				InstrumentClassifier.channel_of(kinds, InstrumentClassifier.Instrument.DRUMS),
+			]
+		)
+	)
 
 
 func _process(delta: float) -> void:

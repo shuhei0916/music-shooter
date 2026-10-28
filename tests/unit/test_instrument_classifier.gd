@@ -114,3 +114,16 @@ func test_単音中心で高めのチャンネルがなければノートの最�
 func test_ドラムとベースしかない曲にはボーカルがない() -> void:
 	var kinds := InstrumentClassifier.classify({9: _profile(), 1: _profile({"program": 33})})
 	assert_eq(_vocal_channels(kinds), [])
+
+
+func test_指定した楽器のチャンネルを返す() -> void:
+	var kinds := {
+		3: InstrumentClassifier.Instrument.VOCAL, 9: InstrumentClassifier.Instrument.DRUMS
+	}
+	assert_eq(InstrumentClassifier.channel_of(kinds, InstrumentClassifier.Instrument.VOCAL), 3)
+	assert_eq(InstrumentClassifier.channel_of(kinds, InstrumentClassifier.Instrument.DRUMS), 9)
+
+
+func test_指定した楽器のチャンネルがなければマイナス1を返す() -> void:
+	var kinds := {0: InstrumentClassifier.Instrument.OTHER}
+	assert_eq(InstrumentClassifier.channel_of(kinds, InstrumentClassifier.Instrument.DRUMS), -1)

@@ -161,3 +161,13 @@ func test_リザルト画面が出ているときのEscでは一時停止しな�
 	main.game_ui.show_result(false)
 	_press("ui_cancel")
 	assert_false(get_tree().paused)
+
+
+func test_曲を読み込むと武器を曲のボーカルとドラムのチャンネルに割り当てる():
+	var saved_song: String = Session.song_path
+	Session.song_path = "res://assets/audio/Jump!.mid"  # ch3がトラック名MELODY、ch9がドラム
+	var scene = MainScene.instantiate()
+	scene.midi_soundfont_path = ""
+	add_child_autofree(scene)
+	Session.song_path = saved_song
+	assert_eq([3, 9], scene.player.get_weapon_channels())

@@ -37,6 +37,12 @@ static func classify(profiles: Dictionary) -> Dictionary:
 	return kinds
 
 
+## classify()の結果から、instrumentのチャンネル（複数あれば番号の小さいもの、なければ-1）を返す
+static func channel_of(kinds: Dictionary, instrument: Instrument) -> int:
+	var channels: Array = kinds.keys().filter(func(channel): return kinds[channel] == instrument)
+	return channels.min() if not channels.is_empty() else -1
+
+
 ## ドラムとベース以外から、トラック名 → 声の音色 → メロディらしさの順に候補を絞り、
 ## そのうちノートの最も多いチャンネルを返す（候補がなければ-1）
 static func _choose_vocal(profiles: Dictionary, kinds: Dictionary) -> int:
