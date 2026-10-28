@@ -5,6 +5,7 @@ const MainScene := preload("res://scenes/main.tscn")
 
 func _make_main(speed: float, length: float) -> Main:
 	var main: Main = MainScene.instantiate()
+	main.song_path = ""
 	main.forward_speed = speed
 	main.course_length = length
 	return add_child_autofree(main)
@@ -50,6 +51,7 @@ func test_プレイ中は何も表示しない():
 
 func _make_main_with_layout(layout: Array) -> Main:
 	var main: Main = MainScene.instantiate()
+	main.song_path = ""
 	main.layout = layout
 	return add_child_autofree(main)
 
@@ -73,3 +75,37 @@ func test_配置どおりのレーンとHPで敵を並べる():
 	var enemies := _find_all(main, Enemy)
 	assert_eq(enemies.size(), 1)
 	assert_eq([enemies[0].global_position, enemies[0].health.hp], [Vector3(3, 0, -20), 8])
+
+
+func _make_wav(seconds: float) -> AudioStreamWAV:
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_8_BITS
+	wav.mix_rate = 8000
+	var data := PackedByteArray()
+	data.resize(int(8000 * seconds))
+	wav.data = data
+	return wav
+
+
+func _make_main_with_song(speed: float, seconds: float) -> Main:
+	var main: Main = MainScene.instantiate()
+	main.song = _make_wav(seconds)
+	main.forward_speed = speed
+	return add_child_autofree(main)
+
+
+func test_曲があればコースの長さは曲の長さに速さをかけた長さになる():
+	var main := _make_main_with_song(10.0, 2.0)
+	assert_almost_eq(main.course_length, 20.0, 0.01)
+
+
+func test_曲があれば始まると曲が流れる():
+	var main := _make_main_with_song(10.0, 2.0)
+	assert_true(main.get_node("Music").playing)
+
+
+func test_ゲームオーバーになったら曲を止める():
+	var main := _make_main_with_song(10.0, 2.0)
+	main.get_node("Player").health.hp = 0
+	simulate(main, 1, 0.1)
+	assert_false(main.get_node("Music").playing)

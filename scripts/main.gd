@@ -22,12 +22,15 @@ const MESSAGES := {
 	Judge.Result.GAME_OVER: "GAME OVER",
 }
 
+## 曲のファイル。見つからなければ曲なしで、course_length の長さを時間だけで進む
+@export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
 @export var forward_speed := 6.0
 @export var course_length := 150.0
 @export var layout: Array = DEFAULT_LAYOUT
 @export var lane_count := 3
 @export var lane_width := 3.0
 
+var song: AudioStream
 var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
@@ -38,12 +41,21 @@ var _result := Judge.Result.PLAYING
 @onready var _camera_offset := _camera.position
 @onready var _message: Label = $UI/Message
 @onready var _hint: Label = $UI/Hint
+@onready var _music: AudioStreamPlayer = $Music
 
 
 func _ready() -> void:
+	if song == null and ResourceLoader.exists(song_path):
+		song = load(song_path)
+	if song != null:
+		_music.stream = song
+		_clock = MusicClock.new(_music)
+		course_length = _clock.duration() * forward_speed
+	else:
+		_clock = TimerClock.new(course_length / forward_speed)
 	_course = Course.new(forward_speed, course_length)
-	_clock = TimerClock.new(course_length / forward_speed)
 	_lanes = Lanes.new(lane_count, lane_width)
+	_clock.start()
 	$GoalLine.position.z = -course_length
 	for row in layout:
 		_spawn_row(row)
@@ -68,6 +80,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _finish() -> void:
 	_player.process_mode = Node.PROCESS_MODE_DISABLED
+	if _result == Judge.Result.GAME_OVER:
+		_music.stop()
 	_message.text = MESSAGES[_result]
 	_message.visible = true
 	_hint.visible = true

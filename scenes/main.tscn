@@ -52,6 +52,8 @@ mesh = SubResource("BoxMesh_goal")
 transform = Transform3D(1, 0, 0, 0, 0.81915206, 0.57357645, 0, -0.57357645, 0.81915206, 0, 7, 6.0126457)
 fov = 60.0
 
+[node name="Music" type="AudioStreamPlayer" parent="."]
+
 [node name="UI" type="CanvasLayer" parent="." unique_id=1506709604]
 
 [node name="Message" type="Label" parent="UI" unique_id=961771604]
