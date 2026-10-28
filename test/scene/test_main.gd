@@ -109,3 +109,27 @@ func test_ゲームオーバーになったら曲を止める():
 	main.get_node("Player").health.hp = 0
 	simulate(main, 1, 0.1)
 	assert_false(main.get_node("Music").playing)
+
+
+func _make_generated_main(length: float, seed_value: int) -> Main:
+	var main: Main = MainScene.instantiate()
+	main.song_path = ""
+	main.course_length = length
+	main.layout_seed = seed_value
+	return add_child_autofree(main)
+
+
+func test_配置を指定しなければコースの長さに合わせてゲートと敵を自動で並べる():
+	var main := _make_generated_main(300.0, 1)
+	assert_gt(_find_all(main, GateArea).size(), 0)
+	assert_gt(_find_all(main, Enemy).size(), 0)
+	for node in _find_all(main, GateArea) + _find_all(main, Enemy):
+		assert_gt(node.global_position.z, -300.0)
+
+
+func test_同じシードなら同じ配置になる():
+	var amounts := func(main: Main) -> Array:
+		return _find_all(main, GateArea).map(func(g): return g.amount)
+	var a := _make_generated_main(300.0, 5)
+	var b := _make_generated_main(300.0, 5)
+	assert_eq(amounts.call(a), amounts.call(b))

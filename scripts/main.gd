@@ -4,18 +4,13 @@ extends Node3D
 const GateScene := preload("res://scenes/gate.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
 const GATE_X := 2.0
-## z: スタートからの距離、gates: 左右のゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
-const DEFAULT_LAYOUT := [
-	{"z": 12.0, "gates": [[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]]},
-	{"z": 25.0, "enemies": [[0, 5], [2, 5]]},
-	{"z": 40.0, "gates": [[Gate.Op.MULTIPLY, 2], [Gate.Op.ADD, 5]]},
-	{"z": 55.0, "enemies": [[0, 8], [1, 12], [2, 8]]},
-	{"z": 70.0, "gates": [[Gate.Op.ADD, -10], [Gate.Op.MULTIPLY, 3]]},
-	{"z": 85.0, "enemies": [[0, 20], [2, 15]]},
-	{"z": 100.0, "gates": [[Gate.Op.ADD, 20], [Gate.Op.MULTIPLY, 2]]},
-	{"z": 115.0, "enemies": [[0, 25], [1, 30], [2, 25]]},
-	{"z": 130.0, "gates": [[Gate.Op.ADD, -15], [Gate.Op.ADD, 10]]},
-	{"z": 142.0, "enemies": [[1, 40]]},
+## 山札に入れるゲートのペア。[[種類, 数], [種類, 数]]
+const GATE_CARDS := [
+	[[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]],
+	[[Gate.Op.MULTIPLY, 2], [Gate.Op.ADD, 5]],
+	[[Gate.Op.ADD, -10], [Gate.Op.MULTIPLY, 3]],
+	[[Gate.Op.ADD, 20], [Gate.Op.MULTIPLY, 2]],
+	[[Gate.Op.ADD, -15], [Gate.Op.ADD, 10]],
 ]
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
@@ -26,7 +21,16 @@ const MESSAGES := {
 @export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
 @export var forward_speed := 6.0
 @export var course_length := 150.0
-@export var layout: Array = DEFAULT_LAYOUT
+## z: スタートからの距離、gates: 左右のゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
+## 空なら、コースの長さに合わせて自動で並べる
+@export var layout: Array = []
+## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
+@export var layout_seed := -1
+@export var row_start := 20.0
+@export var row_spacing := 12.0
+@export var row_end_margin := 15.0
+@export var enemy_base_hp := 5
+@export var enemy_hp_per_meter := 0.03
 @export var lane_count := 3
 @export var lane_width := 3.0
 
@@ -57,6 +61,8 @@ func _ready() -> void:
 	_lanes = Lanes.new(lane_count, lane_width)
 	_clock.start()
 	$GoalLine.position.z = -course_length
+	if layout.is_empty():
+		layout = _build_layout()
 	for row in layout:
 		_spawn_row(row)
 
@@ -85,6 +91,14 @@ func _finish() -> void:
 	_message.text = MESSAGES[_result]
 	_message.visible = true
 	_hint.visible = true
+
+
+func _build_layout() -> Array:
+	var seed_value := layout_seed if layout_seed >= 0 else randi()
+	var deck := GateDeck.new(GATE_CARDS, seed_value)
+	var wave := EnemyWave.new(lane_count, enemy_base_hp, enemy_hp_per_meter, seed_value)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_spacing, row_end_margin)
+	return builder.build(course_length)
 
 
 func _spawn_row(row: Dictionary) -> void:
