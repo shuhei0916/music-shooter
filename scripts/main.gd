@@ -3,13 +3,17 @@ extends Node3D
 
 const GateScene := preload("res://scenes/gate.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
-## 山札に入れるゲートのペア。[[種類, 数], [種類, 数]]
+## 山札に入れるゲートのカード。選択肢は2つか3つで、[[種類, 数], ...]
 const GATE_CARDS := [
 	[[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]],
 	[[Gate.Op.MULTIPLY, 2], [Gate.Op.ADD, 5]],
 	[[Gate.Op.ADD, -10], [Gate.Op.MULTIPLY, 3]],
-	[[Gate.Op.ADD, 20], [Gate.Op.MULTIPLY, 2]],
-	[[Gate.Op.ADD, -15], [Gate.Op.ADD, 10]],
+	[[Gate.Op.POWER, 1], [Gate.Op.ADD, 10]],
+	[[Gate.Op.FIRE_RATE, 1], [Gate.Op.MULTIPLY, 2]],
+	[[Gate.Op.POWER, 1], [Gate.Op.ADD, -5]],
+	[[Gate.Op.ADD, 15], [Gate.Op.POWER, 1], [Gate.Op.FIRE_RATE, 1]],
+	[[Gate.Op.MULTIPLY, 2], [Gate.Op.POWER, 2], [Gate.Op.ADD, -10]],
+	[[Gate.Op.ADD, 20], [Gate.Op.ADD, -15], [Gate.Op.POWER, 1]],
 ]
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
