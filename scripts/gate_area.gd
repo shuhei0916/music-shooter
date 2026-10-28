@@ -1,6 +1,10 @@
 class_name GateArea
 extends Area3D
 
+const FloatingTextScene := preload("res://scenes/floating_text.tscn")
+## 取ったときに飛び出す文字の、プレイヤーの足もとからの高さ
+const POPUP_HEIGHT := 3.2
+
 @export var op := Gate.Op.ADD
 @export var amount := 1
 @export var width := 4.0
@@ -8,18 +12,19 @@ extends Area3D
 @export var harmful_color := Color(1, 0.3, 0.3, 0.45)
 
 var _gate: Gate
+var _color: Color
 var _used := false
 
 
 func _ready() -> void:
 	_gate = Gate.new(op, amount)
 	$Label.text = _gate.label()
-	var color := harmful_color if _gate.is_harmful() else good_color
+	_color = harmful_color if _gate.is_harmful() else good_color
 	var material: StandardMaterial3D = $Panel.mesh.material.duplicate()
-	material.albedo_color = color
+	material.albedo_color = _color
 	$Panel.material_override = material
 	var frame_material := StandardMaterial3D.new()
-	frame_material.albedo_color = Color(color, 1.0)
+	frame_material.albedo_color = Color(_color, 1.0)
 	for part: MeshInstance3D in $Frame.get_children():
 		part.material_override = frame_material
 	_apply_width()
@@ -57,6 +62,11 @@ func close() -> void:
 
 func give_to(player: Player) -> void:
 	_gate.apply(player.stats)
+	var popup: FloatingText = FloatingTextScene.instantiate()
+	popup.text = _gate.label()
+	popup.modulate = Color(_color, 1.0)
+	popup.position.y = POPUP_HEIGHT
+	player.add_child(popup)
 	queue_free()
 
 

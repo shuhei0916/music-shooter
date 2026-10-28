@@ -133,3 +133,36 @@ func test_柱はゲートの両端に立つ():
 	assert_lt(left.position.x, -1.0)
 	assert_gt(left.position.x, -1.5)
 	assert_almost_eq(right.position.x, -left.position.x, 0.001)
+
+
+func _floating_texts_of(player: Player) -> Array:
+	return player.get_children().filter(func(n): return n is FloatingText)
+
+
+func test_ゲートを取るとプレイヤーの頭の上にゲートの文字が飛び出す():
+	var gate_area := _make_gate(Gate.Op.MULTIPLY, 2)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	var texts := _floating_texts_of(player)
+	assert_eq(texts.size(), 1)
+	assert_eq(texts[0].text, "×2")
+	assert_gt(texts[0].position.y, 2.0)
+
+
+func _make_gate_in_own_row(amount: int) -> GateArea:
+	var row: Node3D = add_child_autofree(Node3D.new())
+	var gate_area: GateArea = GateScene.instantiate()
+	gate_area.amount = amount
+	row.add_child(gate_area)
+	return gate_area
+
+
+func test_飛び出す文字はゲートと同じ色になる():
+	var good := _make_gate_in_own_row(5)
+	var bad := _make_gate_in_own_row(-5)
+	var player := _make_player(10)
+	good.area_entered.emit(player)
+	bad.area_entered.emit(player)
+	var texts := _floating_texts_of(player)
+	assert_eq(Color(texts[0].modulate, 1.0), Color(good.good_color, 1.0))
+	assert_eq(Color(texts[1].modulate, 1.0), Color(bad.harmful_color, 1.0))
