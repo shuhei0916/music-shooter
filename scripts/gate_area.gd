@@ -22,12 +22,24 @@ func _ready() -> void:
 func _on_area_entered(area: Area3D) -> void:
 	if _used or not area is Player:
 		return
+	# 同じ距離なら先に並んでいる（左の）ゲートを選ぶ
+	var nearest: GateArea = null
 	for sibling in get_parent().get_children():
 		if sibling is GateArea:
 			sibling.close()
-	area.health.hp = _gate.apply(area.health.hp)
-	queue_free()
+			if nearest == null or _distance_x(sibling, area) < _distance_x(nearest, area):
+				nearest = sibling
+	nearest.give_to(area)
 
 
 func close() -> void:
 	_used = true
+
+
+func give_to(player: Player) -> void:
+	player.health.hp = _gate.apply(player.health.hp)
+	queue_free()
+
+
+static func _distance_x(a: Node3D, b: Node3D) -> float:
+	return absf(a.global_position.x - b.global_position.x)

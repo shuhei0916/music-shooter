@@ -73,3 +73,37 @@ func test_くぐらなかった隣のゲートは消えずに残る():
 	pair.add_child(right)
 	left.area_entered.emit(_make_player(1))
 	assert_false(right.is_queued_for_deletion())
+
+
+func test_両方のゲートに触れたときはプレイヤーに近いほうが効く():
+	var pair: Node3D = add_child_autofree(Node3D.new())
+	var left: GateArea = GateScene.instantiate()
+	var right: GateArea = GateScene.instantiate()
+	left.position.x = -2.0
+	left.amount = 5
+	right.position.x = 2.0
+	right.amount = 100
+	pair.add_child(left)
+	pair.add_child(right)
+	var player := _make_player(1)
+	player.position.x = 0.3
+	left.area_entered.emit(player)
+	right.area_entered.emit(player)
+	assert_eq(player.health.hp, 101)
+	assert_true(right.is_queued_for_deletion())
+	assert_false(left.is_queued_for_deletion())
+
+
+func test_左右のゲートからちょうど同じ距離なら左のゲートが効く():
+	var pair: Node3D = add_child_autofree(Node3D.new())
+	var left: GateArea = GateScene.instantiate()
+	var right: GateArea = GateScene.instantiate()
+	left.position.x = -2.0
+	left.amount = 5
+	right.position.x = 2.0
+	right.amount = 100
+	pair.add_child(left)
+	pair.add_child(right)
+	var player := _make_player(1)
+	right.area_entered.emit(player)
+	assert_eq(player.health.hp, 6)
