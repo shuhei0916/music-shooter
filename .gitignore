@@ -1,22 +1,17 @@
-music/
-
+# Godot 4（*.import と addons/ はインポート設定・プラグインなのでコミットする）
 .godot/
 /android/
+.cache/
+
+# 書き出し設定（認証情報を含むことがある）
+export_presets.cfg
+
+# OS
 .dropbox.attr
 Thumbs.db
-.import/*
-data/*
-dev/*
-ui/*
-*.import
-default_bus_layout.tres
-default_env.tres
-export_presets.cfg
-godot-midi-player.png
-icon.png
-project.godot
+
+# ローカルの作業用
+music/
+.local/
 TestScene.tscn
 TestScene.gd
-
-addons/
-.local/
