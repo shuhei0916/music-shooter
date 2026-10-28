@@ -73,7 +73,10 @@ func test_ふくらんだあと時間がたつと元の大きさに戻る():
 
 func _shape_width(scene: PackedScene) -> float:
 	var node: Node = autofree(scene.instantiate())
-	return node.get_node("CollisionShape3D").shape.size.x
+	var shape: Shape3D = node.get_node("CollisionShape3D").shape
+	if shape is CylinderShape3D:
+		return shape.radius * 2.0
+	return shape.size.x
 
 
 func test_隣り合うレーンの敵のあいだはプレイヤーが通れないほど狭い():
