@@ -5,7 +5,7 @@ const CARD := [[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]]
 
 func _make_builder() -> LayoutBuilder:
 	var deck := GateDeck.new([CARD], 1)
-	var wave := EnemyWave.new(3, 5, 0.0, 1)
+	var wave := EnemyWave.new(3, 5, 5, 200.0, 1)
 	return LayoutBuilder.new(deck, wave, 20.0, 10.0, 15.0)
 
 

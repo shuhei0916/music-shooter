@@ -36,8 +36,10 @@ const MESSAGES := {
 @export var row_start := 20.0
 @export var row_spacing := 12.0
 @export var row_end_margin := 15.0
-@export var enemy_base_hp := 5
-@export var enemy_hp_per_meter := 0.03
+@export var enemy_start_hp := 5
+## ゴールでの敵のHP。敵のHPはスタートからここまで一定の比率で増える
+## 約107億にすると、コースの後半（後ろ半分）の敵のHPの平均が約10億になる
+@export var enemy_goal_hp := 10_740_000_000
 @export var lane_count := 3
 @export var lane_width := 3.0
 
@@ -116,7 +118,7 @@ func _fit_road() -> void:
 func _build_layout() -> Array:
 	var seed_value := layout_seed if layout_seed >= 0 else randi()
 	var deck := GateDeck.new(GATE_CARDS, seed_value)
-	var wave := EnemyWave.new(lane_count, enemy_base_hp, enemy_hp_per_meter, seed_value)
+	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
 	var builder := LayoutBuilder.new(deck, wave, row_start, row_spacing, row_end_margin)
 	return builder.build(course_length)
 
