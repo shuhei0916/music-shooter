@@ -22,3 +22,11 @@ func test_始めると曲を再生する():
 	player.stream = _make_wav(2.0)
 	MusicClock.new(player).start()
 	assert_true(player.playing)
+
+
+func test_曲が終わったら時刻は曲の長さで止まる():
+	var player: AudioStreamPlayer = add_child_autofree(AudioStreamPlayer.new())
+	player.stream = _make_wav(2.0)
+	var clock := MusicClock.new(player)
+	player.finished.emit()
+	assert_almost_eq(clock.time(), 2.0, 0.01)
