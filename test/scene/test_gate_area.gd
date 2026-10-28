@@ -107,3 +107,29 @@ func test_左右のゲートからちょうど同じ距離なら左のゲート�
 	var player := _make_player(1)
 	right.area_entered.emit(player)
 	assert_eq(player.health.hp, 6)
+
+
+func _make_gate_with_width(width: float) -> GateArea:
+	var gate_area: GateArea = GateScene.instantiate()
+	gate_area.width = width
+	return add_child_autofree(gate_area)
+
+
+func test_指定した幅の当たり判定になる():
+	var gate_area := _make_gate_with_width(3.0)
+	assert_almost_eq(gate_area.get_node("CollisionShape3D").shape.size.x, 3.0, 0.001)
+
+
+func test_幅を変えても他のゲートの当たり判定は変わらない():
+	_make_gate_with_width(3.0)
+	var other := _make_gate_with_width(4.5)
+	assert_almost_eq(other.get_node("CollisionShape3D").shape.size.x, 4.5, 0.001)
+
+
+func test_柱はゲートの両端に立つ():
+	var gate_area := _make_gate_with_width(3.0)
+	var left: Node3D = gate_area.get_node("Frame/PostLeft")
+	var right: Node3D = gate_area.get_node("Frame/PostRight")
+	assert_lt(left.position.x, -1.0)
+	assert_gt(left.position.x, -1.5)
+	assert_almost_eq(right.position.x, -left.position.x, 0.001)

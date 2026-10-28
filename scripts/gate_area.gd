@@ -3,6 +3,7 @@ extends Area3D
 
 @export var op := Gate.Op.ADD
 @export var amount := 1
+@export var width := 4.0
 @export var good_color := Color(0.3, 0.7, 1, 0.45)
 @export var harmful_color := Color(1, 0.3, 0.3, 0.45)
 
@@ -21,7 +22,23 @@ func _ready() -> void:
 	frame_material.albedo_color = Color(color, 1.0)
 	for part: MeshInstance3D in $Frame.get_children():
 		part.material_override = frame_material
+	_apply_width()
 	area_entered.connect(_on_area_entered)
+
+
+## 当たり判定・パネル・枠を、幅に合わせる。リソースは他のゲートと共有しているので複製する
+func _apply_width() -> void:
+	var shape: BoxShape3D = $CollisionShape3D.shape.duplicate()
+	shape.size.x = width
+	$CollisionShape3D.shape = shape
+	var panel: BoxMesh = $Panel.mesh.duplicate()
+	panel.size.x = width - 0.4
+	$Panel.mesh = panel
+	var beam: BoxMesh = $Frame/Beam.mesh.duplicate()
+	beam.size.x = width - 0.1
+	$Frame/Beam.mesh = beam
+	$Frame/PostLeft.position.x = -(width / 2.0 - 0.15)
+	$Frame/PostRight.position.x = width / 2.0 - 0.15
 
 
 func _on_area_entered(area: Area3D) -> void:
