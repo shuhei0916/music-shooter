@@ -20,3 +20,15 @@ func seconds_per_beat() -> float:
 func crossed(prev_time: float, now: float, beats: float) -> bool:
 	var step := seconds_per_beat() * beats
 	return floori((now - offset) / step) > floori((prev_time - offset) / step)
+
+
+## 曲を調べるツール（tools/analyze.py）が書き出した JSON から作る
+## 読めなければ、BPM は fallback_bpm、最初の拍は 0 秒とする
+static func from_json(text: String, fallback_bpm: float) -> BeatGrid:
+	var json := JSON.new()
+	if json.parse(text) != OK:
+		return BeatGrid.new(fallback_bpm)
+	var data = json.data
+	if not (data is Dictionary and data.has("bpm") and data.has("offset")):
+		return BeatGrid.new(fallback_bpm)
+	return BeatGrid.new(data.bpm, data.offset)
