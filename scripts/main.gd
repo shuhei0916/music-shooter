@@ -38,8 +38,8 @@ const MESSAGES := {
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
 ## ゴールでの敵のHP。敵のHPはスタートからここまで一定の比率で増える
-## 約107億にすると、コースの後半（後ろ半分）の敵のHPの平均が約10億になる
-@export var enemy_goal_hp := 10_740_000_000
+## 約700万にすると、コースの後半（後ろ半分）の敵のHPの平均が約100万になる
+@export var enemy_goal_hp := 7_000_000
 @export var lane_count := 3
 @export var lane_width := 3.0
 
