@@ -22,3 +22,24 @@ func test_プレイヤーがくぐるとゲートの効果でHPが変わる():
 	var player := _make_player(4)
 	gate_area.area_entered.emit(player)
 	assert_eq(player.health.hp, 12)
+
+
+func test_一度くぐったゲートは二度は効かない():
+	var gate_area := _make_gate(Gate.Op.ADD, 5)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	gate_area.area_entered.emit(player)
+	assert_eq(player.health.hp, 6)
+
+
+func test_弾が当たってもゲートは使われない():
+	var gate_area := _make_gate(Gate.Op.ADD, 5)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(add_child_autofree(Bullet.new()))
+	gate_area.area_entered.emit(player)
+	assert_eq(player.health.hp, 6)
+
+
+func test_ゲートに効果の文字を表示する():
+	var gate_area := _make_gate(Gate.Op.MULTIPLY, 2)
+	assert_eq(gate_area.get_node("Label").text, "×2")
