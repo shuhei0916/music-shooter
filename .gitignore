@@ -10,8 +10,5 @@ export_presets.cfg
 .dropbox.attr
 Thumbs.db
 
-# ローカルの作業用
+# 手持ちの曲（権利のある音源はコミットしない）
 music/
-.local/
-TestScene.tscn
-TestScene.gd
