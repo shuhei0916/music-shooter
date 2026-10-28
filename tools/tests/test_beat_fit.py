@@ -16,3 +16,8 @@ def pulses(times, length=10.0):
 def test_find_offset_returns_time_of_first_beat():
     beats = np.arange(0.3, 10.0, 0.5)
     assert find_offset(pulses(beats), FRAME_RATE, bpm=120.0) == 0.3
+
+
+def test_find_offset_with_another_first_beat():
+    beats = np.arange(0.12, 10.0, 0.5)
+    assert find_offset(pulses(beats), FRAME_RATE, bpm=120.0) == 0.12
