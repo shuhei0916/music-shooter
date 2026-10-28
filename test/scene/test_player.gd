@@ -72,3 +72,10 @@ func test_撃った弾は今の威力を持つ():
 	player.stats.power = 4
 	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
 	assert_eq(_bullets_of(player)[0].damage, 4)
+
+
+func test_大きなHPは短く表示する():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.health.hp = 1_234_567
+	simulate(player, 1, 0.1)
+	assert_eq(player.get_node("HpLabel").text, "1.2m")

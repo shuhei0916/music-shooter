@@ -15,7 +15,7 @@ var _flash_left := 0.0
 
 func _ready() -> void:
 	health = Health.new(start_hp)
-	_hp_label.text = str(health.hp)
+	_update_hp_label()
 	var material: StandardMaterial3D = _body.mesh.material.duplicate()
 	_base_color = material.albedo_color
 	_body.material_override = material
@@ -37,7 +37,7 @@ func _on_area_entered(area: Area3D) -> void:
 		_show_hit_effect()
 	elif area is Player:
 		area.health.clash(health)
-	_hp_label.text = str(health.hp)
+	_update_hp_label()
 	if health.is_dead():
 		queue_free()
 
@@ -46,3 +46,7 @@ func _show_hit_effect() -> void:
 	var t := _flash_left / flash_duration
 	_body.material_override.albedo_color = _base_color.lerp(Color.WHITE, t)
 	_body.scale = Vector3.ONE * lerpf(1.0, hit_scale, t)
+
+
+func _update_hp_label() -> void:
+	_hp_label.text = NumberFormat.short(health.hp)

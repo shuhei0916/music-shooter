@@ -26,7 +26,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var axis := Input.get_axis("move_left", "move_right")
 	position.x = _steering.next_x(position.x, axis, delta)
-	_hp_label.text = str(health.hp)
+	_hp_label.text = NumberFormat.short(health.hp)
 
 
 ## 曲の時刻を受け取り、前回から拍の線をまたいでいたら撃つ

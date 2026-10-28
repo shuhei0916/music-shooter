@@ -91,3 +91,8 @@ func test_弾の威力の分だけHPが減る():
 	bullet.damage = 3
 	enemy.area_entered.emit(bullet)
 	assert_eq(enemy.health.hp, 2)
+
+
+func test_大きなHPは短く表示する():
+	var enemy := _make_enemy(1_234_567_890)
+	assert_eq(enemy.get_node("HpLabel").text, "1.2b")
