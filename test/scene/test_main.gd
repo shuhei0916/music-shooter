@@ -60,14 +60,25 @@ func _find_all(root: Node, type: Variant) -> Array:
 	return root.find_children("*", "", true, false).filter(func(n): return is_instance_of(n, type))
 
 
-func test_配置どおりの位置に左右2枚のゲートを並べる():
+func test_2枚のゲートは道の幅を2つに分けて並べる():
 	var main := _make_main_with_layout(
 		[{"z": 10.0, "gates": [[Gate.Op.ADD, 5], [Gate.Op.ADD, -3]]}]
 	)
 	var gates := _find_all(main, GateArea)
 	assert_eq(gates.size(), 2)
-	assert_eq([gates[0].global_position, gates[0].amount], [Vector3(-2, 0, -10), 5])
-	assert_eq([gates[1].global_position, gates[1].amount], [Vector3(2, 0, -10), -3])
+	assert_eq([gates[0].global_position, gates[0].amount], [Vector3(-2.25, 0, -10), 5])
+	assert_eq([gates[1].global_position, gates[1].amount], [Vector3(2.25, 0, -10), -3])
+	assert_almost_eq(gates[0].width, 4.5, 0.001)
+
+
+func test_3枚のゲートは道の幅を3つに分けて並べる():
+	var main := _make_main_with_layout(
+		[{"z": 10.0, "gates": [[Gate.Op.ADD, 1], [Gate.Op.ADD, 2], [Gate.Op.ADD, 3]]}]
+	)
+	var gates := _find_all(main, GateArea)
+	assert_eq(gates.map(func(g): return g.global_position.x), [-3.0, 0.0, 3.0])
+	assert_eq(gates.map(func(g): return g.amount), [1, 2, 3])
+	assert_almost_eq(gates[0].width, 3.0, 0.001)
 
 
 func test_配置どおりのレーンとHPで敵を並べる():

@@ -3,7 +3,6 @@ extends Node3D
 
 const GateScene := preload("res://scenes/gate.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
-const GATE_X := 2.0
 ## 山札に入れるゲートのペア。[[種類, 数], [種類, 数]]
 const GATE_CARDS := [
 	[[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]],
@@ -21,7 +20,7 @@ const MESSAGES := {
 @export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
 @export var forward_speed := 6.0
 @export var course_length := 150.0
-## z: スタートからの距離、gates: 左右のゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
+## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
 ## 空なら、コースの長さに合わせて自動で並べる
 @export var layout: Array = []
 ## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
@@ -107,11 +106,15 @@ func _spawn_row(row: Dictionary) -> void:
 		var pair := Node3D.new()
 		pair.position.z = z
 		add_child(pair)
-		for i in row.gates.size():
+		var count: int = row.gates.size()
+		var road_width := lane_count * lane_width
+		var slots := Lanes.new(count, road_width / count)
+		for i in count:
 			var gate_area: GateArea = GateScene.instantiate()
 			gate_area.op = row.gates[i][0]
 			gate_area.amount = row.gates[i][1]
-			gate_area.position.x = -GATE_X if i == 0 else GATE_X
+			gate_area.width = slots.width
+			gate_area.position.x = slots.x_of(i)
 			pair.add_child(gate_area)
 	for spec in row.get("enemies", []):
 		var enemy: Enemy = EnemyScene.instantiate()
