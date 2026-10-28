@@ -156,6 +156,20 @@ func test_曲のBPMに合わせてプレイヤーが弾を撃つ():
 	assert_eq(_find_all(main, Bullet).size(), 3)
 
 
+func test_曲の隣に拍のJSONがあれば最初の拍の時刻に合わせて撃つ():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string('{"bpm": 60.0, "offset": 0.3}')
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	add_child_autofree(main)
+	# 0.25 秒ずつ 1 秒まで。拍の線は 0.3 秒にだけある（JSON がなければ BPM 105 で 0 秒と 0.57 秒）
+	simulate(main, 4, 0.25)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	assert_eq(_find_all(main, Bullet).size(), 1)
+
+
 func test_道はスタートの後ろからゴールの先まで続く():
 	var main := _make_main(10.0, 1000.0)
 	var road: MeshInstance3D = main.get_node("Road")

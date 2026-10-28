@@ -25,6 +25,7 @@ const MESSAGES := {
 ## 曲のファイル。見つからなければ曲なしで、course_length の長さを時間だけで進む
 @export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
 ## 曲のBPM。弾はこの拍に合わせて撃つ（Tropic Love は 105）
+## 曲の隣に「曲の名前.beats.json」（tools/analyze.py で作る）があれば、そちらのBPMと最初の拍の時刻を使う
 @export var bpm := 105.0
 @export var forward_speed := 6.0
 @export var course_length := 150.0
@@ -69,7 +70,7 @@ func _ready() -> void:
 		_clock = TimerClock.new(course_length / forward_speed)
 	_course = Course.new(forward_speed, course_length)
 	_lanes = Lanes.new(lane_count, lane_width)
-	_grid = BeatGrid.new(bpm)
+	_grid = BeatGrid.from_json(_read_beats_json(), bpm)
 	_clock.start()
 	$PauseMenu.quit_requested.connect(get_tree().quit)
 	$GoalLine.position.z = -course_length
@@ -105,6 +106,13 @@ func _finish() -> void:
 	_message.text = MESSAGES[_result]
 	_message.visible = true
 	_hint.visible = true
+
+
+func _read_beats_json() -> String:
+	var path := song_path.get_basename() + ".beats.json"
+	if not FileAccess.file_exists(path):
+		return ""
+	return FileAccess.get_file_as_string(path)
 
 
 ## 道をスタートの後ろ（ROAD_BEHIND）からゴールの先（ROAD_AHEAD）まで伸ばす
