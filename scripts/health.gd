@@ -12,3 +12,7 @@ func _init(p_hp: int) -> void:
 
 func damage(amount: int) -> void:
 	hp -= amount
+
+
+func is_dead() -> bool:
+	return hp == 0
