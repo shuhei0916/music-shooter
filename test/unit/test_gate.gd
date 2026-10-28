@@ -26,3 +26,12 @@ func test_ゲートの表示はマイナスならマイナスの数になる():
 
 func test_ゲートの表示はかけ算ならバツ印つきの数になる():
 	assert_eq(Gate.new(Gate.Op.MULTIPLY, 2).label(), "×2")
+
+
+func test_HPが減るゲートは損なゲート():
+	assert_true(Gate.new(Gate.Op.ADD, -3).is_harmful())
+
+
+func test_HPが増えるゲートは損なゲートではない():
+	assert_false(Gate.new(Gate.Op.ADD, 3).is_harmful())
+	assert_false(Gate.new(Gate.Op.MULTIPLY, 2).is_harmful())

@@ -26,3 +26,11 @@ func label() -> String:
 			return "×%d" % amount
 		_:
 			return "%+d" % amount
+
+
+func is_harmful() -> bool:
+	match op:
+		Op.MULTIPLY:
+			return amount < 1
+		_:
+			return amount < 0
