@@ -12,3 +12,8 @@ Thumbs.db
 
 # 手持ちの曲（権利のある音源はコミットしない）
 music/
+
+# Python（tools/ の仮想環境とキャッシュ）
+tools/.venv/
+__pycache__/
+.pytest_cache/
