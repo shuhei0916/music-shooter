@@ -16,11 +16,12 @@ func _init(lane_count: int, base_hp: int, hp_per_meter: float, seed_value: int) 
 
 
 ## [[レーン番号, HP], ...] を返す
-func make(_distance: float) -> Array:
+func make(distance: float) -> Array:
 	var lanes := range(_lane_count)
 	var count := _rng.randi_range(1, _lane_count)
+	var hp := _base_hp + roundi(_hp_per_meter * distance)
 	var result := []
 	for i in count:
 		var lane: int = lanes.pop_at(_rng.randi_range(0, lanes.size() - 1))
-		result.append([lane, _base_hp])
+		result.append([lane, hp])
 	return result
