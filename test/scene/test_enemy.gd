@@ -56,3 +56,16 @@ func test_光ったあと時間がたつと元の色に戻る():
 	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
 	simulate(enemy, 3, 0.1)
 	assert_eq(_body_color(enemy), original)
+
+
+func test_弾が当たると少しふくらむ():
+	var enemy := _make_enemy(5)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	assert_gt(enemy.get_node("Body").scale.x, 1.0)
+
+
+func test_ふくらんだあと時間がたつと元の大きさに戻る():
+	var enemy := _make_enemy(5)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	simulate(enemy, 3, 0.1)
+	assert_eq(enemy.get_node("Body").scale, Vector3.ONE)

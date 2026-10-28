@@ -3,6 +3,7 @@ extends Area3D
 
 @export var start_hp := 3
 @export var flash_duration := 0.12
+@export var hit_scale := 1.15
 
 var health: Health
 var _base_color: Color
@@ -25,7 +26,7 @@ func _process(delta: float) -> void:
 	if _flash_left <= 0.0:
 		return
 	_flash_left = maxf(_flash_left - delta, 0.0)
-	_show_flash()
+	_show_hit_effect()
 
 
 func _on_area_entered(area: Area3D) -> void:
@@ -33,7 +34,7 @@ func _on_area_entered(area: Area3D) -> void:
 		health.damage(1)
 		area.queue_free()
 		_flash_left = flash_duration
-		_show_flash()
+		_show_hit_effect()
 	elif area is Player:
 		area.health.clash(health)
 	_hp_label.text = str(health.hp)
@@ -41,6 +42,7 @@ func _on_area_entered(area: Area3D) -> void:
 		queue_free()
 
 
-func _show_flash() -> void:
+func _show_hit_effect() -> void:
 	var t := _flash_left / flash_duration
 	_body.material_override.albedo_color = _base_color.lerp(Color.WHITE, t)
+	_body.scale = Vector3.ONE * lerpf(1.0, hit_scale, t)
