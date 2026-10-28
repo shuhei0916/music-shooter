@@ -1,4 +1,0 @@
-[tool.gdtoolkit.linter]
-disable = [
-    "function-name",
-]
