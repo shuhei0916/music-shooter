@@ -11,4 +11,4 @@ func _init(p_speed: float, p_half_width: float) -> void:
 
 
 func next_x(x: float, axis: float, delta: float) -> float:
-	return x + axis * speed * delta
+	return clampf(x + axis * speed * delta, -half_width, half_width)
