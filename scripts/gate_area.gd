@@ -34,9 +34,6 @@ func _apply_width() -> void:
 	var panel: BoxMesh = $Panel.mesh.duplicate()
 	panel.size.x = width - 0.4
 	$Panel.mesh = panel
-	var beam: BoxMesh = $Frame/Beam.mesh.duplicate()
-	beam.size.x = width - 0.1
-	$Frame/Beam.mesh = beam
 	$Frame/PostLeft.position.x = -(width / 2.0 - 0.15)
 	$Frame/PostRight.position.x = width / 2.0 - 0.15
 
