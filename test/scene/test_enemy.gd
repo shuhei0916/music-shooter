@@ -69,3 +69,14 @@ func test_ふくらんだあと時間がたつと元の大きさに戻る():
 	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
 	simulate(enemy, 3, 0.1)
 	assert_eq(enemy.get_node("Body").scale, Vector3.ONE)
+
+
+func _shape_width(scene: PackedScene) -> float:
+	var node: Node = autofree(scene.instantiate())
+	return node.get_node("CollisionShape3D").shape.size.x
+
+
+func test_隣り合うレーンの敵のあいだはプレイヤーが通れないほど狭い():
+	var main: Main = autofree(preload("res://scenes/main.tscn").instantiate())
+	var gap := main.lane_width - _shape_width(EnemyScene)
+	assert_lt(gap, _shape_width(PlayerScene))
