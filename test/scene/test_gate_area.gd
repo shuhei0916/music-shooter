@@ -57,3 +57,19 @@ func test_並んだゲートの片方をくぐると隣のゲートは効かな�
 	left.area_entered.emit(player)
 	right.area_entered.emit(player)
 	assert_eq(player.health.hp, 6)
+
+
+func test_くぐったゲートは消える():
+	var gate_area := _make_gate(Gate.Op.ADD, 5)
+	gate_area.area_entered.emit(_make_player(1))
+	assert_true(gate_area.is_queued_for_deletion())
+
+
+func test_くぐらなかった隣のゲートは消えずに残る():
+	var pair: Node3D = add_child_autofree(Node3D.new())
+	var left: GateArea = GateScene.instantiate()
+	var right: GateArea = GateScene.instantiate()
+	pair.add_child(left)
+	pair.add_child(right)
+	left.area_entered.emit(_make_player(1))
+	assert_false(right.is_queued_for_deletion())

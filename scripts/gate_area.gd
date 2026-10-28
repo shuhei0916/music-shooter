@@ -26,6 +26,7 @@ func _on_area_entered(area: Area3D) -> void:
 		if sibling is GateArea:
 			sibling.close()
 	area.health.hp = _gate.apply(area.health.hp)
+	queue_free()
 
 
 func close() -> void:
