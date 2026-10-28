@@ -12,4 +12,8 @@ func _init(p_speed: float, p_length: float) -> void:
 
 
 func advance(delta: float) -> void:
-	distance += speed * delta
+	distance = minf(distance + speed * delta, length)
+
+
+func is_finished() -> bool:
+	return distance >= length
