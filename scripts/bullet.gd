@@ -3,6 +3,7 @@ extends Area3D
 
 @export var speed := 30.0
 @export var max_range := 40.0
+@export var damage := 1
 
 var _traveled := 0.0
 

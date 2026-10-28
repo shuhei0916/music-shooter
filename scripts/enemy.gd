@@ -31,7 +31,7 @@ func _process(delta: float) -> void:
 
 func _on_area_entered(area: Area3D) -> void:
 	if area is Bullet:
-		health.damage(1)
+		health.damage(area.damage)
 		area.queue_free()
 		_flash_left = flash_duration
 		_show_hit_effect()

@@ -83,3 +83,11 @@ func test_隣り合うレーンの敵のあいだはプレイヤーが通れな�
 	var main: Main = autofree(preload("res://scenes/main.tscn").instantiate())
 	var gap := main.lane_width - _shape_width(EnemyScene)
 	assert_lt(gap, _shape_width(PlayerScene))
+
+
+func test_弾の威力の分だけHPが減る():
+	var enemy := _make_enemy(5)
+	var bullet: Bullet = add_child_autofree(BulletScene.instantiate())
+	bullet.damage = 3
+	enemy.area_entered.emit(bullet)
+	assert_eq(enemy.health.hp, 2)

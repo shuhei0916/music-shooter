@@ -36,4 +36,5 @@ func _process(delta: float) -> void:
 func _fire() -> void:
 	var bullet: Bullet = BulletScene.instantiate()
 	bullet.position = position + Vector3(0, 1, -0.6)
+	bullet.damage = stats.power
 	get_parent().add_child(bullet)

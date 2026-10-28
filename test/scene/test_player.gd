@@ -41,3 +41,13 @@ func test_一定の間隔ごとに弾を撃つ():
 	simulate(stage, 4, 0.1)
 	var bullets := stage.get_children().filter(func(n): return n is Bullet)
 	assert_eq(bullets.size(), 2)
+
+
+func test_撃った弾は今の威力を持つ():
+	var stage: Node3D = add_child_autofree(Node3D.new())
+	var player: Player = PlayerScene.instantiate()
+	stage.add_child(player)
+	player.stats.power = 4
+	simulate(stage, 1, 0.1)
+	var bullets := stage.get_children().filter(func(n): return n is Bullet)
+	assert_eq(bullets[0].damage, 4)
