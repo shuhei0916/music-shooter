@@ -2,18 +2,21 @@ extends GutTest
 
 
 func test_プラスのゲートを通るとHPがその数だけ増える():
-	var gate := Gate.new(Gate.Op.ADD, 5)
-	assert_eq(gate.apply(10), 15)
+	var stats := PlayerStats.new(10)
+	Gate.new(Gate.Op.ADD, 5).apply(stats)
+	assert_eq(stats.health.hp, 15)
 
 
 func test_かけ算のゲートを通るとHPがその数の倍になる():
-	var gate := Gate.new(Gate.Op.MULTIPLY, 2)
-	assert_eq(gate.apply(10), 20)
+	var stats := PlayerStats.new(10)
+	Gate.new(Gate.Op.MULTIPLY, 2).apply(stats)
+	assert_eq(stats.health.hp, 20)
 
 
 func test_マイナスのゲートを通るとHPがその数だけ減る():
-	var gate := Gate.new(Gate.Op.ADD, -3)
-	assert_eq(gate.apply(10), 7)
+	var stats := PlayerStats.new(10)
+	Gate.new(Gate.Op.ADD, -3).apply(stats)
+	assert_eq(stats.health.hp, 7)
 
 
 func test_ゲートの表示はプラスなら符号つきの数になる():

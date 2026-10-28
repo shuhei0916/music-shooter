@@ -8,7 +8,10 @@ const BulletScene := preload("res://scenes/bullet.tscn")
 @export var road_half_width := 4.0
 @export var fire_interval := 0.2
 
-var health: Health
+var stats: PlayerStats
+var health: Health:
+	get:
+		return stats.health
 var _steering: Steering
 var _fire_cooldown := 0.0
 
@@ -16,7 +19,7 @@ var _fire_cooldown := 0.0
 
 
 func _ready() -> void:
-	health = Health.new(start_hp)
+	stats = PlayerStats.new(start_hp)
 	_steering = Steering.new(side_speed, road_half_width)
 
 

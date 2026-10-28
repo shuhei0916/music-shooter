@@ -12,12 +12,12 @@ func _init(p_op: Op, p_amount: int) -> void:
 	amount = p_amount
 
 
-func apply(hp: int) -> int:
+func apply(stats: PlayerStats) -> void:
 	match op:
 		Op.MULTIPLY:
-			return hp * amount
+			stats.health.hp *= amount
 		_:
-			return hp + amount
+			stats.health.hp += amount
 
 
 func label() -> String:

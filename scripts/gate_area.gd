@@ -59,7 +59,7 @@ func close() -> void:
 
 
 func give_to(player: Player) -> void:
-	player.health.hp = _gate.apply(player.health.hp)
+	_gate.apply(player.stats)
 	queue_free()
 
 
