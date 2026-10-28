@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cjgff84e34grm"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://dib3rdkc0gwl4" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
@@ -29,32 +29,32 @@ emission = Color(1, 0.8, 0.1, 1)
 material = SubResource("StandardMaterial3D_goal")
 size = Vector3(9, 0.1, 0.6)
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=823058432]
 script = ExtResource("1_main")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2059918041]
 environment = SubResource("Environment_env")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 10, 0)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1039388878]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 10, 0)
 shadow_enabled = true
 
-[node name="Road" type="MeshInstance3D" parent="."]
+[node name="Road" type="MeshInstance3D" parent="." unique_id=1974276187]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -190)
 mesh = SubResource("PlaneMesh_road")
 
-[node name="GoalLine" type="MeshInstance3D" parent="."]
+[node name="GoalLine" type="MeshInstance3D" parent="." unique_id=531980723]
 mesh = SubResource("BoxMesh_goal")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=797256514 instance=ExtResource("2_player")]
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, 7, 9)
+[node name="Camera3D" type="Camera3D" parent="." unique_id=72348126]
+transform = Transform3D(1, 0, 0, 0, 0.81915206, 0.57357645, 0, -0.57357645, 0.81915206, 0, 7, 6.0126457)
 fov = 60.0
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1506709604]
 
-[node name="Message" type="Label" parent="UI"]
+[node name="Message" type="Label" parent="UI" unique_id=961771604]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,7 +65,7 @@ theme_override_font_sizes/font_size = 72
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Hint" type="Label" parent="UI"]
+[node name="Hint" type="Label" parent="UI" unique_id=1613564585]
 visible = false
 anchors_preset = 12
 anchor_top = 1.0
