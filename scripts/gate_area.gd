@@ -22,5 +22,11 @@ func _ready() -> void:
 func _on_area_entered(area: Area3D) -> void:
 	if _used or not area is Player:
 		return
-	_used = true
+	for sibling in get_parent().get_children():
+		if sibling is GateArea:
+			sibling.close()
 	area.health.hp = _gate.apply(area.health.hp)
+
+
+func close() -> void:
+	_used = true

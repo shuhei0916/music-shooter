@@ -43,3 +43,17 @@ func test_弾が当たってもゲートは使われない():
 func test_ゲートに効果の文字を表示する():
 	var gate_area := _make_gate(Gate.Op.MULTIPLY, 2)
 	assert_eq(gate_area.get_node("Label").text, "×2")
+
+
+func test_並んだゲートの片方をくぐると隣のゲートは効かなくなる():
+	var pair: Node3D = add_child_autofree(Node3D.new())
+	var left: GateArea = GateScene.instantiate()
+	var right: GateArea = GateScene.instantiate()
+	left.amount = 5
+	right.amount = 100
+	pair.add_child(left)
+	pair.add_child(right)
+	var player := _make_player(1)
+	left.area_entered.emit(player)
+	right.area_entered.emit(player)
+	assert_eq(player.health.hp, 6)
