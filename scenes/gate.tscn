@@ -11,7 +11,18 @@ albedo_color = Color(0.3, 0.7, 1, 0.45)
 
 [sub_resource type="BoxMesh" id="BoxMesh_gate"]
 material = SubResource("StandardMaterial3D_gate")
-size = Vector3(4, 3, 0.4)
+size = Vector3(3.6, 3, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frame"]
+albedo_color = Color(0.3, 0.7, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_post"]
+material = SubResource("StandardMaterial3D_frame")
+size = Vector3(0.2, 3.3, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_beam"]
+material = SubResource("StandardMaterial3D_frame")
+size = Vector3(3.9, 0.2, 0.5)
 
 [node name="Gate" type="Area3D"]
 script = ExtResource("1_gate")
@@ -23,6 +34,20 @@ shape = SubResource("BoxShape3D_gate")
 [node name="Panel" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 mesh = SubResource("BoxMesh_gate")
+
+[node name="Frame" type="Node3D" parent="."]
+
+[node name="PostLeft" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.85, 1.65, 0)
+mesh = SubResource("BoxMesh_post")
+
+[node name="PostRight" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.85, 1.65, 0)
+mesh = SubResource("BoxMesh_post")
+
+[node name="Beam" type="MeshInstance3D" parent="Frame"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+mesh = SubResource("BoxMesh_beam")
 
 [node name="Label" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0.25)

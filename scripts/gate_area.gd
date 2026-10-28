@@ -13,9 +13,14 @@ var _used := false
 func _ready() -> void:
 	_gate = Gate.new(op, amount)
 	$Label.text = _gate.label()
+	var color := harmful_color if _gate.is_harmful() else good_color
 	var material: StandardMaterial3D = $Panel.mesh.material.duplicate()
-	material.albedo_color = harmful_color if _gate.is_harmful() else good_color
+	material.albedo_color = color
 	$Panel.material_override = material
+	var frame_material := StandardMaterial3D.new()
+	frame_material.albedo_color = Color(color, 1.0)
+	for part: MeshInstance3D in $Frame.get_children():
+		part.material_override = frame_material
 	area_entered.connect(_on_area_entered)
 
 
