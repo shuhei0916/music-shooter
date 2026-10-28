@@ -144,3 +144,13 @@ func test_同じシードなら同じ配置になる():
 	var a := _make_generated_main(300.0, 5)
 	var b := _make_generated_main(300.0, 5)
 	assert_eq(amounts.call(a), amounts.call(b))
+
+
+func test_曲のBPMに合わせてプレイヤーが弾を撃つ():
+	var main: Main = MainScene.instantiate()
+	main.song_path = ""
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	main.bpm = 120.0
+	add_child_autofree(main)
+	simulate(main, 4, 0.25)
+	assert_eq(_find_all(main, Bullet).size(), 3)

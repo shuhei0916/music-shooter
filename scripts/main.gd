@@ -18,6 +18,8 @@ const MESSAGES := {
 
 ## 曲のファイル。見つからなければ曲なしで、course_length の長さを時間だけで進む
 @export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
+## 曲のBPM。弾はこの拍に合わせて撃つ（Tropic Love は 105）
+@export var bpm := 105.0
 @export var forward_speed := 6.0
 @export var course_length := 150.0
 ## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
@@ -37,6 +39,7 @@ var song: AudioStream
 var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
+var _grid: BeatGrid
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -58,6 +61,7 @@ func _ready() -> void:
 		_clock = TimerClock.new(course_length / forward_speed)
 	_course = Course.new(forward_speed, course_length)
 	_lanes = Lanes.new(lane_count, lane_width)
+	_grid = BeatGrid.new(bpm)
 	_clock.start()
 	$GoalLine.position.z = -course_length
 	if layout.is_empty():
@@ -71,6 +75,7 @@ func _process(delta: float) -> void:
 		return
 	_clock.advance(delta)
 	_course.seek(_clock.time())
+	_player.shoot_on_beat(_clock.time(), _grid)
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)
