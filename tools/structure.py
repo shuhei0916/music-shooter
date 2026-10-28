@@ -14,11 +14,14 @@ def find_downbeat(change, beats_per_bar):
 
 
 def novelty(features, window):
-    """小節ごとに、その前の window 小節と後ろの window 小節の特徴（平均）がどれだけ違うか"""
+    """小節ごとに、その前の window 小節と後ろの window 小節の特徴（平均）がどれだけ違うか
+
+    曲の端で前か後ろの小節が window に足りないところは測らず、0 とする
+    """
     features = np.asarray(features, dtype=float)
     result = np.zeros(len(features))
-    for i in range(1, len(features)):
-        before = features[max(0, i - window) : i].mean(axis=0)
+    for i in range(window, len(features) - window + 1):
+        before = features[i - window : i].mean(axis=0)
         after = features[i : i + window].mean(axis=0)
         result[i] = np.linalg.norm(after - before)
     return result
