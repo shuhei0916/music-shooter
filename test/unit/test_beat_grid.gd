@@ -15,3 +15,14 @@ func test_拍の線をまたいでいなければ撃たない():
 
 func test_半拍ごとなら半拍の線をまたいだら撃つ():
 	assert_true(BeatGrid.new(120.0).crossed(0.2, 0.3, 0.5))
+
+
+func test_最初の拍の時刻があれば拍の線もその分だけずれる():
+	var grid := BeatGrid.new(120.0, 0.45)
+	assert_true(grid.crossed(0.4, 0.46, 1.0))
+
+
+func test_最初の拍の時刻がずれていれば元の拍の線では撃たない():
+	var grid := BeatGrid.new(120.0, 0.45)
+	assert_false(grid.crossed(0.4, 0.44, 1.0))
+	assert_false(grid.crossed(0.46, 0.6, 1.0))
