@@ -47,3 +47,14 @@ func test_同じカードでも左右が入れ替わって出ることがある(
 	for i in 20:
 		orders[deck.draw()] = true
 	assert_eq(orders.size(), 2)
+
+
+func test_選択肢が3つのカードは3つとも出て並びが入れ替わる():
+	var card := [[Gate.Op.ADD, 1], [Gate.Op.ADD, 2], [Gate.Op.ADD, 3]]
+	var deck := GateDeck.new([card], 7)
+	var orders := {}
+	for i in 30:
+		var drawn := deck.draw()
+		assert_eq(_normalize(drawn), _normalize(card))
+		orders[drawn] = true
+	assert_gt(orders.size(), 2)

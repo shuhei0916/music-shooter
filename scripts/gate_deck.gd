@@ -1,6 +1,6 @@
 class_name GateDeck
 extends RefCounted
-## ゲートのペアのカードを、シードつきの乱数で混ぜて1枚ずつ引く山札
+## ゲートの選択肢（2つか3つ）のカードを、シードつきの乱数で混ぜて1枚ずつ引く山札
 
 var _cards: Array
 var _pile: Array = []
@@ -12,14 +12,11 @@ func _init(cards: Array, seed_value: int) -> void:
 	_rng.seed = seed_value
 
 
-## [[左の種類, 数], [右の種類, 数]] を返す。左右はランダムに入れ替わる
+## 左から順に [[種類, 数], ...] を返す。選択肢の並びはランダムに入れ替わる
 func draw() -> Array:
 	if _pile.is_empty():
 		_pile = _shuffled(_cards)
-	var pair: Array = _pile.pop_back()
-	if _rng.randi_range(0, 1) == 1:
-		return [pair[1], pair[0]]
-	return pair
+	return _shuffled(_pile.pop_back())
 
 
 func _shuffled(cards: Array) -> Array:
