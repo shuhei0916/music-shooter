@@ -67,6 +67,7 @@ func _ready() -> void:
 	_lanes = Lanes.new(lane_count, lane_width)
 	_grid = BeatGrid.new(bpm)
 	_clock.start()
+	$PauseMenu.quit_requested.connect(get_tree().quit)
 	$GoalLine.position.z = -course_length
 	if layout.is_empty():
 		layout = _build_layout()

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dib3rdkc0gwl4" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="3_pause"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -79,3 +80,5 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 32
 text = "Enterでもう一度"
 horizontal_alignment = 1
+
+[node name="PauseMenu" parent="." instance=ExtResource("3_pause")]
