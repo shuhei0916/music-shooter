@@ -44,3 +44,11 @@ def find_boundaries(features, window, min_length, threshold=0.3):
         if count - i >= min_length and all(abs(i - s) >= min_length for s in starts):
             starts.append(i)
     return sorted(starts)
+
+
+def section_energy(bar_energy, starts):
+    """セクションごとの小節の大きさの平均を、最も大きいセクションを 1 として返す"""
+    bar_energy = np.asarray(bar_energy, dtype=float)
+    ends = list(starts[1:]) + [len(bar_energy)]
+    means = np.array([bar_energy[s:e].mean() for s, e in zip(starts, ends)])
+    return list(means / means.max())
