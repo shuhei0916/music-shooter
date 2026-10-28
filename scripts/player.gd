@@ -8,6 +8,8 @@ extends Area3D
 var health: Health
 var _steering: Steering
 
+@onready var _hp_label: Label3D = $HpLabel
+
 
 func _ready() -> void:
 	health = Health.new(start_hp)
@@ -17,3 +19,4 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var axis := Input.get_axis("move_left", "move_right")
 	position.x = _steering.next_x(position.x, axis, delta)
+	_hp_label.text = str(health.hp)

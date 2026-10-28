@@ -24,3 +24,10 @@ func test_左へ動く操作をすると左へ動く():
 	simulate(player, 1, 0.1)
 	Input.action_release("move_left")
 	assert_lt(player.position.x, 0.0)
+
+
+func test_頭の上に今のHPを表示する():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.health.hp = 15
+	simulate(player, 1, 0.1)
+	assert_eq(player.get_node("HpLabel").text, "15")
