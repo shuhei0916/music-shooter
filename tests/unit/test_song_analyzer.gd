@@ -84,3 +84,60 @@ func test_途中でテンポが変わる曲は区間ごとのテンポでtickを
 	# 最初の4拍は120BPM（2秒）、その後の4拍は60BPM（4秒）
 	var smf_data := _make_smf([_make_tempo_chunk(0, 120.0), _make_tempo_chunk(480 * 4, 60.0)])
 	assert_almost_eq(analyzer.ticks_to_seconds(smf_data, 480 * 8), 6.0, 0.001)
+
+
+func _make_note_chunk(tick: int, channel: int, note: int) -> SMF.MIDIEventChunk:
+	return SMF.MIDIEventChunk.new(tick, channel, SMF.MIDIEventNoteOn.new(note, 100))
+
+
+func test_チャンネルの特徴にはチャンネルごとのノートの数が入る() -> void:
+	var smf_data := _make_smf(
+		[_make_note_chunk(0, 0, 60), _make_note_chunk(480, 0, 62), _make_note_chunk(0, 9, 36)]
+	)
+	var profiles: Dictionary = analyzer.channel_profiles(smf_data)
+	assert_eq(profiles[0].note_count, 2)
+	assert_eq(profiles[9].note_count, 1)
+
+
+func test_チャンネルの特徴ではvelocity0のnote_onをノートとして数えない() -> void:
+	var smf_data := _make_smf([_make_note_chunk(0, 0, 60), _make_note_on_chunk(240, 0, 0)])
+	assert_eq(analyzer.channel_profiles(smf_data)[0].note_count, 1)
+
+
+func _make_program_chunk(tick: int, channel: int, program: int) -> SMF.MIDIEventChunk:
+	return SMF.MIDIEventChunk.new(tick, channel, SMF.MIDIEventProgramChange.new(program))
+
+
+func test_チャンネルの特徴には最初に指定された音色の番号が入る() -> void:
+	var smf_data := _make_smf(
+		[_make_program_chunk(0, 1, 33), _make_note_chunk(0, 1, 40), _make_program_chunk(960, 1, 0)]
+	)
+	assert_eq(analyzer.channel_profiles(smf_data)[1].program, 33)
+
+
+func test_音色の指定がないチャンネルの音色の番号はマイナス1() -> void:
+	var smf_data := _make_smf([_make_note_chunk(0, 0, 60)])
+	assert_eq(analyzer.channel_profiles(smf_data)[0].program, -1)
+
+
+func test_ノートのないチャンネルはチャンネルの特徴に含めない() -> void:
+	var smf_data := _make_smf([_make_program_chunk(0, 2, 48), _make_note_chunk(0, 0, 60)])
+	assert_false(analyzer.channel_profiles(smf_data).has(2))
+
+
+func test_チャンネルの特徴には平均の音の高さが入る() -> void:
+	var smf_data := _make_smf([_make_note_chunk(0, 0, 60), _make_note_chunk(480, 0, 70)])
+	assert_almost_eq(analyzer.channel_profiles(smf_data)[0].mean_pitch, 65.0, 0.001)
+
+
+func test_チャンネルの特徴には同じtickに鳴る音の数の平均が入る() -> void:
+	# tick0に3音の和音、tick480に単音 → 4ノート / 2回 = 2
+	var smf_data := _make_smf(
+		[
+			_make_note_chunk(0, 0, 60),
+			_make_note_chunk(0, 0, 64),
+			_make_note_chunk(0, 0, 67),
+			_make_note_chunk(480, 0, 72),
+		]
+	)
+	assert_almost_eq(analyzer.channel_profiles(smf_data)[0].polyphony, 2.0, 0.001)
