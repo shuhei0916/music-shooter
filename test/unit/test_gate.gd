@@ -38,3 +38,13 @@ func test_HPが減るゲートは損なゲート():
 func test_HPが増えるゲートは損なゲートではない():
 	assert_false(Gate.new(Gate.Op.ADD, 3).is_harmful())
 	assert_false(Gate.new(Gate.Op.MULTIPLY, 2).is_harmful())
+
+
+func test_威力のゲートを通ると弾の威力がその数だけ上がる():
+	var stats := PlayerStats.new(10)
+	Gate.new(Gate.Op.POWER, 2).apply(stats)
+	assert_eq([stats.power, stats.health.hp], [3, 10])
+
+
+func test_威力のゲートの表示は威力と符号つきの数になる():
+	assert_eq(Gate.new(Gate.Op.POWER, 2).label(), "威力+2")
