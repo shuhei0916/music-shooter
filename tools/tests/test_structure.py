@@ -1,6 +1,6 @@
 import numpy as np
 
-from structure import find_downbeat
+from structure import find_boundaries, find_downbeat
 
 
 def test_find_downbeat_picks_beat_where_sound_changes_most():
@@ -12,3 +12,31 @@ def test_find_downbeat_picks_beat_where_sound_changes_most():
 def test_find_downbeat_with_three_beats_per_bar():
     change = np.tile([0.0, 1.0, 0.2], 5)
     assert find_downbeat(change, beats_per_bar=3) == 1
+
+
+def bars(*parts):
+    """(特徴の番号, 小節の数) の順に、同じ番号なら同じ特徴の小節を並べる（少しだけ揺らす）"""
+    rng = np.random.default_rng(0)
+    rows = []
+    for kind, count in parts:
+        base = np.zeros(6)
+        base[kind] = 1.0
+        rows += [base + rng.normal(0, 0.05, 6) for _ in range(count)]
+    return np.array(rows)
+
+
+def test_find_boundaries_starts_section_where_bars_change():
+    features = bars((0, 8), (1, 8), (2, 16), (0, 8))
+    assert find_boundaries(features, window=4, min_length=4) == [0, 8, 16, 32]
+
+
+def test_find_boundaries_keeps_only_one_of_changes_closer_than_min_length():
+    # 2小節だけ違う部分があっても、その前後の両方をセクションの切れ目にはしない
+    features = bars((0, 8), (1, 2), (0, 8))
+    assert len(find_boundaries(features, window=4, min_length=4)) == 2
+
+
+def test_find_boundaries_ignores_small_changes():
+    features = bars((0, 8), (1, 8))
+    features[12:] += 0.1  # 後ろの4小節が少しだけ変わる
+    assert find_boundaries(features, window=4, min_length=4) == [0, 8]
