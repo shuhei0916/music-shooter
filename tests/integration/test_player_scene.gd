@@ -56,3 +56,21 @@ func test_違うtickのノートではそれぞれ発射する():
 	player.on_note(0, BAR, TIMEBASE)
 	player.on_note(0, BAR * 2, TIMEBASE)
 	assert_eq(2, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_武器のチャンネルを並び順に付け替えると新しいチャンネルのノートで発射する():
+	player.set_weapon_channels([3, 9])
+	player.on_note(3, BAR, TIMEBASE)
+	assert_eq(1, get_tree().get_nodes_in_group("bullet").size())
+	assert_eq([3, 9], player.get_weapon_channels())
+
+
+func test_武器のチャンネルを付け替えると元のチャンネルのノートでは発射しない():
+	player.set_weapon_channels([3, 9])
+	player.on_note(0, BAR, TIMEBASE)
+	assert_eq(0, get_tree().get_nodes_in_group("bullet").size())
+
+
+func test_マイナス1を指定した武器はチャンネルを変えない():
+	player.set_weapon_channels([3, -1])
+	assert_eq([3, 9], player.get_weapon_channels())

@@ -18,9 +18,26 @@ var _last_fired_ticks: Dictionary = {}  # チャンネル -> 最後に発射し�
 
 
 func _ready() -> void:
-	for child in get_children():
-		if child.is_in_group("weapon"):
-			_weapon_map[child.channel] = child
+	_rebuild_weapon_map()
+
+
+## 武器（子ノードの並び順）のチャンネルを付け替える。-1を指定した武器はチャンネルを変えない
+func set_weapon_channels(channels: Array) -> void:
+	var weapons := _weapons()
+	for i in mini(channels.size(), weapons.size()):
+		if channels[i] != -1:
+			weapons[i].channel = channels[i]
+	_rebuild_weapon_map()
+
+
+func _weapons() -> Array:
+	return get_children().filter(func(child): return child.is_in_group("weapon"))
+
+
+func _rebuild_weapon_map() -> void:
+	_weapon_map.clear()
+	for weapon in _weapons():
+		_weapon_map[weapon.channel] = weapon
 
 
 func _physics_process(_delta):
