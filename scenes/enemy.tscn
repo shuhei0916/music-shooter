@@ -2,26 +2,29 @@
 
 [ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_enemy"]
-size = Vector3(2.4, 1.4, 1.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_enemy"]
+height = 1.4
+radius = 1.1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
 albedo_color = Color(0.85, 0.2, 0.35, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_enemy"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_enemy"]
 material = SubResource("StandardMaterial3D_enemy")
-size = Vector3(2.4, 1.4, 1.4)
+top_radius = 1.1
+bottom_radius = 1.1
+height = 1.4
 
 [node name="Enemy" type="Area3D"]
 script = ExtResource("1_enemy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-shape = SubResource("BoxShape3D_enemy")
+shape = SubResource("CylinderShape3D_enemy")
 
 [node name="Body" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-mesh = SubResource("BoxMesh_enemy")
+mesh = SubResource("CylinderMesh_enemy")
 
 [node name="HpLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
