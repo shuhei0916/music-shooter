@@ -19,5 +19,13 @@ func _init(
 	_end_margin = end_margin
 
 
-func build(_length: float) -> Array:
-	return [{"z": _start, "gates": _deck.draw()}]
+func build(length: float) -> Array:
+	var rows := []
+	var z := _start
+	while z <= length - _end_margin:
+		if rows.size() % 2 == 0:
+			rows.append({"z": z, "gates": _deck.draw()})
+		else:
+			rows.append({"z": z, "enemies": _wave.make(z)})
+		z += _spacing
+	return rows
