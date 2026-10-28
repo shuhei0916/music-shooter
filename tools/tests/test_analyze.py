@@ -54,11 +54,11 @@ def write_song(path, bpm, offset, first_bar_beat, quiet_bars, loud_bars):
     chords = {False: [[220.0, 277.2], [196.0, 246.9]], True: [[329.6, 415.3], [293.7, 370.0]]}
     for i in range(-1, quiet_bars + loud_bars):
         loud = i >= quiet_bars
-        start = max(0.0, downbeat + i * bar)
-        end = downbeat + (i + 1) * bar
-        t = np.arange(int(start * SAMPLE_RATE), int(end * SAMPLE_RATE)) / SAMPLE_RATE
+        start = int(max(0.0, downbeat + i * bar) * SAMPLE_RATE)
+        end = min(int((downbeat + (i + 1) * bar) * SAMPLE_RATE), len(audio))
+        t = np.arange(start, end) / SAMPLE_RATE
         tone = sum(np.sin(2 * np.pi * f * t) for f in chords[loud][(i // 2) % 2])
-        audio[(t * SAMPLE_RATE).astype(int)] += tone * (0.4 if loud else 0.08)
+        audio[start:end] += tone * (0.4 if loud else 0.08)
     soundfile.write(path, audio, SAMPLE_RATE)
 
 

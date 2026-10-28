@@ -28,7 +28,10 @@ FEATURE_HOP = 512
 N_MELS = 32
 # セクションの切れ目は、前後それぞれ何小節を比べて探すか。また、セクションは最低何小節か
 SECTION_WINDOW = 4
-SECTION_MIN_LENGTH = 8
+SECTION_MIN_LENGTH = 4
+# 最も大きな変化のこの割合より小さい変化は、セクションの切れ目にしない
+# 曲の終わりのフェードアウトが最も大きな変化になりやすいので、低めにしておく
+SECTION_THRESHOLD = 0.2
 # 最後の区間が、区間の長さのこの割合までなら短くても1つと数える
 LAST_SEGMENT_SLACK = 0.05
 
@@ -56,7 +59,7 @@ def analyze(path, bpm_range, bpm_step):
     bar_mel = librosa.power_to_db(segment_means(mel, feature_rate, downbeat, bar_length, duration))
     rms = librosa.feature.rms(y=audio, hop_length=FEATURE_HOP)
     bar_energy = segment_means(rms, feature_rate, downbeat, bar_length, duration)[:, 0]
-    starts = find_boundaries(bar_mel, SECTION_WINDOW, SECTION_MIN_LENGTH)
+    starts = find_boundaries(bar_mel, SECTION_WINDOW, SECTION_MIN_LENGTH, SECTION_THRESHOLD)
     energies = section_energy(bar_energy, starts)
     return {
         "bpm": bpm,
