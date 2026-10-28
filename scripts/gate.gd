@@ -18,3 +18,11 @@ func apply(hp: int) -> int:
 			return hp * amount
 		_:
 			return hp + amount
+
+
+func label() -> String:
+	match op:
+		Op.MULTIPLY:
+			return "×%d" % amount
+		_:
+			return "%+d" % amount
