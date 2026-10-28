@@ -9,3 +9,8 @@ func test_プラスのゲートを通るとHPがその数だけ増える():
 func test_かけ算のゲートを通るとHPがその数の倍になる():
 	var gate := Gate.new(Gate.Op.MULTIPLY, 2)
 	assert_eq(gate.apply(10), 20)
+
+
+func test_マイナスのゲートを通るとHPがその数だけ減る():
+	var gate := Gate.new(Gate.Op.ADD, -3)
+	assert_eq(gate.apply(10), 7)
