@@ -85,10 +85,10 @@ func _pos(beat_in_bar: int, since_beat: float, energy: float) -> Dictionary:
 	return {"beat_in_bar": beat_in_bar, "since_beat": since_beat, "energy": energy}
 
 
-func test_小節の頭の拍の瞬間は体が一瞬ふくらむ():
+func test_拍の瞬間は体が一瞬ふくらむ():
 	var player: Player = add_child_autofree(PlayerScene.instantiate())
 	player.dance(_pos(0, 0.0, 1.0))
-	assert_eq(player.get_node("Pivot").scale, Vector3.ONE * (1.0 + Groove.STRONG))
+	assert_eq(player.get_node("Pivot").scale, Vector3.ONE * (1.0 + Groove.PEAK))
 
 
 func test_体は足もとを支点にして動く():
