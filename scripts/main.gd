@@ -26,6 +26,7 @@ const MESSAGES := {
 @export_file("*.mp3", "*.ogg", "*.wav") var song_path := "res://music/tropic_love.mp3"
 ## 曲のBPM。弾はこの拍に合わせて撃つ（Tropic Love は 105）
 ## 曲の隣に「曲の名前.beats.json」（tools/analyze.py で作る）があれば、そちらのBPMと最初の拍の時刻を使う
+## 小節やセクションも、その JSON から読んで右上の円に表示する
 @export var bpm := 105.0
 @export var forward_speed := 6.0
 @export var course_length := 150.0
@@ -49,6 +50,7 @@ var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
 var _grid: BeatGrid
+var _map: SongMap
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -57,6 +59,7 @@ var _result := Judge.Result.PLAYING
 @onready var _message: Label = $UI/Message
 @onready var _hint: Label = $UI/Hint
 @onready var _music: AudioStreamPlayer = $Music
+@onready var _beat_hud: BeatHud = $UI/BeatHud
 
 
 func _ready() -> void:
@@ -70,7 +73,9 @@ func _ready() -> void:
 		_clock = TimerClock.new(course_length / forward_speed)
 	_course = Course.new(forward_speed, course_length)
 	_lanes = Lanes.new(lane_count, lane_width)
-	_grid = BeatGrid.from_json(_read_beats_json(), bpm)
+	_map = SongMap.from_json(_read_beats_json(), bpm)
+	_grid = _map.grid
+	_beat_hud.beats_per_bar = _map.beats_per_bar
 	_clock.start()
 	$PauseMenu.quit_requested.connect(get_tree().quit)
 	$GoalLine.position.z = -course_length
@@ -87,6 +92,7 @@ func _process(delta: float) -> void:
 	_clock.advance(delta)
 	_course.seek(_clock.time())
 	_player.shoot_on_beat(_clock.time(), _grid)
+	_beat_hud.show_at(_map.at(_clock.time()))
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)

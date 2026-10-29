@@ -170,6 +170,29 @@ func test_曲の隣に拍のJSONがあれば最初の拍の時刻に合わせて
 	assert_eq(_find_all(main, Bullet).size(), 1)
 
 
+func test_右上の円に曲のいまのセクションと小節を表示する():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, '
+			+ '"sections": [{"bar": 0, "label": "VERSE", "energy": 0.6}, '
+			+ '{"bar": 1, "label": "DROP", "energy": 1.0}], "bar_energy": [0.6, 1.0, 1.0]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	add_child_autofree(main)
+	# 1小節は 2 秒。2.5 秒は DROP の 1 小節目の 2 拍目
+	simulate(main, 5, 0.5)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	var hud: BeatHud = main.get_node("UI/BeatHud")
+	assert_eq(hud.get_node("Label").text, "DROP")
+	assert_eq(hud.get_node("Bar").text, "1 / 2")
+	assert_eq(hud.beat_in_bar, 1)
+
+
 func test_道はスタートの後ろからゴールの先まで続く():
 	var main := _make_main(10.0, 1000.0)
 	var road: MeshInstance3D = main.get_node("Road")

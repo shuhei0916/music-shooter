@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dib3rdkc0gwl4" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="3_pause"]
+[ext_resource type="PackedScene" path="res://scenes/beat_hud.tscn" id="4_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -80,5 +81,15 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 32
 text = "Enterでもう一度"
 horizontal_alignment = 1
+
+[node name="BeatHud" parent="UI" instance=ExtResource("4_hud")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 220.0
+grow_horizontal = 0
 
 [node name="PauseMenu" parent="." instance=ExtResource("3_pause")]
