@@ -20,7 +20,9 @@ script = ExtResource("1_player")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("BoxShape3D_body")
 
-[node name="Body" type="MeshInstance3D" parent="."]
+[node name="Pivot" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Pivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 mesh = SubResource("CapsuleMesh_body")
 

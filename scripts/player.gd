@@ -16,6 +16,8 @@ var _steering: Steering
 var _last_shot_check := -0.001
 
 @onready var _hp_label: Label3D = $HpLabel
+## 体を動かすときの支点（足もと）
+@onready var _pivot: Node3D = $Pivot
 
 
 func _ready() -> void:
@@ -34,6 +36,14 @@ func shoot_on_beat(time: float, grid: BeatGrid) -> void:
 	if grid.crossed(_last_shot_check, time, stats.beats_per_shot()):
 		_fire()
 	_last_shot_check = time
+
+
+## 曲の位置 pos（SongMap.at の結果）に合わせて体を弾ませる。beat_length は1拍の秒数
+func dance(pos: Dictionary, beat_length: float) -> void:
+	var squash := Groove.squash(pos.since_beat, pos.beat_in_bar == 0, pos.energy)
+	# 縮んだ分だけ横にふくらませ、つぶれたように見せる
+	_pivot.scale = Vector3(1.0 + squash / 2, 1.0 - squash, 1.0 + squash / 2)
+	_pivot.rotation.z = Groove.sway(pos.beat_in_bar, pos.since_beat, beat_length, pos.energy)
 
 
 func _fire() -> void:

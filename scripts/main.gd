@@ -101,7 +101,9 @@ func _process(delta: float) -> void:
 	_clock.advance(delta)
 	_course.seek(_clock.time())
 	_player.shoot_on_beat(_clock.time(), _grid)
-	_beat_hud.show_at(_map.at(_clock.time()))
+	var pos := _map.at(_clock.time())
+	_player.dance(pos, _grid.seconds_per_beat())
+	_beat_hud.show_at(pos)
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)

@@ -79,3 +79,31 @@ func test_大きなHPは短く表示する():
 	player.health.hp = 1_234_567
 	simulate(player, 1, 0.1)
 	assert_eq(player.get_node("HpLabel").text, "1.2m")
+
+
+func _pos(beat_in_bar: int, since_beat: float, energy: float) -> Dictionary:
+	return {"beat_in_bar": beat_in_bar, "since_beat": since_beat, "energy": energy}
+
+
+func test_小節の頭の拍の瞬間は体が縦につぶれて横にふくらむ():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.dance(_pos(0, 0.0, 1.0), 0.5)
+	var pivot: Node3D = player.get_node("Pivot")
+	assert_almost_eq(pivot.scale.y, 1.0 - Groove.SQUASH_STRONG, 0.0001)
+	assert_almost_eq(pivot.scale.x, 1.0 + Groove.SQUASH_STRONG / 2, 0.0001)
+	assert_almost_eq(pivot.scale.z, 1.0 + Groove.SQUASH_STRONG / 2, 0.0001)
+
+
+func test_拍ごとに体を左右交互に傾ける():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	var pivot: Node3D = player.get_node("Pivot")
+	player.dance(_pos(0, 0.0, 1.0), 0.5)
+	assert_almost_eq(pivot.rotation.z, Groove.SWAY, 0.0001)
+	player.dance(_pos(1, 0.0, 1.0), 0.5)
+	assert_almost_eq(pivot.rotation.z, -Groove.SWAY, 0.0001)
+
+
+func test_体は足もとを支点にして動く():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	assert_eq(player.get_node("Pivot").position, Vector3.ZERO)
+	assert_true(player.has_node("Pivot/Body"))
