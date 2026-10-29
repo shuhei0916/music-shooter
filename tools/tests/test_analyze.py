@@ -86,3 +86,11 @@ def test_main_writes_downbeat_and_sections_too(tmp_path):
     assert [s["bar"] for s in beats["sections"]] == [0, 8]
     assert beats["sections"][1]["energy"] == 1.0
     assert len(beats["bar_energy"]) == 16
+
+
+def test_main_writes_section_labels(tmp_path):
+    path = tmp_path / "song.wav"
+    write_song(path, bpm=120.0, offset=0.25, first_bar_beat=1, quiet_bars=8, loud_bars=8)
+    main([str(path), "--bpm", "120"])
+    beats = json.loads((tmp_path / "song.beats.json").read_text(encoding="utf-8"))
+    assert [s["label"] for s in beats["sections"]] == ["BUILD", "DROP"]

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from structure import find_boundaries, find_downbeat, novelty, section_energy
+from structure import find_boundaries, find_downbeat, label_sections, novelty, section_energy
 
 
 def test_find_downbeat_picks_beat_where_sound_changes_most():
@@ -53,3 +53,13 @@ def test_novelty_is_measured_only_where_both_windows_are_full():
     # 曲の端で窓が欠けると平均がかたよるので、そこは測らない（0 とする）
     features = np.array([[1.0, 0.0], [0.0, 1.0]] * 4)
     assert novelty(features, window=2) == pytest.approx([0.0] * 8)
+
+
+def test_label_sections_by_energy():
+    # 大きいものは DROP、小さいものは BREAK、その間は VERSE。DROP の直前は BUILD
+    energies = [0.7, 0.4, 0.8, 0.6, 0.95, 0.5, 1.0]
+    assert label_sections(energies) == ["VERSE", "BREAK", "VERSE", "BUILD", "DROP", "BUILD", "DROP"]
+
+
+def test_label_sections_keeps_drop_before_drop():
+    assert label_sections([0.9, 1.0]) == ["DROP", "DROP"]

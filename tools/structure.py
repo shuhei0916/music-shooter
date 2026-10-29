@@ -55,3 +55,27 @@ def section_energy(bar_energy, starts):
     ends = list(starts[1:]) + [len(bar_energy)]
     means = np.array([bar_energy[s:e].mean() for s, e in zip(starts, ends)])
     return list(means / means.max())
+
+
+# セクションの盛り上がりが、これ以上なら DROP、これ以下なら BREAK とする
+DROP_ENERGY = 0.9
+BREAK_ENERGY = 0.5
+
+
+def label_sections(energies):
+    """セクションの盛り上がりから、DROP・BUILD・VERSE・BREAK の名前をつける
+
+    DROP の直前のセクションは、盛り上がりにかかわらず BUILD（DROP どうしが続くときは DROP のまま）
+    """
+    labels = []
+    for energy in energies:
+        if energy >= DROP_ENERGY:
+            labels.append("DROP")
+        elif energy <= BREAK_ENERGY:
+            labels.append("BREAK")
+        else:
+            labels.append("VERSE")
+    for i in range(len(labels) - 1):
+        if labels[i + 1] == "DROP" and labels[i] != "DROP":
+            labels[i] = "BUILD"
+    return labels

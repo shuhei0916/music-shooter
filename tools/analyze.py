@@ -12,7 +12,7 @@ import librosa
 import numpy as np
 
 from beat_fit import find_grid
-from structure import find_boundaries, find_downbeat, section_energy
+from structure import find_boundaries, find_downbeat, label_sections, section_energy
 
 SAMPLE_RATE = 22050
 # オンセットの強さを求める間隔（サンプル数）。128 で約 5.8 ミリ秒ごと
@@ -67,8 +67,8 @@ def analyze(path, bpm_range, bpm_step):
         "beats_per_bar": BEATS_PER_BAR,
         "downbeat": downbeat,
         "sections": [
-            {"bar": bar, "start": downbeat + bar * bar_length, "energy": energy}
-            for bar, energy in zip(starts, energies)
+            {"bar": bar, "start": downbeat + bar * bar_length, "energy": energy, "label": label}
+            for bar, energy, label in zip(starts, energies, label_sections(energies))
         ],
         "bar_energy": list(bar_energy / bar_energy.max()),
     }
@@ -101,7 +101,12 @@ def main(argv=None):
         "beats_per_bar": result["beats_per_bar"],
         "downbeat": round(result["downbeat"], 4),
         "sections": [
-            {"bar": s["bar"], "start": round(s["start"], 4), "energy": round(float(s["energy"]), 2)}
+            {
+                "bar": s["bar"],
+                "start": round(s["start"], 4),
+                "energy": round(float(s["energy"]), 2),
+                "label": s["label"],
+            }
             for s in result["sections"]
         ],
         "bar_energy": [round(float(e), 2) for e in result["bar_energy"]],
