@@ -44,7 +44,6 @@ const MESSAGES := {
 ## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
 @export var layout_seed := -1
 @export var row_start := 20.0
-@export var row_spacing := 12.0
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
 ## ゴールでの敵のHP。敵のHPはスタートからここまで一定の比率で増える
@@ -190,8 +189,9 @@ func _build_layout() -> Array:
 	var seed_value := layout_seed if layout_seed >= 0 else randi()
 	var deck := GateDeck.new(GATE_CARDS, seed_value)
 	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
-	var builder := LayoutBuilder.new(deck, wave, row_start, row_spacing, row_end_margin)
-	return builder.build(course_length)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin)
+	var lines := _map.bar_lines(forward_speed, course_length / forward_speed)
+	return builder.build(lines.map(func(line): return line.distance), course_length)
 
 
 func _spawn_row(row: Dictionary) -> void:

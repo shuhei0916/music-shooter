@@ -233,6 +233,28 @@ func test_床に拍ごとの線も引く():
 	assert_eq(zs.slice(0, 4), [-5.0, -10.0, -15.0, -25.0])
 
 
+func test_自動で並べるときはゲートと敵の列を小節の線の上に置く():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string('{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0}')
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 7.0
+	main.course_length = 100.0
+	main.layout_seed = 1
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	# 1小節は 2 秒で 14 進む。スタートから 20 より先、ゴールの 15 手前（85）までの線
+	var gate_zs := {}
+	for gate in _find_all(main, GateArea):
+		gate_zs[gate.global_position.z] = true
+	var enemy_zs := {}
+	for enemy in _find_all(main, Enemy):
+		enemy_zs[enemy.global_position.z] = true
+	assert_eq(gate_zs.keys(), [-28.0, -56.0, -84.0])
+	assert_eq(enemy_zs.keys(), [-42.0, -70.0])
+
+
 func test_道はスタートの後ろからゴールの先まで続く():
 	var main := _make_main(10.0, 1000.0)
 	var road: MeshInstance3D = main.get_node("Road")
