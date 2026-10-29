@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/beat_hud.gd" id="1_hud"]
+
+[node name="BeatHud" type="Control"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 200.0
+offset_bottom = 200.0
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="Section" type="Label" parent="."]
+layout_mode = 0
+offset_top = 38.0
+offset_right = 200.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_top = 62.0
+offset_right = 200.0
+offset_bottom = 102.0
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+
+[node name="Bar" type="Label" parent="."]
+layout_mode = 0
+offset_top = 102.0
+offset_right = 200.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
