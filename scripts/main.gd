@@ -102,7 +102,7 @@ func _process(delta: float) -> void:
 	_course.seek(_clock.time())
 	_player.shoot_on_beat(_clock.time(), _grid)
 	var pos := _map.at(_clock.time())
-	_player.dance(pos, _grid.seconds_per_beat())
+	_player.dance(pos)
 	_beat_hud.show_at(pos)
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
