@@ -17,6 +17,11 @@ const GATE_CARDS := [
 ]
 const ROAD_BEHIND := 10.0
 const ROAD_AHEAD := 60.0
+## 床に引く小節の線の太さと色。セクションの始まりは、BAR_LINE_GAP だけ手前にもう1本引き、
+## 円の UI と同じく盛り上がりで色を変える
+const BAR_LINE_WIDTH := 0.12
+const BAR_LINE_GAP := 0.5
+const BAR_LINE_COLOR := Color(1, 1, 1, 0.35)
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
 	Judge.Result.GAME_OVER: "GAME OVER",
@@ -80,6 +85,7 @@ func _ready() -> void:
 	$PauseMenu.quit_requested.connect(get_tree().quit)
 	$GoalLine.position.z = -course_length
 	_fit_road()
+	_draw_bar_lines()
 	if layout.is_empty():
 		layout = _build_layout()
 	for row in layout:
@@ -127,6 +133,40 @@ func _fit_road() -> void:
 	road.size.y = ROAD_BEHIND + course_length + ROAD_AHEAD
 	$Road.mesh = road
 	$Road.position.z = ROAD_BEHIND - road.size.y / 2.0
+
+
+## 床に小節の線を引く。セクションの始まりは2本線にする
+func _draw_bar_lines() -> void:
+	var bar_lines := Node3D.new()
+	bar_lines.name = "BarLines"
+	add_child(bar_lines)
+	var bar_material := _line_material(BAR_LINE_COLOR)
+	for line in _map.bar_lines(forward_speed, course_length / forward_speed):
+		if not line.section_start:
+			_add_bar_line(bar_lines, line.distance, bar_material)
+			continue
+		var color := BeatHud.CALM_COLOR.lerp(BeatHud.HOT_COLOR, line.energy)
+		var material := _line_material(color)
+		_add_bar_line(bar_lines, line.distance, material)
+		_add_bar_line(bar_lines, line.distance - BAR_LINE_GAP, material)
+
+
+func _add_bar_line(parent: Node3D, distance: float, material: Material) -> void:
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(lane_count * lane_width, 0.02, BAR_LINE_WIDTH)
+	mesh.material = material
+	var line := MeshInstance3D.new()
+	line.mesh = mesh
+	line.position = Vector3(0, 0.01, -distance)
+	parent.add_child(line)
+
+
+func _line_material(color: Color) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	return material
 
 
 func _build_layout() -> Array:

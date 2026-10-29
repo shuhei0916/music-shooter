@@ -193,6 +193,29 @@ func test_右上の円に曲のいまのセクションと小節を表示する(
 	assert_eq(hud.beat_in_bar, 1)
 
 
+func test_床に小節の線を引きセクションの始まりは2本線にする():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, '
+			+ '"sections": [{"bar": 0, "label": "VERSE", "energy": 0.6}, '
+			+ '{"bar": 1, "label": "DROP", "energy": 1.0}]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 10.0
+	main.course_length = 100.0
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	# 1小節は 2 秒で 20 進む。0 と 20 はセクションの始まりなので、少し手前にもう1本
+	var zs: Array = main.get_node("BarLines").get_children().map(func(n): return n.position.z)
+	zs.sort()
+	assert_eq(zs, [-100.0, -80.0, -60.0, -40.0, -20.0, -19.5, 0.0, 0.5])
+
+
 func test_道はスタートの後ろからゴールの先まで続く():
 	var main := _make_main(10.0, 1000.0)
 	var road: MeshInstance3D = main.get_node("Road")
