@@ -73,3 +73,23 @@ func at(time: float) -> Dictionary:
 		"beat_in_bar": posmod(beat, beats_per_bar),
 		"since_beat": time - downbeat - beat * beat_length,
 	}
+
+
+## 曲の長さ duration 秒までの、小節の頭の線。速さ speed で進むコース上の距離（distance）と、
+## セクションの始まりか（section_start）、その小節のセクションの盛り上がり（energy）
+func bar_lines(speed: float, duration: float) -> Array:
+	var bar_length := grid.seconds_per_beat() * beats_per_bar
+	var lines := []
+	var bar := 0
+	var time := downbeat
+	while time <= duration:
+		lines.append(
+			{
+				"distance": time * speed,
+				"section_start": sections.any(func(s): return s.bar == bar),
+				"energy": at(time).energy,
+			}
+		)
+		bar += 1
+		time = downbeat + bar * bar_length
+	return lines

@@ -61,3 +61,22 @@ func test_JSONが読めなければ決めておいたBPMで0秒から拍を数�
 	var pos := map.at(1.1)
 	assert_eq(pos.beat_in_bar, 2)
 	assert_almost_eq(pos.since_beat, 0.1, 0.0001)
+
+
+func test_小節の線はコース上の距離に並べる():
+	# 小節の頭は 0.75 秒から 2 秒ごと。速さ 10 で、曲の長さは 9 秒
+	var lines := _map().bar_lines(10.0, 9.0)
+	assert_eq(lines.map(func(line): return line.distance), [7.5, 27.5, 47.5, 67.5, 87.5])
+
+
+func test_セクションの始まりの小節の線には印をつけ盛り上がりも添える():
+	var lines := _map().bar_lines(10.0, 9.0)
+	assert_eq(lines.map(func(line): return line.section_start), [true, false, true, false, false])
+	assert_almost_eq(lines[2].energy, 1.0, 0.0001)
+	assert_almost_eq(lines[0].energy, 0.3, 0.0001)
+
+
+func test_セクションがなければ小節の線に印はつけない():
+	var lines := SongMap.from_json("", 120.0).bar_lines(1.0, 4.0)
+	assert_eq(lines.map(func(line): return line.distance), [0.0, 2.0, 4.0])
+	assert_eq(lines.map(func(line): return line.section_start), [false, false, false])
