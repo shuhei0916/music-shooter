@@ -91,6 +91,13 @@ func test_拍の瞬間は体が一瞬ふくらむ():
 	assert_eq(player.get_node("Pivot").scale, Vector3.ONE * (1.0 + Groove.PEAK))
 
 
+func test_体がふくらんでも当たり判定の大きさは変わらない():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.dance(_pos(0, 0.0, 1.0))
+	var shape: CollisionShape3D = player.get_node("CollisionShape3D")
+	assert_eq(shape.global_basis.get_scale(), Vector3.ONE)
+
+
 func test_体は足もとを支点にして動く():
 	var player: Player = add_child_autofree(PlayerScene.instantiate())
 	assert_eq(player.get_node("Pivot").position, Vector3.ZERO)
