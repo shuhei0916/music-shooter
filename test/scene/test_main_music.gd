@@ -126,7 +126,7 @@ func test_自動で並べるときはゲートと敵の列を小節の線の上�
 
 
 func test_プレイヤーは曲の拍に合わせて体を弾ませる():
-	# 曲の頭は小節の頭の拍なので、少しあとでは体がつぶれている
+	# 曲の頭は小節の頭の拍なので、少しあとでは体がふくらんでいる
 	var main := _make_main(10.0, 100.0)
 	simulate(main, 1, 0.02)
-	assert_lt(main.get_node("Player/Pivot").scale.y, 1.0)
+	assert_gt(main.get_node("Player/Pivot").scale.y, 1.0)

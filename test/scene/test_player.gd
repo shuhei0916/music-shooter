@@ -85,13 +85,10 @@ func _pos(beat_in_bar: int, since_beat: float, energy: float) -> Dictionary:
 	return {"beat_in_bar": beat_in_bar, "since_beat": since_beat, "energy": energy}
 
 
-func test_小節の頭の拍の瞬間は体が縦につぶれて横にふくらむ():
+func test_小節の頭の拍の瞬間は体が一瞬ふくらむ():
 	var player: Player = add_child_autofree(PlayerScene.instantiate())
 	player.dance(_pos(0, 0.0, 1.0))
-	var pivot: Node3D = player.get_node("Pivot")
-	assert_almost_eq(pivot.scale.y, 1.0 - Groove.SQUASH_STRONG, 0.0001)
-	assert_almost_eq(pivot.scale.x, 1.0 + Groove.SQUASH_STRONG / 2, 0.0001)
-	assert_almost_eq(pivot.scale.z, 1.0 + Groove.SQUASH_STRONG / 2, 0.0001)
+	assert_eq(player.get_node("Pivot").scale, Vector3.ONE * (1.0 + Groove.STRONG))
 
 
 func test_体は足もとを支点にして動く():

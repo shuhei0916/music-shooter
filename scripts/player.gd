@@ -51,9 +51,7 @@ func shoot_on_beat(time: float, grid: BeatGrid) -> void:
 
 ## 曲の位置 pos（SongMap.at の結果）に合わせて体を弾ませる
 func dance(pos: Dictionary) -> void:
-	var squash := Groove.squash(pos.since_beat, pos.beat_in_bar == 0, pos.energy)
-	# 縮んだ分だけ横にふくらませ、つぶれたように見せる
-	_pivot.scale = Vector3(1.0 + squash / 2, 1.0 - squash, 1.0 + squash / 2)
+	_pivot.scale = Vector3.ONE * Groove.scale(pos.since_beat, pos.beat_in_bar == 0, pos.energy)
 
 
 func _fire() -> void:
