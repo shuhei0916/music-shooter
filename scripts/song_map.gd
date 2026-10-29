@@ -31,16 +31,7 @@ static func from_json(text: String, fallback_bpm: float) -> SongMap:
 		return SongMap.new(grid, grid.offset)
 	var sections := []
 	for section in data.get("sections", []):
-		(
-			sections
-			. append(
-				{
-					"bar": int(section.bar),
-					"label": str(section.get("label", "")),
-					"energy": float(section.get("energy", 0.0)),
-				}
-			)
-		)
+		sections.append(_read_section(section))
 	return SongMap.new(
 		grid,
 		float(data.get("downbeat", grid.offset)),
@@ -48,6 +39,14 @@ static func from_json(text: String, fallback_bpm: float) -> SongMap:
 		sections,
 		data.get("bar_energy", []).size()
 	)
+
+
+static func _read_section(data: Dictionary) -> Dictionary:
+	return {
+		"bar": int(data.bar),
+		"label": str(data.get("label", "")),
+		"energy": float(data.get("energy", 0.0)),
+	}
 
 
 ## time 秒の位置。section_index・section_count・label・energy・bar_in_section・
