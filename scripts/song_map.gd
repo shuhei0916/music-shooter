@@ -93,3 +93,18 @@ func bar_lines(speed: float, duration: float) -> Array:
 		bar += 1
 		time = downbeat + bar * bar_length
 	return lines
+
+
+## 曲の長さ duration 秒までの、小節の頭を除いた拍の線の、コース上の距離
+## 最初の小節の頭より前の拍（弱起）も含める
+func beat_lines(speed: float, duration: float) -> Array:
+	var beat_length := grid.seconds_per_beat()
+	var beat := -floori(downbeat / beat_length)
+	var lines := []
+	var time := downbeat + beat * beat_length
+	while time <= duration:
+		if posmod(beat, beats_per_bar) != 0:
+			lines.append(time * speed)
+		beat += 1
+		time = downbeat + beat * beat_length
+	return lines

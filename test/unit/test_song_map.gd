@@ -80,3 +80,9 @@ func test_セクションがなければ小節の線に印はつけない():
 	var lines := SongMap.from_json("", 120.0).bar_lines(1.0, 4.0)
 	assert_eq(lines.map(func(line): return line.distance), [0.0, 2.0, 4.0])
 	assert_eq(lines.map(func(line): return line.section_start), [false, false, false])
+
+
+func test_拍の線は小節の頭を除いた拍の位置に並べる():
+	# 拍は 0.25 秒から 0.5 秒ごと。0.75 秒と 2.75 秒は小節の頭なので除く
+	var lines := _map().beat_lines(10.0, 3.3)
+	assert_eq(lines, [2.5, 12.5, 17.5, 22.5, 32.5])
