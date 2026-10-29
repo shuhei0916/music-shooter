@@ -13,6 +13,15 @@ material = SubResource("StandardMaterial3D_body")
 radius = 0.4
 height = 1.8
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.5, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_flash"]
+material = SubResource("StandardMaterial3D_flash")
+radius = 0.25
+height = 0.5
+
 [node name="Player" type="Area3D"]
 script = ExtResource("1_player")
 
@@ -32,3 +41,16 @@ billboard = 1
 text = "10"
 font_size = 96
 outline_size = 16
+
+[node name="Muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.6)
+
+[node name="Flash" type="MeshInstance3D" parent="Muzzle"]
+visible = false
+cast_shadow = 0
+mesh = SubResource("SphereMesh_flash")
+
+[node name="Light" type="OmniLight3D" parent="Muzzle"]
+light_color = Color(1, 0.8, 0.4, 1)
+light_energy = 0.0
+omni_range = 4.0
