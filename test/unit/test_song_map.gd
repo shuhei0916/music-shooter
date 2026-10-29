@@ -86,3 +86,9 @@ func test_拍の線は小節の頭を除いた拍の位置に並べる():
 	# 拍は 0.25 秒から 0.5 秒ごと。0.75 秒と 2.75 秒は小節の頭なので除く
 	var lines := _map().beat_lines(10.0, 3.3)
 	assert_eq(lines, [2.5, 12.5, 17.5, 22.5, 32.5])
+
+
+func test_弾を撃つ拍の線は最初の小節の頭から引く():
+	var grid := _map().shot_grid()
+	assert_almost_eq(grid.bpm, 120.0, 0.0001)
+	assert_almost_eq(grid.offset, 0.75, 0.0001)

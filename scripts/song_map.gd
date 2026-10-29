@@ -49,6 +49,11 @@ static func _read_section(data: Dictionary) -> Dictionary:
 	}
 
 
+## 弾を撃つ拍の線。拍は同じで、最初の小節の頭から数えるので、何拍かごとに撃っても小節の頭にそろう
+func shot_grid() -> BeatGrid:
+	return BeatGrid.new(grid.bpm, downbeat)
+
+
 ## time 秒の位置。section_index・section_count・label・energy・bar_in_section・
 ## bars_in_section（分からなければ 0）・beat_in_bar（0 が小節の頭）・since_beat（直前の拍からの秒数）
 func at(time: float) -> Dictionary:

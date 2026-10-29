@@ -22,6 +22,7 @@ func test_曲のBPMに合わせてプレイヤーが弾を撃つ():
 	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
 	main.bpm = 120.0
 	add_child_autofree(main)
+	main.get_node("Player").stats.fire_level = PlayerStats.MAX_FIRE_LEVEL
 	simulate(main, 4, 0.25)
 	assert_eq(_find_all(main, Bullet).size(), 3)
 
@@ -130,3 +131,19 @@ func test_プレイヤーは曲の拍に合わせて体を弾ませる():
 	var main := _make_main(10.0, 100.0)
 	simulate(main, 1, 0.02)
 	assert_gt(main.get_node("Player/Pivot").scale.y, 1.0)
+
+
+func test_初めは小節の頭で弾を撃つ():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string('{"bpm": 120.0, "offset": 0.25, "beats_per_bar": 4, "downbeat": 0.75}')
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	# 最初の拍（0.25 秒）では撃たず、小節の頭（0.75 秒）で撃つ
+	simulate(main, 2, 0.25)
+	assert_eq(_find_all(main, Bullet).size(), 0)
+	simulate(main, 2, 0.25)
+	assert_eq(_find_all(main, Bullet).size(), 1)

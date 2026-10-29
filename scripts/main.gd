@@ -56,7 +56,7 @@ var song: AudioStream
 var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
-var _grid: BeatGrid
+var _shot_grid: BeatGrid
 var _map: SongMap
 var _result := Judge.Result.PLAYING
 
@@ -81,7 +81,7 @@ func _ready() -> void:
 	_course = Course.new(forward_speed, course_length)
 	_lanes = Lanes.new(lane_count, lane_width)
 	_map = SongMap.from_json(_read_beats_json(), bpm)
-	_grid = _map.grid
+	_shot_grid = _map.shot_grid()
 	_beat_hud.beats_per_bar = _map.beats_per_bar
 	_clock.start()
 	$PauseMenu.quit_requested.connect(get_tree().quit)
@@ -100,7 +100,7 @@ func _process(delta: float) -> void:
 		return
 	_clock.advance(delta)
 	_course.seek(_clock.time())
-	_player.shoot_on_beat(_clock.time(), _grid)
+	_player.shoot_on_beat(_clock.time(), _shot_grid)
 	var pos := _map.at(_clock.time())
 	_player.dance(pos)
 	_beat_hud.show_at(pos)

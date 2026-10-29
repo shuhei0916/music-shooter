@@ -44,21 +44,26 @@ func _bullets_of(player: Player) -> Array:
 	return player.get_parent().get_children().filter(func(n): return n is Bullet)
 
 
-func test_拍ごとに弾を撃つ():
+func _shots(fire_level: int, times: Array) -> int:
 	var player := _make_player_on_stage()
+	player.stats.fire_level = fire_level
 	var grid := BeatGrid.new(120.0)
-	for time in [0.0, 0.25, 0.5, 0.75, 1.0]:
+	for time in times:
 		player.shoot_on_beat(time, grid)
-	assert_eq(_bullets_of(player).size(), 3)
+	return _bullets_of(player).size()
 
 
-func test_連射の段階が上がると半拍ごとに撃つ():
-	var player := _make_player_on_stage()
-	player.stats.fire_level = 1
-	var grid := BeatGrid.new(120.0)
-	for time in [0.0, 0.25, 0.5, 0.75, 1.0]:
-		player.shoot_on_beat(time, grid)
-	assert_eq(_bullets_of(player).size(), 5)
+func test_初めは1小節ごとに弾を撃つ():
+	# BPM 120 なので1拍は 0.5 秒、1小節は 2 秒。0・2・4 秒で撃つ
+	assert_eq(_shots(0, [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]), 3)
+
+
+func test_連射の段階が上がると2拍ごとに撃つ():
+	assert_eq(_shots(1, [0.0, 0.5, 1.0, 1.5, 2.0]), 3)
+
+
+func test_連射の段階が上限なら1拍ごとに撃つ():
+	assert_eq(_shots(PlayerStats.MAX_FIRE_LEVEL, [0.0, 0.25, 0.5, 0.75, 1.0]), 3)
 
 
 func test_時間がたつだけでは弾を撃たない():
