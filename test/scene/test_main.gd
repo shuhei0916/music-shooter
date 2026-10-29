@@ -216,6 +216,23 @@ func test_床に小節の線を引きセクションの始まりは2本線にす
 	assert_eq(zs, [-100.0, -80.0, -60.0, -40.0, -20.0, -19.5, 0.0, 0.5])
 
 
+func test_床に拍ごとの線も引く():
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string('{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0}')
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 10.0
+	main.course_length = 100.0
+	main.layout = [{"z": 500.0, "enemies": [[1, 1]]}]
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	# 1拍は 0.5 秒で 5 進む。10 秒までの 21 拍のうち、小節の頭の 6 拍を除く
+	var zs: Array = main.get_node("BeatLines").get_children().map(func(n): return n.position.z)
+	assert_eq(zs.size(), 15)
+	assert_eq(zs.slice(0, 4), [-5.0, -10.0, -15.0, -25.0])
+
+
 func test_道はスタートの後ろからゴールの先まで続く():
 	var main := _make_main(10.0, 1000.0)
 	var road: MeshInstance3D = main.get_node("Road")

@@ -22,6 +22,9 @@ const ROAD_AHEAD := 60.0
 const BAR_LINE_WIDTH := 0.12
 const BAR_LINE_GAP := 0.5
 const BAR_LINE_COLOR := Color(1, 1, 1, 0.35)
+## 拍ごとの線は、小節の線より細く薄くする
+const BEAT_LINE_WIDTH := 0.06
+const BEAT_LINE_COLOR := Color(1, 1, 1, 0.15)
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
 	Judge.Result.GAME_OVER: "GAME OVER",
@@ -86,6 +89,7 @@ func _ready() -> void:
 	$GoalLine.position.z = -course_length
 	_fit_road()
 	_draw_bar_lines()
+	_draw_beat_lines()
 	if layout.is_empty():
 		layout = _build_layout()
 	for row in layout:
@@ -137,23 +141,36 @@ func _fit_road() -> void:
 
 ## 床に小節の線を引く。セクションの始まりは2本線にする
 func _draw_bar_lines() -> void:
-	var bar_lines := Node3D.new()
-	bar_lines.name = "BarLines"
-	add_child(bar_lines)
+	var bar_lines := _add_line_group("BarLines")
 	var bar_material := _line_material(BAR_LINE_COLOR)
 	for line in _map.bar_lines(forward_speed, course_length / forward_speed):
 		if not line.section_start:
-			_add_bar_line(bar_lines, line.distance, bar_material)
+			_add_line(bar_lines, line.distance, BAR_LINE_WIDTH, bar_material)
 			continue
 		var color := BeatHud.CALM_COLOR.lerp(BeatHud.HOT_COLOR, line.energy)
 		var material := _line_material(color)
-		_add_bar_line(bar_lines, line.distance, material)
-		_add_bar_line(bar_lines, line.distance - BAR_LINE_GAP, material)
+		_add_line(bar_lines, line.distance, BAR_LINE_WIDTH, material)
+		_add_line(bar_lines, line.distance - BAR_LINE_GAP, BAR_LINE_WIDTH, material)
 
 
-func _add_bar_line(parent: Node3D, distance: float, material: Material) -> void:
+## 床に拍ごとの線を引く（小節の頭は小節の線があるので除く）
+func _draw_beat_lines() -> void:
+	var beat_lines := _add_line_group("BeatLines")
+	var material := _line_material(BEAT_LINE_COLOR)
+	for distance in _map.beat_lines(forward_speed, course_length / forward_speed):
+		_add_line(beat_lines, distance, BEAT_LINE_WIDTH, material)
+
+
+func _add_line_group(group_name: String) -> Node3D:
+	var group := Node3D.new()
+	group.name = group_name
+	add_child(group)
+	return group
+
+
+func _add_line(parent: Node3D, distance: float, width: float, material: Material) -> void:
 	var mesh := BoxMesh.new()
-	mesh.size = Vector3(lane_count * lane_width, 0.02, BAR_LINE_WIDTH)
+	mesh.size = Vector3(lane_count * lane_width, 0.02, width)
 	mesh.material = material
 	var line := MeshInstance3D.new()
 	line.mesh = mesh
