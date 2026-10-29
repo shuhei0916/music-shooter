@@ -6,6 +6,8 @@ const BulletScene := preload("res://scenes/bullet.tscn")
 @export var start_hp := 10
 @export var side_speed := 8.0
 @export var road_half_width := 4.0
+## 撃ったときの演出（銃口の光とのけぞり）を出すか。ノリとまぎれるので、いったん切ってある
+@export var shot_effect_enabled := false
 ## 撃った瞬間の、銃口の光が道を照らす明るさ
 @export var muzzle_light_energy := 3.0
 
@@ -63,9 +65,11 @@ func _fire() -> void:
 
 
 func _show_shot_effect() -> void:
-	var brightness := ShotEffect.flash_brightness(_since_shot)
+	# 切ってあるときは、撃っていないのと同じに見せる
+	var since := _since_shot if shot_effect_enabled else INF
+	var brightness := ShotEffect.flash_brightness(since)
 	_flash.visible = brightness > 0.0
 	_flash.transparency = 1.0 - brightness
-	_flash.scale = Vector3.ONE * ShotEffect.flash_size(_since_shot)
+	_flash.scale = Vector3.ONE * ShotEffect.flash_size(since)
 	_muzzle_light.light_energy = muzzle_light_energy * brightness
-	_pivot.rotation.x = ShotEffect.recoil(_since_shot)
+	_pivot.rotation.x = ShotEffect.recoil(since)

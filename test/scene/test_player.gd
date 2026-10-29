@@ -106,8 +106,24 @@ func test_撃つ前は銃口は光らない():
 	assert_false(player.get_node("Muzzle/Flash").visible)
 
 
+func test_撃ったときの演出を切っていれば光らずのけぞらない():
+	var player := _make_player_on_stage()
+	player.shot_effect_enabled = false
+	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
+	simulate(player, 1, 0.01)
+	assert_false(player.get_node("Muzzle/Flash").visible)
+	assert_eq(player.get_node("Muzzle/Light").light_energy, 0.0)
+	assert_eq(player.get_node("Pivot").rotation.x, 0.0)
+
+
+func test_撃ったときの演出は初めは切ってある():
+	var player := _make_player_on_stage()
+	assert_false(player.shot_effect_enabled)
+
+
 func test_撃った瞬間に銃口が光る():
 	var player := _make_player_on_stage()
+	player.shot_effect_enabled = true
 	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
 	simulate(player, 1, 0.01)
 	var flash: MeshInstance3D = player.get_node("Muzzle/Flash")
@@ -119,6 +135,7 @@ func test_撃った瞬間に銃口が光る():
 
 func test_光る時間がたつと銃口の光は消える():
 	var player := _make_player_on_stage()
+	player.shot_effect_enabled = true
 	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
 	simulate(player, 2, 0.1)
 	assert_false(player.get_node("Muzzle/Flash").visible)
@@ -127,6 +144,7 @@ func test_光る時間がたつと銃口の光は消える():
 
 func test_撃つと体がのけぞりすぐに戻る():
 	var player := _make_player_on_stage()
+	player.shot_effect_enabled = true
 	var pivot: Node3D = player.get_node("Pivot")
 	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
 	simulate(player, 1, 0.01)
