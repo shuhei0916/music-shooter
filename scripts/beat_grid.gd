@@ -22,6 +22,13 @@ func crossed(prev_time: float, now: float, beats: float) -> bool:
 	return floori((now - offset) / step) > floori((prev_time - offset) / step)
 
 
+## time 以後で最初に来る、beats 拍ごとの線の時刻。time がちょうど線の上なら time のまま
+func next_time(time: float, beats: float) -> float:
+	var step := seconds_per_beat() * beats
+	# 計算の誤差で、線の上の時刻が次の線に送られないよう少しだけ余裕をもたせる
+	return offset + ceili((time - offset) / step - 1e-6) * step
+
+
 ## 曲を調べるツール（tools/analyze.py）が書き出した JSON から作る
 ## 読めなければ、BPM は fallback_bpm、最初の拍は 0 秒とする
 static func from_json(text: String, fallback_bpm: float) -> BeatGrid:
