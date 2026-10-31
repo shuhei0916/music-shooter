@@ -174,3 +174,25 @@ func test_拍の線を渡されたゲートの文字は2拍で消す():
 	var player := _make_player(1)
 	gate_area.area_entered.emit(player)
 	assert_almost_eq(_floating_texts_of(player)[0].duration, 1.0, 0.0001)
+
+
+func test_能力値を渡されたゲートは取る前と取ったあとのダメージを表示する():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	simulate(gate_area, 1, 0.0)
+	assert_eq(gate_area.get_node("Label").text, "ダメージUP\n1->2")
+
+
+func test_威力が上がるとゲートの表示も変わる():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	gate_area.stats.power = 4
+	simulate(gate_area, 1, 0.0)
+	assert_eq(gate_area.get_node("Label").text, "ダメージUP\n4->5")
+
+
+func test_取ったときに飛び出す文字は取る前と取ったあとのダメージになる():
+	var gate_area := _make_gate(Gate.Op.POWER, 2)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	assert_eq(_floating_texts_of(player)[0].text, "ダメージUP\n1->3")

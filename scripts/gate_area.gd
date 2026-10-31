@@ -15,6 +15,8 @@ const POPUP_BEATS := 2.0
 
 ## 取ったときの文字を出す長さを決める拍の線。無ければ文字の決めておいた長さで消す
 var grid: BeatGrid
+## ゲートの文字に、取る前と取ったあとの値を出すためのプレイヤーの能力値。無ければ上がる数だけ出す
+var stats: PlayerStats
 var _gate: Gate
 var _color: Color
 var _used := false
@@ -33,6 +35,13 @@ func _ready() -> void:
 		part.material_override = frame_material
 	_apply_width()
 	area_entered.connect(_on_area_entered)
+
+
+## 前の列のゲートで能力値が変わることがあるので、文字は毎フレーム今の能力値に合わせる
+func _process(_delta: float) -> void:
+	var text := _gate.label(stats)
+	if $Label.text != text:
+		$Label.text = text
 
 
 ## 当たり判定・パネル・枠を、幅に合わせる。リソースは他のゲートと共有しているので複製する
@@ -65,9 +74,9 @@ func close() -> void:
 
 
 func give_to(player: Player) -> void:
-	_gate.apply(player.stats)
 	var popup: FloatingText = FloatingTextScene.instantiate()
-	popup.text = _gate.label()
+	popup.text = _gate.label(player.stats)
+	_gate.apply(player.stats)
 	popup.modulate = Color(_color, 1.0)
 	popup.position.y = POPUP_HEIGHT
 	if grid != null:
