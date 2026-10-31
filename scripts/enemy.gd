@@ -76,8 +76,9 @@ func _on_area_entered(area: Area3D) -> void:
 		_die()
 
 
-## 倒れたら、すぐにほかのものとぶつからないようにし、倒れる演出は拍に合わせて始める
+## 倒れたら、すぐにHPの表示を消してほかのものとぶつからないようにし、倒れる演出は拍に合わせて始める
 func _die() -> void:
+	_hp_label.visible = false
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	_die_at = _beat_time(death_beats)
@@ -112,7 +113,6 @@ func _play_due_death() -> void:
 	if _dying_left >= 0.0 or _now() < _die_at:
 		return
 	_dying_left = death_duration
-	_hp_label.visible = false
 	_body.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_show_death_effect()
 
