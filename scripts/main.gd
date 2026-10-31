@@ -215,5 +215,7 @@ func _spawn_row(row: Dictionary) -> void:
 	for spec in row.get("enemies", []):
 		var enemy: Enemy = EnemyScene.instantiate()
 		enemy.start_hp = spec[1]
+		enemy.clock = _clock
+		enemy.grid = _map.grid
 		enemy.position = Vector3(_lanes.x_of(spec[0]), 0, z)
 		add_child(enemy)
