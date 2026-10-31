@@ -10,10 +10,18 @@ const DAMAGE_FONT_SIZE := 80
 @export var start_hp := 3
 @export var flash_duration := 0.12
 @export var hit_scale := 1.15
+## 当たったときの演出（光る・ふくらむ・ダメージの数字）を、何拍ごとの線に合わせて出すか
+@export var hit_beats := 0.25
 
 var health: Health
+## 演出を拍に合わせるための、曲の時計と拍の線。どちらかが無ければ演出はすぐに出す
+var clock: SongClock
+var grid: BeatGrid
 var _base_color: Color
 var _flash_left := 0.0
+## まだ演出を出していないダメージの合計と、それを出す時刻
+var _pending_damage := 0
+var _hit_at := INF
 
 @onready var _hp_label: Label3D = $HpLabel
 @onready var _body: MeshInstance3D = $Body
@@ -29,24 +37,48 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _flash_left <= 0.0:
-		return
-	_flash_left = maxf(_flash_left - delta, 0.0)
-	_show_hit_effect()
+	if _flash_left > 0.0:
+		_flash_left = maxf(_flash_left - delta, 0.0)
+		_show_hit_effect()
+	_play_due_hit()
 
 
 func _on_area_entered(area: Area3D) -> void:
 	if area is Bullet:
 		health.damage(area.damage)
 		area.queue_free()
-		_flash_left = flash_duration
-		_show_hit_effect()
-		_show_damage(area.damage)
+		if _pending_damage == 0:
+			_hit_at = _beat_time(hit_beats)
+		_pending_damage += area.damage
+		_play_due_hit()
 	elif area is Player:
 		area.health.clash(health)
 	_update_hp_label()
 	if health.is_dead():
 		queue_free()
+
+
+## 曲の今の時刻。時計が無ければ 0
+func _now() -> float:
+	return clock.time() if clock != null else 0.0
+
+
+## 今の時刻のあとで最初に来る、beats 拍ごとの線の時刻。拍に合わせないなら、すぐ（-INF）
+func _beat_time(beats: float) -> float:
+	if clock == null or grid == null:
+		return -INF
+	return grid.next_time(clock.time(), beats)
+
+
+## 出す時刻になっていれば、たまったダメージの演出を出す
+func _play_due_hit() -> void:
+	if _pending_damage == 0 or _now() < _hit_at:
+		return
+	_flash_left = flash_duration
+	_show_hit_effect()
+	_show_damage(_pending_damage)
+	_pending_damage = 0
+	_hit_at = INF
 
 
 func _show_hit_effect() -> void:

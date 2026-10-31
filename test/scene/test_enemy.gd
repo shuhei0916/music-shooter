@@ -113,3 +113,48 @@ func test_弾が当たると受けたダメージの数字が出る():
 	assert_eq(texts.size(), 1)
 	assert_eq(texts[0].text, "1.2k")
 	assert_gt(texts[0].global_position.y, enemy.global_position.y)
+
+
+## BPM 120（1拍 0.5 秒）の曲を time 秒まで進めた時計と拍の線を、敵に渡す
+func _sync_to_beat(enemy: Enemy, time: float) -> TimerClock:
+	var clock := TimerClock.new(100.0)
+	clock.advance(time)
+	enemy.clock = clock
+	enemy.grid = BeatGrid.new(120.0)
+	return clock
+
+
+func _hit(enemy: Enemy, damage: int) -> void:
+	var bullet: Bullet = add_child_autofree(BulletScene.instantiate())
+	bullet.damage = damage
+	enemy.area_entered.emit(bullet)
+
+
+func test_拍に合わせるときは当たってすぐにはHPだけが減り演出はまだ出ない():
+	var enemy := _make_enemy(5)
+	var original := _body_color(enemy)
+	_sync_to_beat(enemy, 0.3)
+	_hit(enemy, 2)
+	assert_eq(enemy.health.hp, 3)
+	assert_eq(_body_color(enemy), original)
+	assert_eq(_damage_texts(enemy).size(), 0)
+
+
+func test_拍に合わせるときは次の四分の一拍で光り数字が出る():
+	var enemy := _make_enemy(5)
+	var clock := _sync_to_beat(enemy, 0.3)
+	_hit(enemy, 2)
+	clock.advance(0.075)
+	simulate(enemy, 1, 0.0)
+	assert_eq(_body_color(enemy), Color.WHITE)
+	assert_eq(_damage_texts(enemy).map(func(t): return t.text), ["2"])
+
+
+func test_演出が出るまでに続けて当たったダメージは1つの数字にまとめる():
+	var enemy := _make_enemy(10)
+	var clock := _sync_to_beat(enemy, 0.3)
+	_hit(enemy, 2)
+	_hit(enemy, 3)
+	clock.advance(0.075)
+	simulate(enemy, 1, 0.0)
+	assert_eq(_damage_texts(enemy).map(func(t): return t.text), ["5"])
