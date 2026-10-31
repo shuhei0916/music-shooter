@@ -12,6 +12,10 @@ const DAMAGE_FONT_SIZE := 80
 @export var hit_scale := 1.15
 ## 当たったときの演出（光る・ふくらむ・ダメージの数字）を、何拍ごとの線に合わせて出すか
 @export var hit_beats := 0.25
+## 倒れる演出を、何拍ごとの線に合わせて始めるか。演出の秒数と、最後にどこまでふくらむか
+@export var death_beats := 0.5
+@export var death_duration := 0.25
+@export var death_scale := 1.6
 
 var health: Health
 ## 演出を拍に合わせるための、曲の時計と拍の線。どちらかが無ければ演出はすぐに出す
@@ -22,6 +26,9 @@ var _flash_left := 0.0
 ## まだ演出を出していないダメージの合計と、それを出す時刻
 var _pending_damage := 0
 var _hit_at := INF
+## 倒れる演出を始める時刻と、演出の残り秒数（演出の前は負）
+var _die_at := INF
+var _dying_left := -1.0
 
 @onready var _hp_label: Label3D = $HpLabel
 @onready var _body: MeshInstance3D = $Body
@@ -41,9 +48,18 @@ func _process(delta: float) -> void:
 		_flash_left = maxf(_flash_left - delta, 0.0)
 		_show_hit_effect()
 	_play_due_hit()
+	_play_due_death()
+	if _dying_left < 0.0:
+		return
+	_dying_left = maxf(_dying_left - delta, 0.0)
+	_show_death_effect()
+	if _dying_left == 0.0:
+		queue_free()
 
 
 func _on_area_entered(area: Area3D) -> void:
+	if health.is_dead():
+		return
 	if area is Bullet:
 		health.damage(area.damage)
 		area.queue_free()
@@ -55,7 +71,15 @@ func _on_area_entered(area: Area3D) -> void:
 		area.health.clash(health)
 	_update_hp_label()
 	if health.is_dead():
-		queue_free()
+		_die()
+
+
+## 倒れたら、すぐにほかのものとぶつからないようにし、倒れる演出は拍に合わせて始める
+func _die() -> void:
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
+	_die_at = _beat_time(death_beats)
+	_play_due_death()
 
 
 ## 曲の今の時刻。時計が無ければ 0
@@ -79,6 +103,23 @@ func _play_due_hit() -> void:
 	_show_damage(_pending_damage)
 	_pending_damage = 0
 	_hit_at = INF
+
+
+## 始める時刻になっていれば、倒れる演出を始める
+func _play_due_death() -> void:
+	if _dying_left >= 0.0 or _now() < _die_at:
+		return
+	_dying_left = death_duration
+	_hp_label.visible = false
+	_body.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_show_death_effect()
+
+
+## 倒れる演出。ふくらみながら薄くなって消える
+func _show_death_effect() -> void:
+	var t := 1.0 - _dying_left / death_duration
+	_body.scale = Vector3.ONE * lerpf(1.0, death_scale, t)
+	_body.material_override.albedo_color.a = 1.0 - t
 
 
 func _show_hit_effect() -> void:

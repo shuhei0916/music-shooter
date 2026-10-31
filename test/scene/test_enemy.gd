@@ -21,10 +21,39 @@ func test_弾が当たるとHPが1減り弾は消える():
 	assert_true(bullet.is_queued_for_deletion())
 
 
-func test_HPが0になった敵は消える():
+func test_HPが0になった敵は倒れる演出が終わると消える():
 	var enemy := _make_enemy(1)
 	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	assert_false(enemy.is_queued_for_deletion())
+	simulate(enemy, 2, enemy.death_duration / 2.0)
 	assert_true(enemy.is_queued_for_deletion())
+
+
+func test_倒れる演出のあいだはふくらみながら薄くなる():
+	var enemy := _make_enemy(1)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	simulate(enemy, 1, enemy.death_duration / 2.0)
+	assert_gt(enemy.get_node("Body").scale.x, 1.0)
+	assert_lt(_body_color(enemy).a, 1.0)
+	assert_gt(_body_color(enemy).a, 0.0)
+	assert_false(enemy.get_node("HpLabel").visible)
+
+
+func test_倒れた敵には弾が当たらない():
+	var enemy := _make_enemy(1)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	var bullet: Bullet = add_child_autofree(BulletScene.instantiate())
+	enemy.area_entered.emit(bullet)
+	assert_false(bullet.is_queued_for_deletion())
+
+
+func test_倒れた敵にはぶつからない():
+	var enemy := _make_enemy(1)
+	enemy.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.health.hp = 10
+	enemy.area_entered.emit(player)
+	assert_eq(player.health.hp, 10)
 
 
 func test_プレイヤーとぶつかるとHPを削り合う():
@@ -33,7 +62,7 @@ func test_プレイヤーとぶつかるとHPを削り合う():
 	player.health.hp = 10
 	enemy.area_entered.emit(player)
 	assert_eq(player.health.hp, 7)
-	assert_true(enemy.is_queued_for_deletion())
+	assert_true(enemy.health.is_dead())
 
 
 func test_頭の上に今のHPを表示する():
@@ -158,3 +187,16 @@ func test_演出が出るまでに続けて当たったダメージは1つの数
 	clock.advance(0.075)
 	simulate(enemy, 1, 0.0)
 	assert_eq(_damage_texts(enemy).map(func(t): return t.text), ["5"])
+
+
+func test_拍に合わせるときは倒れる演出を次の半拍まで待つ():
+	var enemy := _make_enemy(2)
+	var clock := _sync_to_beat(enemy, 0.3)
+	_hit(enemy, 2)
+	clock.advance(0.15)
+	simulate(enemy, 1, 0.0)
+	assert_eq(_body_color(enemy).a, 1.0)
+	assert_eq(_damage_texts(enemy).map(func(t): return t.text), ["2"])
+	clock.advance(0.06)
+	simulate(enemy, 1, enemy.death_duration / 2.0)
+	assert_lt(_body_color(enemy).a, 1.0)
