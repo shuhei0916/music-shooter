@@ -166,3 +166,11 @@ func test_飛び出す文字はゲートと同じ色になる():
 	var texts := _floating_texts_of(player)
 	assert_eq(Color(texts[0].modulate, 1.0), Color(good.good_color, 1.0))
 	assert_eq(Color(texts[1].modulate, 1.0), Color(bad.harmful_color, 1.0))
+
+
+func test_拍の線を渡されたゲートの文字は2拍で消す():
+	var gate_area := _make_gate(Gate.Op.ADD, 5)
+	gate_area.grid = BeatGrid.new(120.0)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	assert_almost_eq(_floating_texts_of(player)[0].duration, 1.0, 0.0001)
