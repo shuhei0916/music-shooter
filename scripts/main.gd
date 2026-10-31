@@ -211,6 +211,7 @@ func _spawn_row(row: Dictionary) -> void:
 			gate_area.amount = row.gates[i][1]
 			gate_area.width = slots.width
 			gate_area.grid = _map.grid
+			gate_area.stats = _player.stats
 			gate_area.position.x = slots.x_of(i)
 			pair.add_child(gate_area)
 	for spec in row.get("enemies", []):

@@ -103,6 +103,13 @@ func test_ゲートには取ったときの文字の長さを決める拍の線�
 		assert_almost_eq(gate_area.grid.bpm, main.bpm, 0.0001)
 
 
+func test_ゲートには文字に今の威力を出すためのプレイヤーの能力値を渡す():
+	var main := _make_main_with_layout([{"z": 10.0, "gates": [[Gate.Op.POWER, 1]]}])
+	var player: Player = main.get_node("Player")
+	for gate_area in _find_all(main, GateArea):
+		assert_same(gate_area.stats, player.stats)
+
+
 func _make_wav(seconds: float) -> AudioStreamWAV:
 	var wav := AudioStreamWAV.new()
 	wav.format = AudioStreamWAV.FORMAT_8_BITS
