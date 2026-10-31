@@ -53,6 +53,8 @@ const MESSAGES := {
 @export var lane_width := 3.0
 
 var song: AudioStream
+## 音を出さないモード。曲は流さず、曲の長さだけ経過時間で進む（自動で遊ばせるときに使う）
+var silent := false
 ## デバッグモード。床の小節・拍の線は、デバッグモードのときだけ見せる
 var debug := false:
 	set(value):
@@ -78,8 +80,11 @@ func _ready() -> void:
 	if song == null and ResourceLoader.exists(song_path):
 		song = load(song_path)
 	if song != null:
-		_music.stream = song
-		_clock = MusicClock.new(_music)
+		if silent:
+			_clock = TimerClock.new(song.get_length())
+		else:
+			_music.stream = song
+			_clock = MusicClock.new(_music)
 		course_length = _clock.duration() * forward_speed
 	else:
 		_clock = TimerClock.new(course_length / forward_speed)
