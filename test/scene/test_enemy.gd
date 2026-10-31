@@ -5,10 +5,12 @@ const PlayerScene := preload("res://scenes/player.tscn")
 const BulletScene := preload("res://scenes/bullet.tscn")
 
 
+## 敵が親に置くもの（ダメージの数字など）を調べやすいよう、テストごとに専用の親の下に置く
 func _make_enemy(hp: int) -> Enemy:
 	var enemy: Enemy = EnemyScene.instantiate()
 	enemy.start_hp = hp
-	return add_child_autofree(enemy)
+	add_child_autofree(Node3D.new()).add_child(enemy)
+	return enemy
 
 
 func test_弾が当たるとHPが1減り弾は消える():
@@ -96,3 +98,18 @@ func test_弾の威力の分だけHPが減る():
 func test_大きなHPは短く表示する():
 	var enemy := _make_enemy(1_234_567_890)
 	assert_eq(enemy.get_node("HpLabel").text, "1.2b")
+
+
+func _damage_texts(enemy: Enemy) -> Array:
+	return enemy.get_parent().get_children().filter(func(n): return n is FloatingText)
+
+
+func test_弾が当たると受けたダメージの数字が出る():
+	var enemy := _make_enemy(5000)
+	var bullet: Bullet = add_child_autofree(BulletScene.instantiate())
+	bullet.damage = 1200
+	enemy.area_entered.emit(bullet)
+	var texts := _damage_texts(enemy)
+	assert_eq(texts.size(), 1)
+	assert_eq(texts[0].text, "1.2k")
+	assert_gt(texts[0].global_position.y, enemy.global_position.y)
