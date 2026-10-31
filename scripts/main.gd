@@ -53,6 +53,11 @@ const MESSAGES := {
 @export var lane_width := 3.0
 
 var song: AudioStream
+## デバッグモード。床の小節・拍の線は、デバッグモードのときだけ見せる
+var debug := false:
+	set(value):
+		debug = value
+		_show_debug()
 var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
@@ -89,6 +94,7 @@ func _ready() -> void:
 	_fit_road()
 	_draw_bar_lines()
 	_draw_beat_lines()
+	_show_debug()
 	if layout.is_empty():
 		layout = _build_layout()
 	for row in layout:
@@ -112,8 +118,18 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
+	if event.is_action_pressed("toggle_debug"):
+		debug = not debug
+	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
 		get_tree().reload_current_scene()
+
+
+## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
+func _show_debug() -> void:
+	for group_name in ["BarLines", "BeatLines"]:
+		var group := get_node_or_null(group_name) as Node3D
+		if group != null:
+			group.visible = debug
 
 
 func _finish() -> void:
