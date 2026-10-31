@@ -129,6 +129,24 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().reload_current_scene()
 
 
+## レーンの中心の x（左から順）
+func lane_xs() -> Array:
+	return range(lane_count).map(func(i): return _lanes.x_of(i))
+
+
+## 曲の今の時刻と、曲の組み立て、今の勝ち負け（自動で遊ばせて記録するときに使う）
+func song_time() -> float:
+	return _clock.time()
+
+
+func song_map() -> SongMap:
+	return _map
+
+
+func result() -> Judge.Result:
+	return _result
+
+
 ## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
 func _show_debug() -> void:
 	for group_name in ["BarLines", "BeatLines"]:

@@ -91,6 +91,11 @@ func _on_area_entered(area: Area3D) -> void:
 	nearest.give_to(area)
 
 
+## このゲートの効果
+func gate() -> Gate:
+	return _gate
+
+
 func close() -> void:
 	_used = true
 
