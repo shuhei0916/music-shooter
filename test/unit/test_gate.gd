@@ -46,8 +46,19 @@ func test_威力のゲートを通ると弾の威力がその数だけ上がる(
 	assert_eq([stats.power, stats.health.hp], [3, 10])
 
 
-func test_威力のゲートの表示は威力と符号つきの数になる():
-	assert_eq(Gate.new(Gate.Op.POWER, 2).label(), "威力+2")
+func test_威力のゲートの表示は能力値が無ければダメージUPと上がる数になる():
+	assert_eq(Gate.new(Gate.Op.POWER, 2).label(), "ダメージUP\n+2")
+
+
+func test_威力のゲートの表示は取る前と取ったあとのダメージになる():
+	var stats := PlayerStats.new(10)
+	stats.power = 3
+	assert_eq(Gate.new(Gate.Op.POWER, 2).label(stats), "ダメージUP\n3->5")
+
+
+func test_威力以外のゲートの表示は能力値を渡しても変わらない():
+	var stats := PlayerStats.new(10)
+	assert_eq(Gate.new(Gate.Op.ADD, 5).label(stats), "+5")
 
 
 func test_連射のゲートを通ると連射の段階が上がる():

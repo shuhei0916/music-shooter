@@ -24,12 +24,15 @@ func apply(stats: PlayerStats) -> void:
 			stats.health.hp += amount
 
 
-func label() -> String:
+## ゲートに書く文字。プレイヤーの能力値を渡すと、威力のゲートは取る前と取ったあとのダメージを見せる
+func label(stats: PlayerStats = null) -> String:
 	match op:
 		Op.MULTIPLY:
 			return "×%d" % amount
 		Op.POWER:
-			return "威力%+d" % amount
+			if stats == null:
+				return "ダメージUP\n%+d" % amount
+			return "ダメージUP\n%d->%d" % [stats.power, stats.power + amount]
 		Op.FIRE_RATE:
 			return "連射UP"
 		_:
