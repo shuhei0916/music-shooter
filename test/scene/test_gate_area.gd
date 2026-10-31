@@ -196,3 +196,27 @@ func test_取ったときに飛び出す文字は取る前と取ったあとの�
 	var player := _make_player(1)
 	gate_area.area_entered.emit(player)
 	assert_eq(_floating_texts_of(player)[0].text, "ダメージUP\n1->3")
+
+
+func _label_size(gate_area: GateArea) -> Vector2:
+	var label: Label3D = gate_area.get_node("Label")
+	var font: Font = label.font if label.font != null else ThemeDB.fallback_font
+	var size := font.get_multiline_string_size(
+		label.text, HORIZONTAL_ALIGNMENT_CENTER, -1, label.font_size
+	)
+	return size * label.pixel_size
+
+
+func test_パネルに収まらない文字は小さくしてパネルに収める():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	simulate(gate_area, 1, 0.0)
+	var panel: BoxMesh = gate_area.get_node("Panel").mesh
+	var size := _label_size(gate_area)
+	assert_lt(size.x, panel.size.x)
+	assert_lt(size.y, panel.size.y)
+
+
+func test_パネルに収まる文字は元の大きさのまま():
+	var gate_area := _make_gate(Gate.Op.MULTIPLY, 2)
+	assert_eq(gate_area.get_node("Label").font_size, 160)

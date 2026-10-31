@@ -6,6 +6,8 @@ const FloatingTextScene := preload("res://scenes/floating_text.tscn")
 const POPUP_HEIGHT := 3.2
 ## 拍の線があるとき、取ったときの文字を何拍で消すか。何が起きたか読めるよう、ダメージの数字より長く残す
 const POPUP_BEATS := 2.0
+## ゲートの文字を、パネルの幅と高さのこの割合までに収める
+const LABEL_FILL := 0.9
 
 @export var op := Gate.Op.ADD
 @export var amount := 1
@@ -20,11 +22,15 @@ var stats: PlayerStats
 var _gate: Gate
 var _color: Color
 var _used := false
+## ゲートの文字の元の大きさ。長い文字はここから縮める
+var _label_font_size: int
+var _label_outline_size: int
 
 
 func _ready() -> void:
 	_gate = Gate.new(op, amount)
-	$Label.text = _gate.label()
+	_label_font_size = $Label.font_size
+	_label_outline_size = $Label.outline_size
 	_color = harmful_color if _gate.is_harmful() else good_color
 	var material: StandardMaterial3D = $Panel.mesh.material.duplicate()
 	material.albedo_color = _color
@@ -34,6 +40,7 @@ func _ready() -> void:
 	for part: MeshInstance3D in $Frame.get_children():
 		part.material_override = frame_material
 	_apply_width()
+	_set_label(_gate.label(stats))
 	area_entered.connect(_on_area_entered)
 
 
@@ -41,7 +48,22 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	var text := _gate.label(stats)
 	if $Label.text != text:
-		$Label.text = text
+		_set_label(text)
+
+
+## 文字を書き、パネルに収まらなければ収まるところまで小さくする
+func _set_label(text: String) -> void:
+	var label: Label3D = $Label
+	label.text = text
+	var font: Font = label.font if label.font != null else ThemeDB.fallback_font
+	var size := (
+		font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, _label_font_size)
+		* label.pixel_size
+	)
+	var room: Vector3 = $Panel.mesh.size * LABEL_FILL
+	var fit := minf(1.0, minf(room.x / size.x, room.y / size.y))
+	label.font_size = floori(_label_font_size * fit)
+	label.outline_size = floori(_label_outline_size * fit)
 
 
 ## 当たり判定・パネル・枠を、幅に合わせる。リソースは他のゲートと共有しているので複製する
