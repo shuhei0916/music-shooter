@@ -95,6 +95,14 @@ func test_敵には当たったときや倒れたときの演出を合わせる�
 	assert_almost_eq(enemy.grid.bpm, main.bpm, 0.0001)
 
 
+func test_ゲートには取ったときの文字の長さを決める拍の線を渡す():
+	var main := _make_main_with_layout(
+		[{"z": 10.0, "gates": [[Gate.Op.ADD, 5], [Gate.Op.ADD, -3]]}]
+	)
+	for gate_area in _find_all(main, GateArea):
+		assert_almost_eq(gate_area.grid.bpm, main.bpm, 0.0001)
+
+
 func _make_wav(seconds: float) -> AudioStreamWAV:
 	var wav := AudioStreamWAV.new()
 	wav.format = AudioStreamWAV.FORMAT_8_BITS
