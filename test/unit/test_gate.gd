@@ -76,3 +76,22 @@ func test_連射の段階は上限より上がらない():
 
 func test_連射のゲートの表示は連射UP():
 	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(), "連射UP")
+
+
+func test_連射のゲートの表示は1小節に撃つ数の取る前と取ったあとになる():
+	var stats := PlayerStats.new(10)
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射UP\n1->2")
+	stats.fire_level = 1
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射UP\n2->4")
+
+
+func test_連射のゲートで上限を超える分は数に入れない():
+	var stats := PlayerStats.new(10)
+	stats.fire_level = 1
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 3).label(stats), "連射UP\n2->4")
+
+
+func test_連射が上限のときの連射のゲートの表示は連射MAX():
+	var stats := PlayerStats.new(10)
+	stats.fire_level = PlayerStats.MAX_FIRE_LEVEL
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射MAX")

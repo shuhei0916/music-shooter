@@ -34,9 +34,22 @@ func label(stats: PlayerStats = null) -> String:
 				return "ダメージUP\n%+d" % amount
 			return "ダメージUP\n%d->%d" % [stats.power, stats.power + amount]
 		Op.FIRE_RATE:
-			return "連射UP"
+			return _fire_rate_label(stats)
 		_:
 			return "%+d" % amount
+
+
+## 連射のゲートの文字。1小節に撃つ数の取る前と取ったあと。上限なら取っても変わらないので MAX
+func _fire_rate_label(stats: PlayerStats) -> String:
+	if stats == null:
+		return "連射UP"
+	if stats.fire_level >= PlayerStats.MAX_FIRE_LEVEL:
+		return "連射MAX"
+	var after := mini(stats.fire_level + amount, PlayerStats.MAX_FIRE_LEVEL)
+	return (
+		"連射UP\n%d->%d"
+		% [PlayerStats.shots_per_bar(stats.fire_level), PlayerStats.shots_per_bar(after)]
+	)
 
 
 func is_harmful() -> bool:
