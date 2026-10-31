@@ -6,6 +6,8 @@ const FloatingTextScene := preload("res://scenes/floating_text.tscn")
 const DAMAGE_HEIGHT := 2.6
 const DAMAGE_COLOR := Color(1, 0.85, 0.3)
 const DAMAGE_FONT_SIZE := 80
+## 拍に合わせるとき、ダメージの数字を何拍で消すか。弾は多くても1拍に1発なので、次の数字と重ならない
+const DAMAGE_BEATS := 1.0
 
 @export var start_hp := 3
 @export var flash_duration := 0.12
@@ -134,6 +136,8 @@ func _show_damage(amount: int) -> void:
 	popup.text = NumberFormat.short(amount)
 	popup.modulate = DAMAGE_COLOR
 	popup.font_size = DAMAGE_FONT_SIZE
+	if grid != null:
+		popup.duration = grid.seconds_per_beat() * DAMAGE_BEATS
 	popup.position = position + Vector3(0, DAMAGE_HEIGHT, 0)
 	get_parent().add_child(popup)
 

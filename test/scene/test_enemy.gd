@@ -200,3 +200,10 @@ func test_拍に合わせるときは倒れる演出を次の半拍まで待つ(
 	clock.advance(0.06)
 	simulate(enemy, 1, enemy.death_duration / 2.0)
 	assert_lt(_body_color(enemy).a, 1.0)
+
+
+func test_拍に合わせるときはダメージの数字を1拍で消す():
+	var enemy := _make_enemy(5)
+	_sync_to_beat(enemy, 0.0)
+	_hit(enemy, 1)
+	assert_almost_eq(_damage_texts(enemy)[0].duration, 0.5, 0.0001)
