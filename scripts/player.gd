@@ -8,6 +8,9 @@ const BulletScene := preload("res://scenes/bullet.tscn")
 @export var road_half_width := 4.0
 
 var stats: PlayerStats
+## 自動操縦。キーの操作の代わりに、auto_axis の向き（-1 で左、1 で右）に動く
+var autopilot := false
+var auto_axis := 0.0
 var health: Health:
 	get:
 		return stats.health
@@ -27,7 +30,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	var axis := Input.get_axis("move_left", "move_right")
+	var axis := auto_axis if autopilot else Input.get_axis("move_left", "move_right")
 	position.x = _steering.next_x(position.x, axis, delta)
 	_hp_label.text = NumberFormat.short(health.hp)
 
