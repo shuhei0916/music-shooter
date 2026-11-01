@@ -2,6 +2,8 @@ extends GutTest
 ## Main のうち、曲の拍・小節・セクションに合わせて動くところ
 
 const MainScene := preload("res://scenes/main.tscn")
+## 自動で並べたとき、ゲートのあいだに敵の列が出るシード
+const SEED_WITH_ENEMIES := 2
 
 
 func _make_main(speed: float, length: float) -> Main:
@@ -104,7 +106,7 @@ func test_床に拍ごとの線も引く():
 	assert_eq(zs.slice(0, 4), [-5.0, -10.0, -15.0, -25.0])
 
 
-func test_自動で並べるときはゲートと敵の列を小節の線の上に置く():
+func test_自動で並べるときはゲートの列を小節の線に敵の列をゲートのあいだの拍の線に置く():
 	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
 	beats.store_string('{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0}')
 	beats.close()
@@ -112,7 +114,7 @@ func test_自動で並べるときはゲートと敵の列を小節の線の上�
 	main.song_path = "user://test_song.mp3"
 	main.forward_speed = 7.0
 	main.course_length = 100.0
-	main.layout_seed = 1
+	main.layout_seed = SEED_WITH_ENEMIES
 	add_child_autofree(main)
 	DirAccess.remove_absolute("user://test_song.beats.json")
 	# 1小節は 2 秒で 14 進む。スタートから 20 より先、ゴールの 15 手前（85）までの線
@@ -122,8 +124,13 @@ func test_自動で並べるときはゲートと敵の列を小節の線の上�
 	var enemy_zs := {}
 	for enemy in _find_all(main, Enemy):
 		enemy_zs[enemy.global_position.z] = true
+	# 1拍は 3.5 進む
 	assert_eq(gate_zs.keys(), [-28.0, -56.0, -84.0])
-	assert_eq(enemy_zs.keys(), [-42.0, -70.0])
+	assert_gt(enemy_zs.size(), 0)
+	for z: float in enemy_zs:
+		assert_almost_eq(fposmod(z, 3.5), 0.0, 0.001)
+		assert_between(z, -84.0, -28.0)
+		assert_false(z in gate_zs)
 
 
 func test_プレイヤーは曲の拍に合わせて体を弾ませる():

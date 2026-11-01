@@ -230,9 +230,10 @@ func _build_layout() -> Array:
 	var seed_value := layout_seed if layout_seed >= 0 else randi()
 	var deck := GateDeck.new(GATE_CARDS, seed_value)
 	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
-	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value)
 	var lines := _map.bar_lines(forward_speed, course_length / forward_speed)
-	return builder.build(lines.map(func(line): return line.distance), course_length)
+	var distances := lines.map(func(line): return line.distance)
+	return builder.build(distances, course_length, _map.beats_per_bar)
 
 
 func _spawn_row(row: Dictionary) -> void:
