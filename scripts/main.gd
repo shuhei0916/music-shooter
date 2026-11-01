@@ -25,6 +25,8 @@ const BAR_LINE_COLOR := Color(1, 1, 1, 0.35)
 ## 拍ごとの線は、小節の線より細く薄くする
 const BEAT_LINE_WIDTH := 0.06
 const BEAT_LINE_COLOR := Color(1, 1, 1, 0.15)
+## セクションが分からない曲で、敵を並べるときに使う盛り上がり（中くらい）
+const UNKNOWN_ENERGY := 0.5
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
 	Judge.Result.GAME_OVER: "GAME OVER",
@@ -232,8 +234,10 @@ func _build_layout() -> Array:
 	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
 	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value)
 	var lines := _map.bar_lines(forward_speed, course_length / forward_speed)
-	var distances := lines.map(func(line): return line.distance)
-	return builder.build(distances, course_length, _map.beats_per_bar)
+	if _map.sections.is_empty():
+		for line in lines:
+			line.energy = UNKNOWN_ENERGY
+	return builder.build(lines, course_length, _map.beats_per_bar)
 
 
 func _spawn_row(row: Dictionary) -> void:

@@ -5,6 +5,9 @@ extends RefCounted
 
 ## ゲートのあいだに置く敵の列の数の上限
 const MAX_ENEMY_ROWS := 2
+## 敵の列を1列ずつ置くかどうかの確率。盛り上がり（energy）が 0 のときと 1 のとき。そのあいだは線形
+const ENEMY_ROW_CHANCE_CALM := 0.2
+const ENEMY_ROW_CHANCE_HOT := 0.9
 ## 敵の列は、ゲートの列からも、ほかの敵の列からも、この拍数以上あける（避けたり選んだりする余裕）
 const ENEMY_GAP_BEATS := 2
 
@@ -25,30 +28,37 @@ func _init(
 	_rng.seed = seed_value
 
 
-## lines: 小節の頭の線のコース上の距離（小さい順）。length: コースの長さ
-## スタートから start より先、ゴールの end_margin 手前までに置く
+## lines: 小節の頭の線 {distance: コース上の距離, energy: その小節の盛り上がり}（近い順）
+## length: コースの長さ。スタートから start より先、ゴールの end_margin 手前までに置く
 func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
-	var usable := lines.filter(func(z): return z >= _start and z <= length - _end_margin)
-	var gate_zs := []
+	var usable := lines.filter(
+		func(line): return line.distance >= _start and line.distance <= length - _end_margin
+	)
+	var gate_lines := []
 	for i in range(0, usable.size(), 2):
-		gate_zs.append(usable[i])
+		gate_lines.append(usable[i])
 	var rows := []
-	for i in gate_zs.size():
-		rows.append({"z": gate_zs[i], "gates": _deck.draw()})
-		if i + 1 < gate_zs.size():
+	for i in gate_lines.size():
+		var gate_z: float = gate_lines[i].distance
+		rows.append({"z": gate_z, "gates": _deck.draw()})
+		if i + 1 < gate_lines.size():
 			var beats := beats_per_bar * 2
-			var beat_length: float = (gate_zs[i + 1] - gate_zs[i]) / beats
-			for beat in _enemy_beats(beats):
-				var z: float = gate_zs[i] + beat * beat_length
+			var beat_length: float = (gate_lines[i + 1].distance - gate_z) / beats
+			for beat in _enemy_beats(beats, gate_lines[i].energy):
+				var z: float = gate_z + beat * beat_length
 				rows.append({"z": z, "enemies": _wave.make(z)})
 	return rows
 
 
 ## ゲートのあいだ（beats 拍）のうち、敵の列を置く拍（ゲートからの拍数、小さい順）
-func _enemy_beats(beats: int) -> Array:
+## 盛り上がり energy が大きいほど、たくさん置く
+func _enemy_beats(beats: int, energy: float) -> Array:
 	var candidates := range(ENEMY_GAP_BEATS, beats - ENEMY_GAP_BEATS + 1)
+	var chance := lerpf(ENEMY_ROW_CHANCE_CALM, ENEMY_ROW_CHANCE_HOT, clampf(energy, 0.0, 1.0))
 	var chosen := []
-	for i in _rng.randi_range(0, MAX_ENEMY_ROWS):
+	for i in MAX_ENEMY_ROWS:
+		if _rng.randf() >= chance:
+			continue
 		var free := candidates.filter(
 			func(c): return chosen.all(func(b): return absi(c - b) >= ENEMY_GAP_BEATS)
 		)

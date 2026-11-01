@@ -154,3 +154,19 @@ func test_初めは小節の頭で弾を撃つ():
 	assert_eq(_find_all(main, Bullet).size(), 0)
 	simulate(main, 2, 0.25)
 	assert_eq(_find_all(main, Bullet).size(), 1)
+
+
+func test_セクションが分からない曲では盛り上がりを中くらいとして敵の列を並べる():
+	var counts := []
+	for seed_value in 10:
+		var main: Main = MainScene.instantiate()
+		main.song_path = ""
+		main.course_length = 600.0
+		main.layout_seed = seed_value
+		add_child_autofree(main)
+		counts.append(main.layout.filter(func(row): return row.has("enemies")).size())
+		var gates: int = main.layout.filter(func(row): return row.has("gates")).size()
+		counts[-1] = float(counts[-1]) / (gates - 1)
+	var mean: float = counts.reduce(func(a, b): return a + b) / counts.size()
+	# 盛り上がり 0.5 なら1列ごとの確率は 0.55 で、ゲートのあいだに平均 1.1 列
+	assert_gt(mean, 0.8)
