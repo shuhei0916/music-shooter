@@ -1,38 +1,52 @@
 class_name GrowthCurve
 extends RefCounted
 ## ゲームの数字の規模（敵の HP やゲートの数の基準）が、コースの上でどう増えるか
-## 小節ごとに、その小節の盛り上がり（energy）に応じた分だけ増える。盛り上がりの大きい小節ほど大きく増える
-## 増え方の形は曲で決まり、大きさは「錨の小節の線でちょうど錨の値になる」ようにそろえる
+## 錨（ボスの小節の線など）で区切ったゾーンごとに、錨の小節の線でちょうど錨の値になるように増える
+## ゾーンの中では、初めはなだらかに、終わりに向けて加速して増える。錨を越えると加速はリセットされる
+## ゾーンの中の進み具合は、小節ごとの盛り上がり（energy）で測る。盛り上がりの大きい小節ほど大きく進む
 
-## 1小節で増える量（対数で）の重み。盛り上がりが 0 のときと 1 のとき。そのあいだは線形
+## 1小節で進む量の重み。盛り上がりが 0 のときと 1 のとき。そのあいだは線形
 const CALM_WEIGHT := 0.25
 const HOT_WEIGHT := 1.0
+## ゾーンの中の加速の強さ。進み具合（0〜1）をこの数で累乗して、規模（の対数）の進み具合にする
+## 1 なら一定の比率で増え、大きいほど初めはなだらかで終わりに急になる
+const ZONE_POWER := 2.0
 
 var _distances: Array[float] = []
 ## 各小節の線までに積み上がった重み
 var _levels: Array[float] = []
 var _start: float
-## 重み 1 あたりに、規模が何倍になるか（の自然対数）
-var _rate := 0.0
+## ゾーンの区切り。[積み上がった重み, 規模の自然対数] の並びで、最初はスタート
+var _anchors: Array = []
 
 
 ## lines: 小節の頭の線 {distance, energy}（近い順）。start: 最初の線での値
-## anchor_index の線で anchor_value になるように、増える比率を決める
-func _init(lines: Array, start: float, anchor_index: int, anchor_value: float) -> void:
+## anchors: [[小節の線の番号, その線での値], ...]（近い順）。最初の線より先の錨だけを使う
+func _init(lines: Array, start: float, anchors: Array) -> void:
 	_start = start
 	var level := 0.0
 	for line in lines:
 		_distances.append(float(line.distance))
 		_levels.append(level)
 		level += lerpf(CALM_WEIGHT, HOT_WEIGHT, clampf(float(line.energy), 0.0, 1.0))
-	if anchor_index > 0 and anchor_index < _levels.size():
-		_rate = log(anchor_value / start) / _levels[anchor_index]
+	_anchors.append([0.0, log(start)])
+	for anchor in anchors:
+		var index: int = anchor[0]
+		if index > 0 and index < _levels.size() and _levels[index] > _anchors.back()[0]:
+			_anchors.append([_levels[index], log(float(anchor[1]))])
 
 
-## distance の位置の規模。小節の線のあいだは、同じ比率で増えるようにつなぐ
-## 最初の線より手前は最初の線の値、最後の線より先は最後の線の値
+## distance の位置の規模。小節の線のあいだもなめらかにつなぐ
+## 最初の線より手前はスタートの値、最後の錨より先は最後の錨の値
 func value_at(distance: float) -> float:
-	return _start * exp(_rate * _level_at(distance))
+	var level := _level_at(distance)
+	for i in range(1, _anchors.size()):
+		var from: Array = _anchors[i - 1]
+		var to: Array = _anchors[i]
+		if level <= to[0]:
+			var progress := inverse_lerp(from[0], to[0], level)
+			return exp(lerpf(from[1], to[1], pow(progress, ZONE_POWER)))
+	return exp(_anchors.back()[1])
 
 
 func _level_at(distance: float) -> float:

@@ -11,7 +11,7 @@ func _curve(goal_hp: float) -> GrowthCurve:
 	var lines := []
 	for distance in [0.0, 50.0, 100.0]:
 		lines.append({"distance": distance, "energy": 0.5})
-	return GrowthCurve.new(lines, 5.0, 2, goal_hp)
+	return GrowthCurve.new(lines, 5.0, [[2, goal_hp]])
 
 
 func test_ふつうの敵の列は1レーンの敵で1から2のレーンを重ならずに埋め必ず1レーンは空ける():
@@ -40,13 +40,14 @@ func _hps_at(distance: float) -> Array:
 
 
 func test_敵のHPはその位置の規模の曲線の値を丸めたものになる():
+	var curve := _curve(500.0)
 	for distance in [0.0, 50.0, 100.0]:
-		var expected: int = [5, 50, 500][int(distance / 50.0)]
+		var expected := roundi(curve.value_at(distance))
 		for hp in _hps_at(distance):
 			assert_eq(hp, expected)
 
 
 func test_ボスは全部のレーンを埋める1体でHPはその位置のふつうの敵の何倍もある():
 	var wave := EnemyWave.new(3, _curve(500.0), 1)
-	assert_eq(wave.boss(50.0), [[0, 50 * EnemyWave.BOSS_HP_RATE, 3]])
+	assert_eq(wave.boss(50.0), [[0, wave.hp_at(50.0) * EnemyWave.BOSS_HP_RATE, 3]])
 	assert_gt(EnemyWave.BOSS_HP_RATE, 1)

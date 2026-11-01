@@ -50,9 +50,11 @@ const MESSAGES := {
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
 ## 最後のボス（ボスが無い曲では最後の小節の線の敵）の HP。自動で並べるときの、数字の規模の基準
-## 敵の HP は、小節ごとの盛り上がりに合わせてここまで増える（GrowthCurve）
+## 敵の HP は、ボスで区切ったゾーンごとに、初めはなだらかに終わりに向けて加速して増える（GrowthCurve）
 ## 5億なら、プレイヤーの HP が10億あればぶつかっても半分残る
 @export var final_boss_hp := 500_000_000
+## ボスを1つさかのぼるごとに、HP を何分の1にするか。1000 なら、ボスを越えるたびに数字の単位が変わる（k→m→b）
+@export var boss_hp_step := 1000
 @export var lane_count := 3
 @export var lane_width := 3.0
 
@@ -241,19 +243,30 @@ func _build_layout() -> Array:
 		for line in lines:
 			line.energy = UNKNOWN_ENERGY
 	# 小節の線は 0 小節目から順に並ぶので、番号がそのまま小節になる
-	var anchor := lines.size() - 1
+	var boss_bars := []
 	for bar in _map.boss_bars():
 		if bar >= 0 and bar < lines.size():
 			lines[bar].boss = true
-			anchor = bar
-	var anchor_hp := float(final_boss_hp)
-	if anchor >= 0 and lines[anchor].get("boss", false):
-		anchor_hp /= EnemyWave.BOSS_HP_RATE
-	_growth = GrowthCurve.new(lines, enemy_start_hp, anchor, anchor_hp)
+			boss_bars.append(bar)
+	_growth = GrowthCurve.new(lines, enemy_start_hp, _growth_anchors(boss_bars, lines.size()))
 	_setup_growth_graph(lines)
 	var wave := EnemyWave.new(lane_count, _growth, seed_value)
 	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value, _growth)
 	return builder.build(lines, course_length, _map.beats_per_bar)
+
+
+## 規模の曲線の錨。ボスの小節の線で、ボスの HP が最後は final_boss_hp、さかのぼるごとに boss_hp_step 分の1
+## になるように、ふつうの敵の規模（ボスの HP ÷ BOSS_HP_RATE）を決める
+## ボスが無ければ、最後の小節の線で final_boss_hp
+func _growth_anchors(boss_bars: Array, line_count: int) -> Array:
+	if boss_bars.is_empty():
+		return [[line_count - 1, float(final_boss_hp)]]
+	var anchors := []
+	var hp := float(final_boss_hp)
+	for i in range(boss_bars.size() - 1, -1, -1):
+		anchors.push_front([boss_bars[i], hp / EnemyWave.BOSS_HP_RATE])
+		hp /= boss_hp_step
+	return anchors
 
 
 ## デバッグモードの成長曲線のグラフに、小節ごとの規模（ふつうの敵の HP）とボスの HP を渡す

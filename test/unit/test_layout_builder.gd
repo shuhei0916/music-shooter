@@ -14,7 +14,7 @@ static func _lines(energy: float) -> Array:
 
 func _make_builder(seed_value := 1) -> LayoutBuilder:
 	var deck := GateDeck.new([CARD], seed_value)
-	var wave := EnemyWave.new(3, GrowthCurve.new([], 5.0, 0, 5.0), seed_value)
+	var wave := EnemyWave.new(3, GrowthCurve.new([], 5.0, []), seed_value)
 	return LayoutBuilder.new(deck, wave, 20.0, 15.0, seed_value)
 
 
@@ -121,8 +121,8 @@ func test_ゲートを置く線にボスの印があればゲートの代わり�
 
 
 func test_規模の曲線を渡すとHPと威力の足し算のゲートの数を規模に合わせて大きくし掛け算と連射はそのまま():
-	# 規模は 5 から 1 小節（16）ごとに10倍。最初のゲート（32）では100倍
-	var growth := GrowthCurve.new(_lines(0.5), 5.0, 1, 50.0)
+	# 規模は 5 から、最初のゲートの線（32）で 500（100倍）
+	var growth := GrowthCurve.new(_lines(0.5), 5.0, [[2, 500.0]])
 	var card := [
 		[Gate.Op.ADD, -5], [Gate.Op.POWER, 1], [Gate.Op.MULTIPLY, 2], [Gate.Op.FIRE_RATE, 1]
 	]
