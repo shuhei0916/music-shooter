@@ -3,6 +3,7 @@ extends GutTest
 const EnemyScene := preload("res://scenes/enemy.tscn")
 const PlayerScene := preload("res://scenes/player.tscn")
 const BulletScene := preload("res://scenes/bullet.tscn")
+const MainScene := preload("res://scenes/main.tscn")
 
 
 ## 敵が親に置くもの（ダメージの数字など）を調べやすいよう、テストごとに専用の親の下に置く
@@ -111,7 +112,7 @@ func _shape_width(scene: PackedScene) -> float:
 
 
 func test_隣り合うレーンの敵のあいだはプレイヤーが通れないほど狭い():
-	var main: Main = autofree(preload("res://scenes/main.tscn").instantiate())
+	var main: Main = autofree(MainScene.instantiate())
 	var gap := main.lane_width - _shape_width(EnemyScene)
 	assert_lt(gap, _shape_width(PlayerScene))
 
@@ -144,18 +145,26 @@ func test_弾が当たると受けたダメージの数字が出る():
 	assert_gt(texts[0].global_position.y, enemy.global_position.y)
 
 
-func _make_big_enemy(hp: int) -> Enemy:
+func _make_big_enemy(hp: int, lanes := 3) -> Enemy:
 	var enemy: Enemy = EnemyScene.instantiate()
 	enemy.start_hp = hp
-	enemy.lanes_wide = 2
+	enemy.lanes_wide = lanes
 	add_child_autofree(Node3D.new()).add_child(enemy)
 	return enemy
 
 
-func test_2レーンを占める敵は大きく出る():
-	var enemy := _make_big_enemy(5)
-	assert_almost_eq(enemy.scale, Vector3.ONE * Enemy.BIG_SCALE, Vector3.ONE * 0.001)
-	assert_gt(Enemy.BIG_SCALE * 1.1, 2.5)
+func test_何レーンも占める敵は占めるレーンの数に合わせて大きく出る():
+	var boss := _make_big_enemy(5, 3)
+	assert_almost_eq(boss.scale, Vector3.ONE * Enemy.SCALE_PER_LANE * 3, Vector3.ONE * 0.001)
+	assert_eq(_make_enemy(5).scale, Vector3.ONE)
+
+
+func test_3レーンを占めるボスは端のレーンにいるプレイヤーともぶつかる():
+	var main: Main = autofree(MainScene.instantiate())
+	var reach: float = (
+		(_shape_width(EnemyScene) * Enemy.SCALE_PER_LANE * 3 + _shape_width(PlayerScene)) / 2
+	)
+	assert_gt(reach, main.lane_width)
 
 
 func test_大きな敵のダメージの数字は大きさに合わせて高い位置に出る():
@@ -166,4 +175,4 @@ func test_大きな敵のダメージの数字は大きさに合わせて高い�
 		enemy.area_entered.emit(bullet)
 	var small_y: float = _damage_texts(small)[0].position.y
 	var big_y: float = _damage_texts(big)[0].position.y
-	assert_almost_eq(big_y, small_y * Enemy.BIG_SCALE, 0.001)
+	assert_almost_eq(big_y, small_y * big.scale.y, 0.001)

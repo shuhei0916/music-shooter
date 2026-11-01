@@ -8,11 +8,12 @@ const DAMAGE_COLOR := Color(1, 0.85, 0.3)
 const DAMAGE_FONT_SIZE := 80
 ## 拍に合わせるとき、ダメージの数字を何拍で消すか。弾は多くても1拍に1発なので、次の数字と重ならない
 const DAMAGE_BEATS := 1.0
-## 2レーンを占める大きな敵の大きさ（ふつうの敵が 1）。2つのレーンの中心を覆う
-const BIG_SCALE := 2.4
+## 何レーンも占める大きな敵（ボス）の、占めるレーン1つあたりの大きさ（ふつうの敵が 1）
+## 3レーンなら 3.6 倍で、端のレーンにいるプレイヤーともぶつかる
+const SCALE_PER_LANE := 1.2
 
 @export var start_hp := 3
-## 占めるレーンの数。2 なら大きな敵として大きく出る
+## 占めるレーンの数。2 以上なら大きな敵（ボス）として大きく出る
 @export var lanes_wide := 1
 @export var flash_duration := 0.12
 @export var hit_scale := 1.15
@@ -43,7 +44,7 @@ var _dying_left := -1.0
 func _ready() -> void:
 	health = Health.new(start_hp)
 	if lanes_wide > 1:
-		scale = Vector3.ONE * BIG_SCALE
+		scale = Vector3.ONE * SCALE_PER_LANE * lanes_wide
 	_update_hp_label()
 	var material: StandardMaterial3D = _body.mesh.material.duplicate()
 	_base_color = material.albedo_color
