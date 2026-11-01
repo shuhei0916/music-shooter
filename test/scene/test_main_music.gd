@@ -193,3 +193,31 @@ func test_自動で並べるときはサビの前の小節にボスを置く():
 	DirAccess.remove_absolute("user://test_song.beats.json")
 	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
 	assert_eq(bosses.map(func(e): return e.global_position), [Vector3(0, 0, -42)])
+
+
+func test_自動で並べるときは最後のボスのHPがちょうど最後のボスのHPの設定値になる():
+	# 1小節は 14 進む。サビは 4〜7 小節目の1回だけなので、ボスは 3 小節目（42）と 7 小節目（98）
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+			+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+			+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+			+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 7.0
+	main.course_length = 200.0
+	main.layout_seed = 1
+	main.final_boss_hp = 1_000_000
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
+	var hp_by_z := {}
+	for boss in bosses:
+		hp_by_z[boss.global_position.z] = boss.start_hp
+	assert_eq(hp_by_z.get(-98.0), 1_000_000)
+	assert_lt(hp_by_z.get(-42.0, 0), 1_000_000)

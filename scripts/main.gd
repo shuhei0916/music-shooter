@@ -49,9 +49,10 @@ const MESSAGES := {
 @export var row_start := 20.0
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
-## ゴールでの敵のHP。敵のHPはスタートからここまで一定の比率で増える
-## 約700万にすると、コースの後半（後ろ半分）の敵のHPの平均が約100万になる
-@export var enemy_goal_hp := 7_000_000
+## 最後のボス（ボスが無い曲では最後の小節の線の敵）の HP。自動で並べるときの、数字の規模の基準
+## 敵の HP は、小節ごとの盛り上がりに合わせてここまで増える（GrowthCurve）
+## 5億なら、プレイヤーの HP が10億あればぶつかっても半分残る
+@export var final_boss_hp := 500_000_000
 @export var lane_count := 3
 @export var lane_width := 3.0
 
@@ -68,6 +69,7 @@ var _clock: SongClock
 var _lanes: Lanes
 var _shot_grid: BeatGrid
 var _map: SongMap
+var _growth: GrowthCurve
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -232,16 +234,22 @@ func _line_material(color: Color) -> StandardMaterial3D:
 func _build_layout() -> Array:
 	var seed_value := layout_seed if layout_seed >= 0 else randi()
 	var deck := GateDeck.new(GATE_CARDS, seed_value)
-	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
-	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value)
 	var lines := _map.bar_lines(forward_speed, course_length / forward_speed)
 	if _map.sections.is_empty():
 		for line in lines:
 			line.energy = UNKNOWN_ENERGY
 	# 小節の線は 0 小節目から順に並ぶので、番号がそのまま小節になる
+	var anchor := lines.size() - 1
 	for bar in _map.boss_bars():
 		if bar >= 0 and bar < lines.size():
 			lines[bar].boss = true
+			anchor = bar
+	var anchor_hp := float(final_boss_hp)
+	if anchor >= 0 and lines[anchor].get("boss", false):
+		anchor_hp /= EnemyWave.BOSS_HP_RATE
+	_growth = GrowthCurve.new(lines, enemy_start_hp, anchor, anchor_hp)
+	var wave := EnemyWave.new(lane_count, _growth, seed_value)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value)
 	return builder.build(lines, course_length, _map.beats_per_bar)
 
 

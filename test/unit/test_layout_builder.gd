@@ -14,7 +14,7 @@ static func _lines(energy: float) -> Array:
 
 func _make_builder(seed_value := 1) -> LayoutBuilder:
 	var deck := GateDeck.new([CARD], seed_value)
-	var wave := EnemyWave.new(3, 5, 5, LENGTH, seed_value)
+	var wave := EnemyWave.new(3, GrowthCurve.new([], 5.0, 0, 5.0), seed_value)
 	return LayoutBuilder.new(deck, wave, 20.0, 15.0, seed_value)
 
 
