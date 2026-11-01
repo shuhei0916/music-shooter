@@ -113,3 +113,30 @@ func beat_lines(speed: float, duration: float) -> Array:
 		beat += 1
 		time = downbeat + beat * beat_length
 	return lines
+
+
+## ボス（3レーンを埋める避けられない敵）を置く小節。ランをこの小節で区切ってゾーンに分ける
+## 1回目と2回目のサビ（DROP）の前の小節に中ボスを、2回目のサビの最後の小節にボスを置く
+## サビが1回だけなら、その前と最後。続けて並んだ DROP はひとつのサビとみなす
+func boss_bars() -> Array:
+	var choruses := _choruses()
+	var bars := []
+	for chorus in choruses.slice(0, 2):
+		bars.append(chorus[0] - 1)
+	if not choruses.is_empty():
+		bars.append(choruses[mini(choruses.size(), 2) - 1][1] - 1)
+	return bars
+
+
+## サビ（続けて並んだ DROP）の [始まる小節, 終わりの次の小節] の並び
+func _choruses() -> Array:
+	var result := []
+	for i in sections.size():
+		if sections[i].label != "DROP":
+			continue
+		var end: int = sections[i + 1].bar if i + 1 < sections.size() else bar_count
+		if i > 0 and sections[i - 1].label == "DROP":
+			result.back()[1] = end
+		else:
+			result.append([sections[i].bar, end])
+	return result
