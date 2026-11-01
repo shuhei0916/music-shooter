@@ -43,3 +43,18 @@ func _level_at(distance: float) -> float:
 			var t := inverse_lerp(_distances[i - 1], _distances[i], distance)
 			return lerpf(_levels[i - 1], _levels[i], t)
 	return _levels.back()
+
+
+## ゲートなどの数 amount を、distance の位置の規模に合わせて大きくする
+## スタートで amount のまま、規模が10倍になったところで10倍。キリのいい数に丸める
+func scaled(amount: int, distance: float) -> int:
+	return round_nice(amount * value_at(distance) / _start)
+
+
+## 上から2桁に丸める（12,345 → 12,000）。100 未満はそのまま整数に丸める
+static func round_nice(value: float) -> int:
+	var size := absf(value)
+	if size < 100.0:
+		return roundi(value)
+	var step := pow(10.0, floorf(log(size) / log(10.0)) - 1.0)
+	return roundi(roundf(value / step) * step)

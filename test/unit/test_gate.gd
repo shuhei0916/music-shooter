@@ -95,3 +95,12 @@ func test_連射が上限のときの連射のゲートの表示は連射MAX():
 	var stats := PlayerStats.new(10)
 	stats.fire_level = PlayerStats.MAX_FIRE_LEVEL
 	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射MAX")
+
+
+func test_大きな数のゲートは数を短く表す():
+	assert_eq(Gate.new(Gate.Op.ADD, 12_000).label(), "+12k")
+	assert_eq(Gate.new(Gate.Op.ADD, -3_500_000).label(), "-3.5m")
+	assert_eq(Gate.new(Gate.Op.POWER, 1_200).label(), "ダメージUP\n+1.2k")
+	var stats := PlayerStats.new(10)
+	stats.power = 2_500
+	assert_eq(Gate.new(Gate.Op.POWER, 1_200).label(stats), "ダメージUP\n2.5k->3.7k")

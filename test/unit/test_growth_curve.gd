@@ -44,3 +44,20 @@ func test_最初の線より手前はスタートの値で最後の線より先�
 func test_錨が最初の線なら増えずにスタートの値のまま():
 	var curve := GrowthCurve.new(_lines([0.5, 0.5]), 3.0, 0, 100.0)
 	assert_almost_eq(curve.value_at(10.0), 3.0, 0.001)
+
+
+func test_ゲートの数はスタートからの規模の倍率をかけて上から2桁に丸める():
+	# 規模は 5 から 4 小節で 5万。1小節で10倍
+	var curve := GrowthCurve.new(_lines([0.5, 0.5, 0.5, 0.5, 0.5]), 5.0, 4, 50_000.0)
+	assert_eq(curve.scaled(10, 0.0), 10)
+	assert_eq(curve.scaled(10, 10.0), 100)
+	assert_eq(curve.scaled(-15, 30.0), -15_000)
+	assert_eq(curve.scaled(1, 15.0), 32)
+	assert_eq(curve.scaled(7, 35.0), 22_000)
+
+
+func test_丸めは上から2桁で100未満はそのまま整数にする():
+	assert_eq(GrowthCurve.round_nice(47.4), 47)
+	assert_eq(GrowthCurve.round_nice(123.0), 120)
+	assert_eq(GrowthCurve.round_nice(12_345.0), 12_000)
+	assert_eq(GrowthCurve.round_nice(-3_456_789.0), -3_500_000)

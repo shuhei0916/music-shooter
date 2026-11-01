@@ -249,7 +249,7 @@ func _build_layout() -> Array:
 		anchor_hp /= EnemyWave.BOSS_HP_RATE
 	_growth = GrowthCurve.new(lines, enemy_start_hp, anchor, anchor_hp)
 	var wave := EnemyWave.new(lane_count, _growth, seed_value)
-	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value, _growth)
 	return builder.build(lines, course_length, _map.beats_per_bar)
 
 

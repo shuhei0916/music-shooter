@@ -2,6 +2,7 @@ class_name LayoutBuilder
 extends RefCounted
 ## 曲の小節の線の上に、ゲートの列と敵の列を並べた配置データを作る
 ## ゲートの列は小節の線1本おき（2小節ごと）に置き、そのあいだの拍の線に敵の列を 0〜2 列置く
+## 規模の曲線を渡すと、HP と威力の足し算のゲートの数を、置く位置の規模に合わせて大きくする
 
 ## ゲートのあいだに置く敵の列の数の上限
 const MAX_ENEMY_ROWS := 2
@@ -15,13 +16,20 @@ var _deck: GateDeck
 var _wave: EnemyWave
 var _start: float
 var _end_margin: float
+var _growth: GrowthCurve
 var _rng := RandomNumberGenerator.new()
 
 
 func _init(
-	deck: GateDeck, wave: EnemyWave, start: float, end_margin: float, seed_value := 0
+	deck: GateDeck,
+	wave: EnemyWave,
+	start: float,
+	end_margin: float,
+	seed_value := 0,
+	growth: GrowthCurve = null
 ) -> void:
 	_deck = deck
+	_growth = growth
 	_wave = wave
 	_start = start
 	_end_margin = end_margin
@@ -46,7 +54,7 @@ func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
 		if gate_lines[i].get("boss", false):
 			rows.append(_boss_row(gate_z))
 		else:
-			rows.append({"z": gate_z, "gates": _deck.draw()})
+			rows.append({"z": gate_z, "gates": _gates_at(gate_z)})
 		if i + 1 >= gate_lines.size():
 			continue
 		var next_z: float = gate_lines[i + 1].distance
@@ -64,6 +72,19 @@ func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
 			var z: float = gate_z + beat * beat_length
 			rows.append({"z": z, "enemies": _wave.make(z)})
 	return rows
+
+
+## 山札から引いたゲート。足し算（HP と威力）の数は、規模の曲線があれば z の位置の規模に合わせる
+func _gates_at(z: float) -> Array:
+	var gates := _deck.draw()
+	if _growth == null:
+		return gates
+	return gates.map(
+		func(gate):
+			if gate[0] in [Gate.Op.ADD, Gate.Op.POWER]:
+				return [gate[0], _growth.scaled(gate[1], z)]
+			return gate
+	)
 
 
 func _boss_row(z: float) -> Dictionary:
