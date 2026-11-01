@@ -49,12 +49,12 @@ const MESSAGES := {
 @export var row_start := 20.0
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
-## 最後のボス（ボスが無い曲では最後の小節の線の敵）の HP。自動で並べるときの、数字の規模の基準
+## ボスの HP（中ボス1・中ボス2・最後のボス）。自動で並べるときの、数字の規模の基準
+## ボスが少ない曲では後ろから順に当てる。ボスが無い曲では、最後の小節の線の敵を最後の値にする
 ## 敵の HP は、ボスで区切ったゾーンごとに、初めはなだらかに終わりに向けて加速して増える（GrowthCurve）
-## 5億なら、プレイヤーの HP が10億あればぶつかっても半分残る
-@export var final_boss_hp := 500_000_000
-## ボスを1つさかのぼるごとに、HP を何分の1にするか。1000 なら、ボスを越えるたびに数字の単位が変わる（k→m→b）
-@export var boss_hp_step := 1000
+## ボスを越えるころにプレイヤーの数字の単位が変わる（k→m→b）ように、それぞれの単位の半分くらいにしている
+## 最後の5億は、プレイヤーの HP が10億あればぶつかっても半分残る
+@export var boss_hps: Array[int] = [5_000, 500_000, 500_000_000]
 @export var lane_count := 3
 @export var lane_width := 3.0
 
@@ -255,17 +255,16 @@ func _build_layout() -> Array:
 	return builder.build(lines, course_length, _map.beats_per_bar)
 
 
-## 規模の曲線の錨。ボスの小節の線で、ボスの HP が最後は final_boss_hp、さかのぼるごとに boss_hp_step 分の1
-## になるように、ふつうの敵の規模（ボスの HP ÷ BOSS_HP_RATE）を決める
-## ボスが無ければ、最後の小節の線で final_boss_hp
+## 規模の曲線の錨。ボスの小節の線で、ボスの HP が boss_hps の値（後ろから順）になるように、
+## ふつうの敵の規模（ボスの HP ÷ BOSS_HP_RATE）を決める。ボスが無ければ、最後の小節の線で最後の値
 func _growth_anchors(boss_bars: Array, line_count: int) -> Array:
 	if boss_bars.is_empty():
-		return [[line_count - 1, float(final_boss_hp)]]
+		return [[line_count - 1, float(boss_hps.back())]]
 	var anchors := []
-	var hp := float(final_boss_hp)
-	for i in range(boss_bars.size() - 1, -1, -1):
-		anchors.push_front([boss_bars[i], hp / EnemyWave.BOSS_HP_RATE])
-		hp /= boss_hp_step
+	var hps := boss_hps.slice(maxi(boss_hps.size() - boss_bars.size(), 0))
+	for i in mini(boss_bars.size(), hps.size()):
+		var bar: int = boss_bars[boss_bars.size() - hps.size() + i]
+		anchors.append([bar, float(hps[i]) / EnemyWave.BOSS_HP_RATE])
 	return anchors
 
 

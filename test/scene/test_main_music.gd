@@ -195,7 +195,7 @@ func test_自動で並べるときはサビの前の小節にボスを置く():
 	assert_eq(bosses.map(func(e): return e.global_position), [Vector3(0, 0, -42)])
 
 
-func test_自動で並べるときは最後のボスのHPが設定値になりその前のボスは1000分の1になる():
+func test_自動で並べるときはボスのHPを設定の並びの後ろから順に当てる():
 	# 1小節は 14 進む。サビは 4〜7 小節目の1回だけなので、ボスは 3 小節目（42）と 7 小節目（98）
 	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
 	beats.store_string(
@@ -212,7 +212,8 @@ func test_自動で並べるときは最後のボスのHPが設定値になり�
 	main.forward_speed = 7.0
 	main.course_length = 200.0
 	main.layout_seed = 1
-	main.final_boss_hp = 1_000_000
+	# ボスは2体なので、3つのうち後ろの2つを使う
+	main.boss_hps = [7, 2_000, 1_000_000]
 	add_child_autofree(main)
 	DirAccess.remove_absolute("user://test_song.beats.json")
 	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
@@ -220,4 +221,4 @@ func test_自動で並べるときは最後のボスのHPが設定値になり�
 	for boss in bosses:
 		hp_by_z[boss.global_position.z] = boss.start_hp
 	assert_eq(hp_by_z.get(-98.0), 1_000_000)
-	assert_eq(hp_by_z.get(-42.0), 1_000)
+	assert_eq(hp_by_z.get(-42.0), 2_000)

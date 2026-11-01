@@ -65,7 +65,7 @@ func test_成長曲線のグラフはデバッグモードのときだけ見せ�
 
 func test_成長曲線のグラフには最後のボスのHPまで入りプレイヤーのHPを時刻とともに記録する():
 	var main := _make_main()
-	assert_gte(_graph(main).max_value, float(main.final_boss_hp))
+	assert_gte(_graph(main).max_value, float(main.boss_hps.back()))
 	simulate(main, 3, 0.5)
 	assert_eq(_graph(main).time, main.song_time())
 	assert_eq(_graph(main).player_points.back().y, float(main.get_node("Player").health.hp))
