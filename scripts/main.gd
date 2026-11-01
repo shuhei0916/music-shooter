@@ -59,7 +59,7 @@ const MESSAGES := {
 var song: AudioStream
 ## 音を出さないモード。曲は流さず、曲の長さだけ経過時間で進む（自動で遊ばせるときに使う）
 var silent := false
-## デバッグモード。床の小節・拍の線は、デバッグモードのときだけ見せる
+## デバッグモード。床の小節・拍の線と成長曲線のグラフは、デバッグモードのときだけ見せる
 var debug := false:
 	set(value):
 		debug = value
@@ -79,6 +79,7 @@ var _result := Judge.Result.PLAYING
 @onready var _hint: Label = $UI/Hint
 @onready var _music: AudioStreamPlayer = $Music
 @onready var _beat_hud: BeatHud = $UI/BeatHud
+@onready var _growth_graph: GrowthGraph = $UI/GrowthGraph
 
 
 func _ready() -> void:
@@ -120,6 +121,7 @@ func _process(delta: float) -> void:
 	var pos := _map.at(_clock.time())
 	_player.dance(pos)
 	_beat_hud.show_at(pos)
+	_growth_graph.show_at(_clock.time(), _player.health.hp)
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)
@@ -154,10 +156,10 @@ func result() -> Judge.Result:
 
 ## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
 func _show_debug() -> void:
-	for group_name in ["BarLines", "BeatLines"]:
-		var group := get_node_or_null(group_name) as Node3D
-		if group != null:
-			group.visible = debug
+	for node_name in ["BarLines", "BeatLines", "UI/GrowthGraph"]:
+		var node := get_node_or_null(node_name)
+		if node != null:
+			node.visible = debug
 
 
 func _finish() -> void:
@@ -248,9 +250,23 @@ func _build_layout() -> Array:
 	if anchor >= 0 and lines[anchor].get("boss", false):
 		anchor_hp /= EnemyWave.BOSS_HP_RATE
 	_growth = GrowthCurve.new(lines, enemy_start_hp, anchor, anchor_hp)
+	_setup_growth_graph(lines)
 	var wave := EnemyWave.new(lane_count, _growth, seed_value)
 	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value, _growth)
 	return builder.build(lines, course_length, _map.beats_per_bar)
+
+
+## デバッグモードの成長曲線のグラフに、小節ごとの規模（ふつうの敵の HP）とボスの HP を渡す
+func _setup_growth_graph(lines: Array) -> void:
+	var curve_points := []
+	var boss_points := []
+	for line in lines:
+		var time: float = line.distance / forward_speed
+		var value := _growth.value_at(line.distance)
+		curve_points.append(Vector2(time, value))
+		if line.get("boss", false):
+			boss_points.append(Vector2(time, value * EnemyWave.BOSS_HP_RATE))
+	_growth_graph.setup(curve_points, boss_points, course_length / forward_speed)
 
 
 func _spawn_row(row: Dictionary) -> void:
