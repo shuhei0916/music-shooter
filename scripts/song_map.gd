@@ -81,18 +81,24 @@ func at(time: float) -> Dictionary:
 
 
 ## 曲の長さ duration 秒までの、小節の頭の線。速さ speed で進むコース上の距離（distance）と、
-## セクションの始まりか（section_start）、その小節のセクションの盛り上がり（energy）
+## セクションの始まりか（section_start）、その小節のセクションの盛り上がり（energy）・名前（label）、
+## セクションの中の進み具合（progress。始まりが 0 で、セクションの小節の数で割る。分からなければ 0）
 func bar_lines(speed: float, duration: float) -> Array:
 	var bar_length := grid.seconds_per_beat() * beats_per_bar
 	var lines := []
 	var bar := 0
 	var time := downbeat
 	while time <= duration:
+		var pos := at(time)
+		var bars_in_section: int = pos.bars_in_section
 		lines.append(
 			{
 				"distance": time * speed,
 				"section_start": sections.any(func(s): return s.bar == bar),
-				"energy": at(time).energy,
+				"energy": pos.energy,
+				"label": pos.label,
+				"progress":
+				float(pos.bar_in_section) / bars_in_section if bars_in_section > 0 else 0.0,
 			}
 		)
 		bar += 1

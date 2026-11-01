@@ -51,3 +51,12 @@ func test_ボスは全部のレーンを埋める1体でHPはその位置のふ�
 	var wave := EnemyWave.new(3, _curve(500.0), 1)
 	assert_eq(wave.boss(50.0), [[0, wave.hp_at(50.0) * EnemyWave.BOSS_HP_RATE, 3]])
 	assert_gt(EnemyWave.BOSS_HP_RATE, 1)
+
+
+func test_緊張の曲線を渡すとふつうの敵のHPに倍率をかけボスにはかけない():
+	var tension := TensionCurve.new([{"distance": 0.0, "label": "DROP", "progress": 0.0}])
+	var wave := EnemyWave.new(3, _curve(500.0), 1, tension)
+	var expected := roundi(_curve(500.0).value_at(100.0) * TensionCurve.DROP_RATE)
+	for spec in wave.make(100.0):
+		assert_eq(spec[1], expected)
+	assert_eq(wave.boss(100.0)[0][1], 500 * EnemyWave.BOSS_HP_RATE)

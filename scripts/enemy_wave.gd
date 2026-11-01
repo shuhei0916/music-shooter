@@ -1,7 +1,7 @@
 class_name EnemyWave
 extends RefCounted
 ## 敵の1列ぶんを作る。どのレーンを埋めるかはシードつきの乱数で決める
-## HPは規模の曲線（GrowthCurve）に合わせて増える
+## HPは規模の曲線（GrowthCurve）に合わせて増える。緊張の曲線（TensionCurve）を渡すと、ふつうの敵にだけその倍率をかける
 ## ふつうの敵の列は、必ず1レーンは空けて避けられるようにする（避けられないのはボスだけ）
 
 ## ボスの HP が、同じ位置のふつうの敵の何倍か（仮の値）
@@ -9,12 +9,16 @@ const BOSS_HP_RATE := 10
 
 var _lane_count: int
 var _curve: GrowthCurve
+var _tension: TensionCurve
 var _rng := RandomNumberGenerator.new()
 
 
-func _init(lane_count: int, curve: GrowthCurve, seed_value: int) -> void:
+func _init(
+	lane_count: int, curve: GrowthCurve, seed_value: int, tension: TensionCurve = null
+) -> void:
 	_lane_count = lane_count
 	_curve = curve
+	_tension = tension
 	_rng.seed = seed_value
 
 
@@ -29,11 +33,12 @@ func make(distance: float) -> Array:
 	return result
 
 
-## distance の位置のふつうの敵の HP
+## distance の位置のふつうの敵の HP。規模に緊張の倍率をかける
 func hp_at(distance: float) -> int:
-	return roundi(_curve.value_at(distance))
+	var rate := _tension.rate_at(distance) if _tension != null else 1.0
+	return roundi(_curve.value_at(distance) * rate)
 
 
-## distance の位置のボス。全部のレーンを埋める1体で、[[0, HP, レーンの数]]
+## distance の位置のボス。全部のレーンを埋める1体で、[[0, HP, レーンの数]]。HP に緊張の倍率はかけない
 func boss(distance: float) -> Array:
-	return [[0, hp_at(distance) * BOSS_HP_RATE, _lane_count]]
+	return [[0, roundi(_curve.value_at(distance)) * BOSS_HP_RATE, _lane_count]]

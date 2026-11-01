@@ -222,3 +222,38 @@ func test_自動で並べるときはボスのHPを設定の並びの後ろか�
 		hp_by_z[boss.global_position.z] = boss.start_hp
 	assert_eq(hp_by_z.get(-98.0), 1_000_000)
 	assert_eq(hp_by_z.get(-42.0), 2_000)
+
+
+func test_自動で並べるときはDROPのふつうの敵を緊張の曲線で弱くする():
+	# サビは 4〜7 小節目（56〜98）。規模はボスの 3 小節目（42）で 1000、7 小節目（98）で 2000
+	# DROP の敵は 0.4 倍されるので、2000 × 0.4 = 800 より多くはならない（倍率が無ければ 1000 以上）
+	var hps := []
+	for seed_value in 5:
+		var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+		beats.store_string(
+			(
+				'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+				+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+				+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+				+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1]}'
+			)
+		)
+		beats.close()
+		var main: Main = MainScene.instantiate()
+		main.song_path = "user://test_song.mp3"
+		main.forward_speed = 7.0
+		main.course_length = 200.0
+		main.layout_seed = seed_value
+		main.boss_hps = [10_000, 20_000]
+		add_child_autofree(main)
+		DirAccess.remove_absolute("user://test_song.beats.json")
+		for enemy in _find_all(main, Enemy):
+			if (
+				enemy.lanes_wide == 1
+				and enemy.global_position.z < -56
+				and enemy.global_position.z > -98
+			):
+				hps.append(enemy.start_hp)
+	assert_gt(hps.size(), 0)
+	for hp in hps:
+		assert_lte(hp, 800)

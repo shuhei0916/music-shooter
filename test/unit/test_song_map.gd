@@ -76,6 +76,12 @@ func test_セクションの始まりの小節の線には印をつけ盛り上�
 	assert_almost_eq(lines[0].energy, 0.3, 0.0001)
 
 
+func test_小節の線にはセクションの名前とセクションの中の進み具合も添える():
+	var lines := _map().bar_lines(10.0, 9.0)
+	assert_eq(lines.map(func(line): return line.label), ["BUILD", "BUILD", "DROP", "DROP", "DROP"])
+	assert_eq(lines.map(func(line): return line.progress), [0.0, 0.5, 0.0, 1.0 / 3, 2.0 / 3])
+
+
 func test_セクションがなければ小節の線に印はつけない():
 	var lines := SongMap.from_json("", 120.0).bar_lines(1.0, 4.0)
 	assert_eq(lines.map(func(line): return line.distance), [0.0, 2.0, 4.0])

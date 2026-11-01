@@ -249,8 +249,9 @@ func _build_layout() -> Array:
 			lines[bar].boss = true
 			boss_bars.append(bar)
 	_growth = GrowthCurve.new(lines, enemy_start_hp, _growth_anchors(boss_bars, lines.size()))
-	_setup_growth_graph(lines)
-	var wave := EnemyWave.new(lane_count, _growth, seed_value)
+	var tension := TensionCurve.new(lines)
+	_setup_growth_graph(lines, tension)
+	var wave := EnemyWave.new(lane_count, _growth, seed_value, tension)
 	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value, _growth)
 	return builder.build(lines, course_length, _map.beats_per_bar)
 
@@ -268,14 +269,14 @@ func _growth_anchors(boss_bars: Array, line_count: int) -> Array:
 	return anchors
 
 
-## デバッグモードの成長曲線のグラフに、小節ごとの規模（ふつうの敵の HP）とボスの HP を渡す
-func _setup_growth_graph(lines: Array) -> void:
+## デバッグモードの成長曲線のグラフに、小節ごとのふつうの敵の HP（規模 × 緊張の倍率）とボスの HP を渡す
+func _setup_growth_graph(lines: Array, tension: TensionCurve) -> void:
 	var curve_points := []
 	var boss_points := []
 	for line in lines:
 		var time: float = line.distance / forward_speed
 		var value := _growth.value_at(line.distance)
-		curve_points.append(Vector2(time, value))
+		curve_points.append(Vector2(time, value * tension.rate_at(line.distance)))
 		if line.get("boss", false):
 			boss_points.append(Vector2(time, value * EnemyWave.BOSS_HP_RATE))
 	_growth_graph.setup(curve_points, boss_points, course_length / forward_speed)
