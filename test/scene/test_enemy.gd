@@ -153,21 +153,30 @@ func _make_big_enemy(hp: int, lanes := 3) -> Enemy:
 	return enemy
 
 
-func test_何レーンも占める敵は占めるレーンの数に合わせて大きく出る():
+func test_ボスは高さはふつうの敵と同じで横と奥行きだけ大きく出る():
 	var boss := _make_big_enemy(5, 3)
-	assert_almost_eq(boss.scale, Vector3.ONE * Enemy.SCALE_PER_LANE * 3, Vector3.ONE * 0.001)
+	assert_almost_eq(boss.scale.y, 1.0, 0.001)
+	assert_gt(boss.scale.x, 2.0)
+	assert_almost_eq(boss.scale.z, boss.scale.x, 0.001)
 	assert_eq(_make_enemy(5).scale, Vector3.ONE)
 
 
-func test_3レーンを占めるボスは端のレーンにいるプレイヤーともぶつかる():
-	var main: Main = autofree(MainScene.instantiate())
-	var reach: float = (
-		(_shape_width(EnemyScene) * Enemy.SCALE_PER_LANE * 3 + _shape_width(PlayerScene)) / 2
-	)
-	assert_gt(reach, main.lane_width)
+func test_ボスの横には端まで寄ったプレイヤーもすり抜けられない():
+	var boss := _make_big_enemy(5, 3)
+	var player: Player = autofree(PlayerScene.instantiate())
+	var reach: float = (_shape_width(EnemyScene) * boss.scale.x + _shape_width(PlayerScene)) / 2
+	assert_gt(reach, player.road_half_width)
+	# すり抜けられないことが保証できれば十分なので、それより大きくはしすぎない
+	assert_lt(reach, player.road_half_width + 0.5)
 
 
-func test_大きな敵のダメージの数字は大きさに合わせて高い位置に出る():
+func test_ボスのHPの文字は横に伸びない():
+	var boss := _make_big_enemy(5, 3)
+	var label_scale: Vector3 = boss.get_node("HpLabel").global_transform.basis.get_scale()
+	assert_almost_eq(label_scale.x, label_scale.y, 0.001)
+
+
+func test_ボスのダメージの数字はふつうの敵と同じ高さに出る():
 	var small := _make_enemy(5000)
 	var big := _make_big_enemy(5000)
 	for enemy in [small, big]:
@@ -175,4 +184,4 @@ func test_大きな敵のダメージの数字は大きさに合わせて高い�
 		enemy.area_entered.emit(bullet)
 	var small_y: float = _damage_texts(small)[0].position.y
 	var big_y: float = _damage_texts(big)[0].position.y
-	assert_almost_eq(big_y, small_y * big.scale.y, 0.001)
+	assert_almost_eq(big_y, small_y, 0.001)
