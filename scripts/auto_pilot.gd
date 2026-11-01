@@ -37,7 +37,7 @@ static func choose_gate(gates: Array, stats: PlayerStats) -> float:
 	return best.x
 
 
-## lanes: レーンの x。enemies: [{x, hp}]。ぶつかる敵の HP がいちばん少ないレーンの x
+## lanes: レーンの x（左から等間隔）。enemies: [{x, hp, lanes: 占めるレーン数（省略で 1）}]。ぶつかる敵の HP がいちばん少ないレーンの x
 ## 同じだけ少ないレーンが複数あれば、player_x に近いほう
 static func choose_lane(lanes: Array, enemies: Array, player_x: float) -> float:
 	var best_x: float = lanes[0]
@@ -57,18 +57,12 @@ static func axis(x: float, target: float) -> float:
 	return signf(target - x)
 
 
-## レーン lane_x にいる敵の HP の合計。敵は、いちばん近いレーンにいるとみなす
+## レーン lane_x をふさぐ敵の HP の合計。敵は、x を中心に lanes（無ければ 1）レーン分の幅を占める
 static func _hp_in_lane(lane_x: float, lanes: Array, enemies: Array) -> int:
+	var spacing: float = lanes[1] - lanes[0] if lanes.size() > 1 else INF
 	var total := 0
 	for enemy in enemies:
-		if _nearest(lanes, enemy.x) == lane_x:
+		var half_width: float = enemy.get("lanes", 1) * spacing / 2.0
+		if absf(lane_x - enemy.x) < half_width:
 			total += enemy.hp
 	return total
-
-
-static func _nearest(values: Array, x: float) -> float:
-	var nearest: float = values[0]
-	for value in values:
-		if absf(value - x) < absf(nearest - x):
-			nearest = value
-	return nearest

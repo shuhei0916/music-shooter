@@ -74,3 +74,10 @@ func test_記録はCSVにできる():
 	assert_eq(lines[0], "time,label,energy,hp,power,fire_level,dps,enemy_hp")
 	assert_eq(lines[1], "2.00,DROP,1.00,10,2,1,2.00,9")
 	autoplay.free()
+
+
+func test_2レーンを占める敵がいればあいているレーンへ向かう():
+	var main := _make_main([{"z": 30.0, "enemies": [[0, 5, 2]]}])
+	var autoplay := _make_autoplay(main)
+	_run(main, autoplay, 10, 0.1)
+	assert_gt(main.get_node("Player").position.x, 1.0)

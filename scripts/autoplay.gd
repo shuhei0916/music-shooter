@@ -76,7 +76,9 @@ func _target_x(player: Player) -> float:
 		var choices := row.map(func(g): return {"x": g.global_position.x, "gate": g.gate()})
 		return AutoPilot.choose_gate(choices, player.stats)
 	var row := enemies.filter(func(e): return is_equal_approx(e.global_position.z, enemy_z))
-	var specs := row.map(func(e): return {"x": e.global_position.x, "hp": e.health.hp})
+	var specs := row.map(
+		func(e): return {"x": e.global_position.x, "hp": e.health.hp, "lanes": e.lanes_wide}
+	)
 	return AutoPilot.choose_lane(main.lane_xs(), specs, player.position.x)
 
 

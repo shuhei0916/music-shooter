@@ -54,3 +54,8 @@ func test_向かう位置が右なら右へ左なら左へ近ければ止まる(
 	assert_eq(AutoPilot.axis(0.0, 3.0), 1.0)
 	assert_eq(AutoPilot.axis(0.0, -3.0), -1.0)
 	assert_eq(AutoPilot.axis(2.95, 3.0), 0.0)
+
+
+func test_2レーンを占める敵は両方のレーンをふさぐ():
+	var enemies := [{"x": -1.5, "hp": 5, "lanes": 2}]
+	assert_eq(AutoPilot.choose_lane([-3.0, 0.0, 3.0], enemies, -3.0), 3.0)
