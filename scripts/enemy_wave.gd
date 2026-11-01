@@ -4,6 +4,9 @@ extends RefCounted
 ## HPはスタートの start_hp から、ゴールの goal_hp まで一定の比率で増える
 ## ふつうの敵の列は、必ず1レーンは空けて避けられるようにする（避けられないのはボスだけ）
 
+## ボスの HP が、同じ位置のふつうの敵の何倍か（仮の値）
+const BOSS_HP_RATE := 10
+
 var _lane_count: int
 var _start_hp: int
 var _goal_hp: int
@@ -33,3 +36,8 @@ func make(distance: float) -> Array:
 ## distance の位置のふつうの敵の HP
 func hp_at(distance: float) -> int:
 	return roundi(_start_hp * pow(float(_goal_hp) / _start_hp, distance / _length))
+
+
+## distance の位置のボス。全部のレーンを埋める1体で、[[0, HP, レーンの数]]
+func boss(distance: float) -> Array:
+	return [[0, hp_at(distance) * BOSS_HP_RATE, _lane_count]]

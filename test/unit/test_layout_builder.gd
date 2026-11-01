@@ -93,3 +93,28 @@ func _mean_enemy_rows(energy: float) -> float:
 
 func test_盛り上がりが大きいほどゲートのあいだの敵の列が多い():
 	assert_gt(_mean_enemy_rows(1.0), _mean_enemy_rows(0.25) + 0.5)
+
+
+## 小節の線 at（番号）にボスの印をつけた線
+static func _lines_with_boss(at: int) -> Array:
+	var lines := _lines(1.0)
+	lines[at].boss = true
+	return lines
+
+
+func test_ボスの印のある線にはボスの列を置きそのゲートのあいだにはほかの敵を置かない():
+	for seed_value in 10:
+		# 48 はゲート（32 と 64）のあいだの線
+		var rows := _make_builder(seed_value).build(_lines_with_boss(3), LENGTH)
+		var between := rows.filter(func(row): return row.z > 32.0 and row.z < 64.0)
+		assert_eq(between.size(), 1)
+		assert_eq(between[0].z, 48.0)
+		assert_eq(between[0].enemies, [[0, 5 * EnemyWave.BOSS_HP_RATE, 3]])
+
+
+func test_ゲートを置く線にボスの印があればゲートの代わりにボスを置く():
+	var rows := _make_builder().build(_lines_with_boss(4), LENGTH)
+	var at_64 := rows.filter(func(row): return is_equal_approx(row.z, 64.0))
+	assert_eq(at_64.size(), 1)
+	assert_false(at_64[0].has("gates"))
+	assert_eq(at_64[0].enemies[0][2], 3)

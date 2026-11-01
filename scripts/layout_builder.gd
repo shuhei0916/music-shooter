@@ -28,7 +28,10 @@ func _init(
 	_rng.seed = seed_value
 
 
-## lines: 小節の頭の線 {distance: コース上の距離, energy: その小節の盛り上がり}（近い順）
+## lines: 小節の頭の線 {distance: コース上の距離, energy: その小節の盛り上がり,
+## boss: ボスを置くか（省略で置かない）}（近い順）
+## ボスの線にはボスの列だけを置く。ゲートの線ならゲートの代わりに置き、ゲートのあいだの線なら
+## そのあいだにはほかの敵の列を置かない
 ## length: コースの長さ。スタートから start より先、ゴールの end_margin 手前までに置く
 func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
 	var usable := lines.filter(
@@ -40,14 +43,31 @@ func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
 	var rows := []
 	for i in gate_lines.size():
 		var gate_z: float = gate_lines[i].distance
-		rows.append({"z": gate_z, "gates": _deck.draw()})
-		if i + 1 < gate_lines.size():
-			var beats := beats_per_bar * 2
-			var beat_length: float = (gate_lines[i + 1].distance - gate_z) / beats
-			for beat in _enemy_beats(beats, gate_lines[i].energy):
-				var z: float = gate_z + beat * beat_length
-				rows.append({"z": z, "enemies": _wave.make(z)})
+		if gate_lines[i].get("boss", false):
+			rows.append(_boss_row(gate_z))
+		else:
+			rows.append({"z": gate_z, "gates": _deck.draw()})
+		if i + 1 >= gate_lines.size():
+			continue
+		var next_z: float = gate_lines[i + 1].distance
+		var bosses := usable.filter(
+			func(line):
+				return line.get("boss", false) and line.distance > gate_z and line.distance < next_z
+		)
+		if not bosses.is_empty():
+			for line in bosses:
+				rows.append(_boss_row(line.distance))
+			continue
+		var beats := beats_per_bar * 2
+		var beat_length: float = (next_z - gate_z) / beats
+		for beat in _enemy_beats(beats, gate_lines[i].energy):
+			var z: float = gate_z + beat * beat_length
+			rows.append({"z": z, "enemies": _wave.make(z)})
 	return rows
+
+
+func _boss_row(z: float) -> Dictionary:
+	return {"z": z, "enemies": _wave.boss(z)}
 
 
 ## ゲートのあいだ（beats 拍）のうち、敵の列を置く拍（ゲートからの拍数、小さい順）

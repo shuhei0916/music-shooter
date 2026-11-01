@@ -44,3 +44,9 @@ func test_敵のHPはゴールではゴールのHPになる():
 func test_敵のHPは一定の比率で増え中間地点では相乗平均になる():
 	for hp in _hps_at(50.0):
 		assert_eq(hp, 50)
+
+
+func test_ボスは全部のレーンを埋める1体でHPはその位置のふつうの敵の何倍もある():
+	var wave := EnemyWave.new(3, 5, 500, 100.0, 1)
+	assert_eq(wave.boss(50.0), [[0, 50 * EnemyWave.BOSS_HP_RATE, 3]])
+	assert_gt(EnemyWave.BOSS_HP_RATE, 1)
