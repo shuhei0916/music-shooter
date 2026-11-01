@@ -92,3 +92,34 @@ func test_丸めは上から2桁で100未満はそのまま整数にする():
 	assert_eq(GrowthCurve.round_nice(123.0), 120)
 	assert_eq(GrowthCurve.round_nice(12_345.0), 12_000)
 	assert_eq(GrowthCurve.round_nice(-3_456_789.0), -3_500_000)
+
+
+func test_掛け算のゲートはゾーンの伸びが基準どおりならそのまま():
+	# 40 小節で1000倍が基準
+	var curve := GrowthCurve.new(_flat(41), 1.0, [[40, 1_000.0]])
+	assert_eq(curve.scaled_multiplier(2, 100.0), 2)
+	assert_eq(curve.scaled_multiplier(3, 100.0), 3)
+
+
+func test_掛け算のゲートはゾーンの伸びが速いほど大きくする():
+	# 20 小節で1000倍は基準の2倍の速さなので、×2 は ×4、×3 は ×9
+	var curve := GrowthCurve.new(_flat(21), 1.0, [[20, 1_000.0]])
+	assert_eq(curve.scaled_multiplier(2, 50.0), 4)
+	assert_eq(curve.scaled_multiplier(3, 50.0), 9)
+
+
+func test_掛け算のゲートはゾーンの伸びが遅くても小さくはしない():
+	var curve := GrowthCurve.new(_flat(41), 1.0, [[40, 10.0]])
+	assert_eq(curve.scaled_multiplier(2, 100.0), 2)
+
+
+func test_掛け算のゲートはそれぞれのゾーンの伸びで決め最後の錨より先は最後のゾーンと同じ():
+	var curve := GrowthCurve.new(_flat(62), 1.0, [[40, 1_000.0], [60, 1_000_000.0]])
+	assert_eq(curve.scaled_multiplier(2, 100.0), 2)
+	assert_eq(curve.scaled_multiplier(2, 500.0), 4)
+	assert_eq(curve.scaled_multiplier(2, 610.0), 4)
+
+
+func test_掛け算のゲートはとても速いゾーンでも上限の累乗までしか大きくしない():
+	var curve := GrowthCurve.new(_flat(3), 1.0, [[2, 1e9]])
+	assert_eq(curve.scaled_multiplier(2, 10.0), roundi(pow(2, GrowthCurve.MAX_MULTIPLIER_POWER)))

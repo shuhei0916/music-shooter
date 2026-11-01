@@ -2,7 +2,8 @@ class_name LayoutBuilder
 extends RefCounted
 ## 曲の小節の線の上に、ゲートの列と敵の列を並べた配置データを作る
 ## ゲートの列は小節の線1本おき（2小節ごと）に置き、そのあいだの拍の線に敵の列を 0〜2 列置く
-## 規模の曲線を渡すと、HP と威力の足し算のゲートの数を、置く位置の規模に合わせて大きくする
+## 規模の曲線を渡すと、HP と威力の足し算のゲートの数を置く位置の規模に合わせて、
+## 掛け算のゲートの数をそのゾーンの伸びの速さに合わせて大きくする
 
 ## ゲートのあいだに置く敵の列の数の上限
 const MAX_ENEMY_ROWS := 2
@@ -74,7 +75,8 @@ func build(lines: Array, length: float, beats_per_bar := 4) -> Array:
 	return rows
 
 
-## 山札から引いたゲート。足し算（HP と威力）の数は、規模の曲線があれば z の位置の規模に合わせる
+## 山札から引いたゲート。規模の曲線があれば、足し算（HP と威力）の数は z の位置の規模に、
+## 掛け算の数はそのゾーンの伸びの速さに合わせる
 func _gates_at(z: float) -> Array:
 	var gates := _deck.draw()
 	if _growth == null:
@@ -83,6 +85,8 @@ func _gates_at(z: float) -> Array:
 		func(gate):
 			if gate[0] in [Gate.Op.ADD, Gate.Op.POWER]:
 				return [gate[0], _growth.scaled(gate[1], z)]
+			if gate[0] == Gate.Op.MULTIPLY:
+				return [gate[0], _growth.scaled_multiplier(gate[1], z)]
 			return gate
 	)
 

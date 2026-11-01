@@ -120,7 +120,7 @@ func test_ゲートを置く線にボスの印があればゲートの代わり�
 	assert_eq(at_64[0].enemies[0][2], 3)
 
 
-func test_規模の曲線を渡すとHPと威力の足し算のゲートの数を規模に合わせて大きくし掛け算と連射はそのまま():
+func test_規模の曲線を渡すと足し算のゲートは規模に合わせ掛け算のゲートはゾーンの伸びの速さに合わせて大きくし連射はそのまま():
 	# 規模は 5 から、最初のゲートの線（32）で 500（100倍）
 	var growth := GrowthCurve.new(_lines(0.5), 5.0, [[2, 500.0]])
 	var card := [
@@ -131,7 +131,14 @@ func test_規模の曲線を渡すとHPと威力の足し算のゲートの数�
 	var builder := LayoutBuilder.new(deck, wave, 20.0, 15.0, 1, growth)
 	var gates: Array = builder.build(_lines(0.5), LENGTH)[0].gates.duplicate()
 	gates.sort()
+	var multiplier := growth.scaled_multiplier(2, 32.0)
+	assert_gt(multiplier, 2)
 	assert_eq(
 		gates,
-		[[Gate.Op.ADD, -500], [Gate.Op.MULTIPLY, 2], [Gate.Op.POWER, 100], [Gate.Op.FIRE_RATE, 1]]
+		[
+			[Gate.Op.ADD, -500],
+			[Gate.Op.MULTIPLY, multiplier],
+			[Gate.Op.POWER, 100],
+			[Gate.Op.FIRE_RATE, 1]
+		]
 	)

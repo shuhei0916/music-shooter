@@ -11,12 +11,17 @@ const HOT_WEIGHT := 1.0
 ## ゾーンの中の加速の強さ。進み具合（0〜1）をこの数で累乗して、規模（の対数）の進み具合にする
 ## 1 なら一定の比率で増え、大きいほど初めはなだらかで終わりに急になる
 const ZONE_POWER := 2.0
+## 基準のゾーンの伸びの速さ（1小節あたりの、規模の自然対数の増え方）。40 小節で1000倍
+## これより速いゾーン（短いのに大きく伸びるゾーン）では、掛け算のゲートを大きくする
+const REFERENCE_PACE := log(1000.0) / 40.0
+## 掛け算のゲートを大きくするときの、累乗の上限（3 なら ×2 は ×8 まで）
+const MAX_MULTIPLIER_POWER := 3.0
 
 var _distances: Array[float] = []
 ## 各小節の線までに積み上がった重み
 var _levels: Array[float] = []
 var _start: float
-## ゾーンの区切り。[積み上がった重み, 規模の自然対数] の並びで、最初はスタート
+## ゾーンの区切り。[積み上がった重み, 規模の自然対数, 小節の線の番号] の並びで、最初はスタート
 var _anchors: Array = []
 
 
@@ -29,11 +34,11 @@ func _init(lines: Array, start: float, anchors: Array) -> void:
 		_distances.append(float(line.distance))
 		_levels.append(level)
 		level += lerpf(CALM_WEIGHT, HOT_WEIGHT, clampf(float(line.energy), 0.0, 1.0))
-	_anchors.append([0.0, log(start)])
+	_anchors.append([0.0, log(start), 0])
 	for anchor in anchors:
 		var index: int = anchor[0]
 		if index > 0 and index < _levels.size() and _levels[index] > _anchors.back()[0]:
-			_anchors.append([_levels[index], log(float(anchor[1]))])
+			_anchors.append([_levels[index], log(float(anchor[1])), index])
 
 
 ## distance の位置の規模。小節の線のあいだもなめらかにつなぐ
@@ -72,3 +77,26 @@ static func round_nice(value: float) -> int:
 		return roundi(value)
 	var step := pow(10.0, floorf(log(size) / log(10.0)) - 1.0)
 	return roundi(roundf(value / step) * step)
+
+
+## 掛け算のゲートの数 amount を、distance の位置のゾーンの伸びの速さに合わせて大きくする
+## 速さが基準の k 倍なら amount の k 乗にする（ゾーンを進むあいだに同じ回数だけ取れば、同じ割合で追いつける）
+## 基準より遅いゾーンでも小さくはしない。とても速いゾーンでも MAX_MULTIPLIER_POWER 乗まで
+func scaled_multiplier(amount: int, distance: float) -> int:
+	var pace := _pace_at(distance)
+	if pace <= REFERENCE_PACE:
+		return amount
+	return roundi(pow(amount, minf(pace / REFERENCE_PACE, MAX_MULTIPLIER_POWER)))
+
+
+## distance の位置のゾーンの伸びの速さ。最後の錨より先は最後のゾーンの速さ。錨が無ければ 0
+func _pace_at(distance: float) -> float:
+	if _anchors.size() < 2:
+		return 0.0
+	var level := _level_at(distance)
+	var i := 1
+	while i < _anchors.size() - 1 and level > _anchors[i][0]:
+		i += 1
+	var from: Array = _anchors[i - 1]
+	var to: Array = _anchors[i]
+	return (to[1] - from[1]) / (to[2] - from[2])
