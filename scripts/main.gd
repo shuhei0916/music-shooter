@@ -40,7 +40,7 @@ const MESSAGES := {
 @export var bpm := 105.0
 @export var forward_speed := 6.0
 @export var course_length := 150.0
-## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
+## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [左端のレーン番号, HP, 占めるレーン数（省略で 1）]
 ## 空なら、コースの長さに合わせて自動で並べる
 @export var layout: Array = []
 ## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
@@ -263,5 +263,9 @@ func _spawn_row(row: Dictionary) -> void:
 		enemy.start_hp = spec[1]
 		enemy.clock = _clock
 		enemy.grid = _map.grid
-		enemy.position = Vector3(_lanes.x_of(spec[0]), 0, z)
+		# 3つめは占めるレーンの数（無ければ 1）。占めるレーンのまんなかに置く
+		var wide: int = spec[2] if spec.size() > 2 else 1
+		enemy.lanes_wide = wide
+		var x := (_lanes.x_of(spec[0]) + _lanes.x_of(spec[0] + wide - 1)) / 2.0
+		enemy.position = Vector3(x, 0, z)
 		add_child(enemy)

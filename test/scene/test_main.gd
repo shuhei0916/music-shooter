@@ -88,6 +88,12 @@ func test_配置どおりのレーンとHPで敵を並べる():
 	assert_eq([enemies[0].global_position, enemies[0].health.hp], [Vector3(3, 0, -20), 8])
 
 
+func test_2レーンを占める敵は2つのレーンのまんなかに大きく置く():
+	var main := _make_main_with_layout([{"z": 20.0, "enemies": [[1, 8, 2]]}])
+	var enemy: Enemy = _find_all(main, Enemy)[0]
+	assert_eq([enemy.global_position.x, enemy.lanes_wide], [1.5, 2])
+
+
 func test_敵には当たったときや倒れたときの演出を合わせる曲の時計と拍の線を渡す():
 	var main := _make_main_with_layout([{"z": 20.0, "enemies": [[0, 8]]}])
 	var enemy: Enemy = _find_all(main, Enemy)[0]
