@@ -170,3 +170,26 @@ func test_セクションが分からない曲では盛り上がりを中くら�
 	var mean: float = counts.reduce(func(a, b): return a + b) / counts.size()
 	# 盛り上がり 0.5 なら1列ごとの確率は 0.55 で、ゲートのあいだに平均 1.1 列
 	assert_gt(mean, 0.8)
+
+
+func test_自動で並べるときはサビの前の小節にボスを置く():
+	# 1小節は 2 秒で 14 進む。4 小節目からが DROP なので、3 小節目の線（42）にボスを置く
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+			+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+			+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+			+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 7.0
+	main.course_length = 200.0
+	main.layout_seed = 1
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
+	assert_eq(bosses.map(func(e): return e.global_position), [Vector3(0, 0, -42)])

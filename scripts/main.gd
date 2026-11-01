@@ -41,6 +41,7 @@ const MESSAGES := {
 @export var forward_speed := 6.0
 @export var course_length := 150.0
 ## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [左端のレーン番号, HP, 占めるレーン数（省略で 1）]
+## 自動で並べるときは、サビの前などの小節（SongMap.boss_bars）に全部のレーンを埋めるボスを置く
 ## 空なら、コースの長さに合わせて自動で並べる
 @export var layout: Array = []
 ## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
@@ -237,6 +238,10 @@ func _build_layout() -> Array:
 	if _map.sections.is_empty():
 		for line in lines:
 			line.energy = UNKNOWN_ENERGY
+	# 小節の線は 0 小節目から順に並ぶので、番号がそのまま小節になる
+	for bar in _map.boss_bars():
+		if bar >= 0 and bar < lines.size():
+			lines[bar].boss = true
 	return builder.build(lines, course_length, _map.beats_per_bar)
 
 
