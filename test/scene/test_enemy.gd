@@ -142,3 +142,28 @@ func test_弾が当たると受けたダメージの数字が出る():
 	assert_eq(texts.size(), 1)
 	assert_eq(texts[0].text, "1.2k")
 	assert_gt(texts[0].global_position.y, enemy.global_position.y)
+
+
+func _make_big_enemy(hp: int) -> Enemy:
+	var enemy: Enemy = EnemyScene.instantiate()
+	enemy.start_hp = hp
+	enemy.lanes_wide = 2
+	add_child_autofree(Node3D.new()).add_child(enemy)
+	return enemy
+
+
+func test_2レーンを占める敵は大きく出る():
+	var enemy := _make_big_enemy(5)
+	assert_almost_eq(enemy.scale, Vector3.ONE * Enemy.BIG_SCALE, Vector3.ONE * 0.001)
+	assert_gt(Enemy.BIG_SCALE * 1.1, 2.5)
+
+
+func test_大きな敵のダメージの数字は大きさに合わせて高い位置に出る():
+	var small := _make_enemy(5000)
+	var big := _make_big_enemy(5000)
+	for enemy in [small, big]:
+		var bullet: Bullet = add_child_autofree(BulletScene.instantiate())
+		enemy.area_entered.emit(bullet)
+	var small_y: float = _damage_texts(small)[0].position.y
+	var big_y: float = _damage_texts(big)[0].position.y
+	assert_almost_eq(big_y, small_y * Enemy.BIG_SCALE, 0.001)

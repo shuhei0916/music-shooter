@@ -8,8 +8,12 @@ const DAMAGE_COLOR := Color(1, 0.85, 0.3)
 const DAMAGE_FONT_SIZE := 80
 ## 拍に合わせるとき、ダメージの数字を何拍で消すか。弾は多くても1拍に1発なので、次の数字と重ならない
 const DAMAGE_BEATS := 1.0
+## 2レーンを占める大きな敵の大きさ（ふつうの敵が 1）。2つのレーンの中心を覆う
+const BIG_SCALE := 2.4
 
 @export var start_hp := 3
+## 占めるレーンの数。2 なら大きな敵として大きく出る
+@export var lanes_wide := 1
 @export var flash_duration := 0.12
 @export var hit_scale := 1.15
 ## 当たったときの演出（光る・ふくらむ・ダメージの数字）を、何拍ごとの線に合わせて出すか
@@ -38,6 +42,8 @@ var _dying_left := -1.0
 
 func _ready() -> void:
 	health = Health.new(start_hp)
+	if lanes_wide > 1:
+		scale = Vector3.ONE * BIG_SCALE
 	_update_hp_label()
 	var material: StandardMaterial3D = _body.mesh.material.duplicate()
 	_base_color = material.albedo_color
@@ -138,7 +144,7 @@ func _show_damage(amount: int) -> void:
 	popup.font_size = DAMAGE_FONT_SIZE
 	if grid != null:
 		popup.duration = grid.seconds_per_beat() * DAMAGE_BEATS
-	popup.position = position + Vector3(0, DAMAGE_HEIGHT, 0)
+	popup.position = position + Vector3(0, DAMAGE_HEIGHT * scale.y, 0)
 	get_parent().add_child(popup)
 
 
