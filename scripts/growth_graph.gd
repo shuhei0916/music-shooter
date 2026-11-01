@@ -5,8 +5,10 @@ extends Control
 
 ## 縦のいちばん大きい値を、曲線とボスのいちばん大きい値の何倍にするか（プレイヤーが上回っても見えるように）
 const HEADROOM := 10.0
-## プレイヤーの強さを記録する時刻の間隔（秒）。これより近ければ最後の記録を置き換える
+## プレイヤーの強さを記録する時刻の間隔（秒）。最後の点はいまの値で、ひとつ前の点からこの間隔があくまで置き換え続ける
 const RECORD_STEP := 0.25
+## プレイヤーの値が縦の上限を超えそうなら、上限をその値の何倍まで広げるか
+const PLAYER_HEADROOM := 2.0
 const BACKGROUND_COLOR := Color(0, 0, 0, 0.55)
 const GRID_COLOR := Color(1, 1, 1, 0.15)
 const CURVE_COLOR := Color(1, 1, 1, 0.9)
@@ -42,10 +44,12 @@ func setup(curve_points: Array, boss_points: Array, duration: float) -> void:
 func show_at(p_time: float, player_value: float) -> void:
 	time = p_time
 	var point := Vector2(p_time, player_value)
-	if not player_points.is_empty() and p_time - player_points.back().x < RECORD_STEP:
+	var count := player_points.size()
+	if count >= 2 and player_points[-1].x - player_points[-2].x < RECORD_STEP:
 		player_points[-1] = point
 	else:
 		player_points.append(point)
+	max_value = maxf(max_value, player_value * PLAYER_HEADROOM)
 	if is_visible_in_tree():
 		queue_redraw()
 

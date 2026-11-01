@@ -39,8 +39,20 @@ func test_いまの時刻とプレイヤーの強さを渡すと記録して縦�
 	assert_eq(graph.player_points, [Vector2(2, 50), Vector2(4, 80)])
 
 
-func test_同じくらいの時刻では記録を増やさず最後の値を置き換える():
+func test_毎フレーム少しずつ進んでも一定の間隔ごとに点を残し最後の点はいまの値にする():
 	var graph := _make_graph()
-	graph.show_at(2.0, 50)
-	graph.show_at(2.01, 60)
-	assert_eq(graph.player_points, [Vector2(2.01, 60)])
+	for frame in 61:
+		graph.show_at(frame / 60.0, 10 + frame)
+	assert_gte(graph.player_points.size(), 4)
+	assert_eq(graph.player_points.back(), Vector2(1, 70))
+	for i in range(1, graph.player_points.size() - 1):
+		var gap := graph.player_points[i].x - graph.player_points[i - 1].x
+		assert_gte(gap, GrowthGraph.RECORD_STEP - 0.001)
+
+
+func test_プレイヤーの値が縦の上限に近づくと上限を広げて枠に収める():
+	var graph := _make_graph()
+	var before := graph.max_value
+	graph.show_at(1.0, before * 5)
+	assert_gt(graph.max_value, before * 5)
+	assert_gt(graph.point_of(1.0, before * 5).y, 0.0)
