@@ -81,3 +81,37 @@ func test_2レーンを占める敵がいればあいているレーンへ向か
 	var autoplay := _make_autoplay(main)
 	_run(main, autoplay, 10, 0.1)
 	assert_gt(main.get_node("Player").position.x, 1.0)
+
+
+func test_ボスにぶつかる直前のプレイヤーのHPとボスの残りのHPを記録する():
+	var main := _make_main([{"z": 30.0, "enemies": [[0, 50, 3]]}])
+	var autoplay := _make_autoplay(main)
+	_run(main, autoplay, 40, 0.1)
+	assert_eq(autoplay.boss_records.size(), 1)
+	var record: Dictionary = autoplay.boss_records[0]
+	assert_eq(record.player_hp, 10)
+	assert_between(record.boss_hp, 45, 50)
+	assert_eq(autoplay.zone(), 1)
+
+
+func test_HPでボスを上回ればそのボスを越えて次のゾーンに進む():
+	var layout := [{"z": 30.0, "enemies": [[0, 4, 3]]}, {"z": 80.0, "enemies": [[0, 500, 3]]}]
+	var main := _make_main(layout)
+	var autoplay := _make_autoplay(main)
+	_run(main, autoplay, 100, 0.1)
+	assert_eq(autoplay.boss_records.size(), 2)
+	assert_eq(autoplay.zone(), 2)
+
+
+func test_ふつうの敵はボスとして記録しない():
+	var main := _make_main([{"z": 30.0, "enemies": [[0, 5]]}])
+	var autoplay := _make_autoplay(main)
+	_run(main, autoplay, 40, 0.1)
+	assert_eq(autoplay.boss_records, [])
+
+
+func test_ボスごとの余裕はプレイヤーのHPをボスの残りのHPで割った値():
+	var autoplay := Autoplay.new()
+	autoplay.boss_records = [{"player_hp": 30, "boss_hp": 20}, {"player_hp": 50, "boss_hp": 200}]
+	assert_eq(autoplay.boss_margins(), [1.5, 0.25])
+	autoplay.free()

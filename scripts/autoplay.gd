@@ -9,6 +9,9 @@ var main: Main
 ## 小節の頭ごとの記録。{time, label, energy, hp, power, fire_level, dps（1秒あたりのダメージ）,
 ## enemy_hp（次の敵の列でいちばん多い HP。敵の列が無ければ 0）}
 var samples: Array = []
+## 出会ったボスごとの、ぶつかる直前の記録。{time, player_hp, boss_hp（ボスの残りの HP）}
+## ぶつかると少ないほうの HP だけ両方が減るので、player_hp が boss_hp より多ければそのボスを越えられる
+var boss_records: Array = []
 ## 時刻 0 ちょうどの小節の頭でも記録できるよう、最初は 0 より少し前にしておく
 var _last_time := -0.001
 
@@ -20,6 +23,27 @@ func _process(_delta: float) -> void:
 	player.autopilot = true
 	player.auto_axis = AutoPilot.axis(player.position.x, _target_x(player))
 	_record(player)
+	_track_boss(player)
+
+
+## いま進んでいるゾーン。1 が中ボス1の前で、ボスを1体越えるごとに 1 増える
+func zone() -> int:
+	return boss_records.filter(func(r): return r.player_hp > r.boss_hp).size() + 1
+
+
+## 前にいる、いちばん近いボスの記録を、いまの HP で書きかえ続ける（ぶつかったあとは書きかえない）
+func _track_boss(player: Player) -> void:
+	var bosses := _ahead(player, _enemies()).filter(func(e): return e.lanes_wide > 1)
+	if bosses.is_empty():
+		return
+	var z := _nearest_z(bosses)
+	var boss: Enemy = bosses.filter(func(e): return is_equal_approx(e.global_position.z, z))[0]
+	if boss_records.is_empty() or boss_records.back().id != boss.get_instance_id():
+		boss_records.append({"id": boss.get_instance_id()})
+	var record: Dictionary = boss_records.back()
+	record.time = main.song_time()
+	record.player_hp = player.health.hp
+	record.boss_hp = boss.health.hp
 
 
 ## 小節の頭をまたいでいたら記録する
@@ -117,3 +141,8 @@ static func _nearest_z(nodes: Array) -> float:
 	for node: Node3D in nodes:
 		z = maxf(z, node.global_position.z)
 	return z
+
+
+## 出会ったボスごとの余裕（プレイヤーの HP ÷ ボスの残りの HP）。1 より大きければ越えられる
+func boss_margins() -> Array:
+	return boss_records.map(func(r): return float(r.player_hp) / maxi(r.boss_hp, 1))
