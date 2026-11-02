@@ -1,5 +1,33 @@
 # TODO
 
+## 次にやること（2026-11-03 時点の引き継ぎ）
+
+方針：曲の解析の値（BPM・セクションなど）は、AI や人が手で決めず、プログラムが自動で決める仕組みを作る。librosa などのライブラリでできる部分は作り直さない。外れたら値を手で直さず、仕組みを直す。
+
+1. BPM の推定を正解と比べる（下の「曲の解析」の BPM の項目）
+   - 正解の BPM の一覧（曲名: BPM）をユーザーが用意する（AI は書かない）。推定と正解を比べるスクリプトを tools/ に作る
+   - 今のずれは My Heart だけ（推定 116、正しくは 174 のドラムンベース）。まず librosa の `feature.tempo` の設定（`start_bpm`・テンポの見込みの分布）で直せるか試し、だめなら `allin1` などと比べる
+2. 複数の曲に対応する
+   - まず `tools/autoplay_run.gd` に `--song=` を足し、曲ごとのクリア率とボスごとの余裕を出す（釣り合いは Tropic Love 1曲でしか取っていない）
+   - そのあと曲選択の画面（`music/` の中で `.beats.json` のある曲を並べる）。今は `main.gd` の `song_path` に1曲を書いているだけ
+   - 曲をどこから持ってくるか：解析ずみの曲を同梱して配布する（NCS はクレジットを出せば使える曲が多い）か、遊ぶ人の mp3 をその場で解析するか（Python を同梱するか、解析を移す必要があって重い）。まずは前者で進め、後者はあとで決める
+   - `analyze.py` に複数の曲をまとめて渡せるようにする
+3. セクションの推定の外れを直す（下の「曲の解析」の Aメロ・サビの項目）。ボスの位置がずれる曲がある
+   - Eclipse・Firefly：1回目のサビが VERSE になり、DROP が1回だけ
+   - Puzzle：切れ目が見つからず、曲全体が1つの DROP
+   - Invincible：DROP が 49 小節と長い
+4. 宝箱（下の「敵」の宝箱の項目）。決めたいこと：持つ敵の割合、中身を固定か山札か、撃って開けるか触れて取るか
+   - 案：2体の列のうち強いほうの敵が確率で持つ。倒しきれれば宝箱、倒しきれなければぶつかって HP を削られる、という賭けにする
+   - 案：倒れた場所に落ち、そのレーンで触れると取れる。出る・取る演出は拍に合わせる。中身はゲートとは別の山札から引き、数は成長曲線に合わせる
+   - ボスとの戦いのごほうびと仕組みを共通にする。自動操縦は、届くまでに倒しきれるとき（DPS × 届くまでの時間 ≥ HP）だけ宝箱のレーンを選ぶ
+
+### 別の環境で始めるとき
+- `music/`（曲と `.beats.json`）は git に入れていない。曲を `music/` に置き、`tools/` で `python analyze.py ../music/曲.mp3` を曲ごとに流して `.beats.json` を作る（`--bpm` は付けない）
+  - 今入れている曲：tropic_love.mp3、NCS の6曲（DEAF KEV - Invincible、Different Heaven, EH!DE - My Heart、Distrion, Alex Skrindo - Entropy、Jim Yosef - Eclipse、Jim Yosef - Firefly、RetroVision - Puzzle。ファイル名は「アーティスト - 曲名 [NCS Release].mp3」）
+- tools/ の仮想環境は Python 3.12 以上で作る（librosa 1.0.0 が 3.12 以上を要る）：`python -m venv .venv` のあと `.venv` の pip で `pip install -r requirements-dev.txt`、テストは `pytest`
+- Godot のテストは GUT（`--headless --script addons/gut/gut_cmdln.gd -gdir=res://test/ -ginclude_subdirs -gexit`）。clone 直後は先に `--headless --import` を1回流す
+- 自動で遊ばせる：`godot --headless --fixed-fps 60 --script res://tools/autoplay_run.gd -- --seeds=10`。今の Tropic Love の結果は10回中7回クリア
+
 ## 曲の解析と、ゲームへの組み込み
 
 - [ ] Aメロ・Bメロ・サビのような曲の組み立てを推定する（今は切れ目を音色の変化で、名前を音量だけでつけているので、EDM 以外では外れやすい）
