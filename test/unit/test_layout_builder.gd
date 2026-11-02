@@ -23,6 +23,7 @@ func _gate_zs(rows: Array) -> Array:
 
 
 ## 各ゲートの列から次のゲートの列までに置いた敵の列の、ゲートからの拍数
+## 最後のゲートの先には次のゲートが無く敵も置かないので、数えない
 func _enemy_beats_between_gates(rows: Array) -> Array:
 	var result := []
 	var gate_z := 0.0
@@ -32,6 +33,7 @@ func _enemy_beats_between_gates(rows: Array) -> Array:
 			result.append([])
 		else:
 			result.back().append((row.z - gate_z) / BEAT)
+	result.pop_back()
 	return result
 
 
@@ -46,11 +48,11 @@ func test_ゲートの列は小節の線1本おきに置く():
 	assert_eq(_gate_zs(rows), [32.0, 64.0, 96.0])
 
 
-func test_ゲートのあいだの敵の列はゲートから2拍以上離れた拍の線に0から2列置き列どうしも2拍以上あける():
+func test_ゲートのあいだの敵の列はゲートから2拍以上離れた拍の線に1から2列置き列どうしも2拍以上あける():
 	for seed_value in 30:
 		var rows := _make_builder(seed_value).build(_lines(0.5), LENGTH)
 		for beats: Array in _enemy_beats_between_gates(rows):
-			assert_between(beats.size(), 0, 2)
+			assert_between(beats.size(), 1, 2)
 			for beat in beats:
 				assert_almost_eq(beat, roundf(beat), 0.001)
 				assert_between(beat, 2.0, 6.0)
@@ -58,13 +60,16 @@ func test_ゲートのあいだの敵の列はゲートから2拍以上離れた
 				assert_gte(beats[1] - beats[0], 2.0)
 
 
-func test_ゲートのあいだの敵の列の数は0列も1列も2列も出る():
+func test_ゲートのあいだの敵の列は盛り上がりが無くても必ず1列はあり1列も2列も出る():
 	var counts := {}
-	for seed_value in 30:
-		var rows := _make_builder(seed_value).build(_lines(0.5), LENGTH)
-		for beats: Array in _enemy_beats_between_gates(rows):
-			counts[beats.size()] = true
-	assert_eq_deep(counts.keys().filter(func(k): return k <= 2).size(), 3)
+	for energy in [0.0, 0.5, 1.0]:
+		for seed_value in 30:
+			var rows := _make_builder(seed_value).build(_lines(energy), LENGTH)
+			for beats: Array in _enemy_beats_between_gates(rows):
+				counts[beats.size()] = true
+	var keys := counts.keys()
+	keys.sort()
+	assert_eq_deep(keys, [1, 2])
 
 
 func test_同じシードなら同じ配置になる():
@@ -92,7 +97,7 @@ func _mean_enemy_rows(energy: float) -> float:
 
 
 func test_盛り上がりが大きいほどゲートのあいだの敵の列が多い():
-	assert_gt(_mean_enemy_rows(1.0), _mean_enemy_rows(0.25) + 0.5)
+	assert_gt(_mean_enemy_rows(1.0), _mean_enemy_rows(0.25) + 0.3)
 
 
 ## 小節の線 at（番号）にボスの印をつけた線

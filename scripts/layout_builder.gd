@@ -1,13 +1,14 @@
 class_name LayoutBuilder
 extends RefCounted
 ## 曲の小節の線の上に、ゲートの列と敵の列を並べた配置データを作る
-## ゲートの列は小節の線1本おき（2小節ごと）に置き、そのあいだの拍の線に敵の列を 0〜2 列置く
+## ゲートの列は小節の線1本おき（2小節ごと）に置き、そのあいだの拍の線に敵の列を 1〜2 列置く
 ## 規模の曲線を渡すと、HP と威力の足し算のゲートの数を置く位置の規模に合わせて、
 ## 掛け算のゲートの数をそのゾーンの伸びの速さに合わせて大きくする
 
 ## ゲートのあいだに置く敵の列の数の上限
 const MAX_ENEMY_ROWS := 2
-## 敵の列を1列ずつ置くかどうかの確率。盛り上がり（energy）が 0 のときと 1 のとき。そのあいだは線形
+## 1列目は必ず置き、2列目からは1列ずつ置くかどうかを確率で決める
+## その確率の、盛り上がり（energy）が 0 のときと 1 のとき。そのあいだは線形
 const ENEMY_ROW_CHANCE_CALM := 0.2
 const ENEMY_ROW_CHANCE_HOT := 0.9
 ## 敵の列は、ゲートの列からも、ほかの敵の列からも、この拍数以上あける（避けたり選んだりする余裕）
@@ -96,13 +97,13 @@ func _boss_row(z: float) -> Dictionary:
 
 
 ## ゲートのあいだ（beats 拍）のうち、敵の列を置く拍（ゲートからの拍数、小さい順）
-## 盛り上がり energy が大きいほど、たくさん置く
+## 必ず1列は置き、盛り上がり energy が大きいほど、たくさん置く
 func _enemy_beats(beats: int, energy: float) -> Array:
 	var candidates := range(ENEMY_GAP_BEATS, beats - ENEMY_GAP_BEATS + 1)
 	var chance := lerpf(ENEMY_ROW_CHANCE_CALM, ENEMY_ROW_CHANCE_HOT, clampf(energy, 0.0, 1.0))
 	var chosen := []
 	for i in MAX_ENEMY_ROWS:
-		if _rng.randf() >= chance:
+		if i > 0 and _rng.randf() >= chance:
 			continue
 		var free := candidates.filter(
 			func(c): return chosen.all(func(b): return absi(c - b) >= ENEMY_GAP_BEATS)
