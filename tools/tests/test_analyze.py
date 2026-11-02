@@ -39,6 +39,16 @@ def test_main_writes_beats_json_next_to_song(tmp_path):
     assert beats["offset"] == pytest.approx(0.25, abs=0.008)
 
 
+@pytest.mark.parametrize("bpm, offset", [(120.0, 0.25), (97.0, 0.1)])
+def test_main_estimates_bpm_with_librosa_when_bpm_is_not_given(tmp_path, bpm, offset):
+    path = tmp_path / "clicks.wav"
+    write_clicks(path, bpm=bpm, offset=offset)
+    main([str(path)])
+    beats = json.loads((tmp_path / "clicks.beats.json").read_text(encoding="utf-8"))
+    assert beats["bpm"] == pytest.approx(bpm, abs=0.05)
+    assert beats["offset"] == pytest.approx(offset, abs=0.008)
+
+
 def write_song(path, bpm, offset, first_bar_beat, quiet_bars, loud_bars):
     """拍ごとのクリックに、小節の頭で変わる和音を重ねた wav を書き出す
 
