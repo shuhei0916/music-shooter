@@ -25,6 +25,8 @@ const BAR_LINE_COLOR := Color(1, 1, 1, 0.35)
 ## 拍ごとの線は、小節の線より細く薄くする
 const BEAT_LINE_WIDTH := 0.06
 const BEAT_LINE_COLOR := Color(1, 1, 1, 0.15)
+## セクションが分からない曲で、敵を並べるときに使う盛り上がり（中くらい）
+const UNKNOWN_ENERGY := 0.5
 const MESSAGES := {
 	Judge.Result.CLEARED: "CLEAR!",
 	Judge.Result.GAME_OVER: "GAME OVER",
@@ -38,7 +40,8 @@ const MESSAGES := {
 @export var bpm := 105.0
 @export var forward_speed := 6.0
 @export var course_length := 150.0
-## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [レーン番号, HP]
+## z: スタートからの距離、gates: 左から順にゲートの [種類, 数]、enemies: 敵の [左端のレーン番号, HP, 占めるレーン数（省略で 1）]
+## 自動で並べるときは、サビの前などの小節（SongMap.boss_bars）に全部のレーンを埋めるボスを置く
 ## 空なら、コースの長さに合わせて自動で並べる
 @export var layout: Array = []
 ## 自動で並べるときの乱数のシード。-1 なら遊ぶたびに変わる
@@ -46,18 +49,29 @@ const MESSAGES := {
 @export var row_start := 20.0
 @export var row_end_margin := 15.0
 @export var enemy_start_hp := 5
-## ゴールでの敵のHP。敵のHPはスタートからここまで一定の比率で増える
-## 約700万にすると、コースの後半（後ろ半分）の敵のHPの平均が約100万になる
-@export var enemy_goal_hp := 7_000_000
+## ボスの HP（中ボス1・中ボス2・最後のボス）。自動で並べるときの、数字の規模の基準
+## ボスが少ない曲では後ろから順に当てる。ボスが無い曲では、最後の小節の線の敵を最後の値にする
+## 敵の HP は、ボスで区切ったゾーンごとに、初めはなだらかに終わりに向けて加速して増える（GrowthCurve）
+## ボスを越えるころにプレイヤーの数字の単位が変わる（k→m→b）くらいにしている（自動で遊ばせて大まかに決めた値）
+## 最後の5億は、プレイヤーの HP が10億あればぶつかっても半分残る
+@export var boss_hps: Array[int] = [2_000, 500_000, 500_000_000]
 @export var lane_count := 3
 @export var lane_width := 3.0
 
 var song: AudioStream
+## 音を出さないモード。曲は流さず、曲の長さだけ経過時間で進む（自動で遊ばせるときに使う）
+var silent := false
+## デバッグモード。床の小節・拍の線と成長曲線のグラフは、デバッグモードのときだけ見せる
+var debug := false:
+	set(value):
+		debug = value
+		_show_debug()
 var _course: Course
 var _clock: SongClock
 var _lanes: Lanes
 var _shot_grid: BeatGrid
 var _map: SongMap
+var _growth: GrowthCurve
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -67,14 +81,18 @@ var _result := Judge.Result.PLAYING
 @onready var _hint: Label = $UI/Hint
 @onready var _music: AudioStreamPlayer = $Music
 @onready var _beat_hud: BeatHud = $UI/BeatHud
+@onready var _growth_graph: GrowthGraph = $UI/GrowthGraph
 
 
 func _ready() -> void:
 	if song == null and ResourceLoader.exists(song_path):
 		song = load(song_path)
 	if song != null:
-		_music.stream = song
-		_clock = MusicClock.new(_music)
+		if silent:
+			_clock = TimerClock.new(song.get_length())
+		else:
+			_music.stream = song
+			_clock = MusicClock.new(_music)
 		course_length = _clock.duration() * forward_speed
 	else:
 		_clock = TimerClock.new(course_length / forward_speed)
@@ -89,6 +107,7 @@ func _ready() -> void:
 	_fit_road()
 	_draw_bar_lines()
 	_draw_beat_lines()
+	_show_debug()
 	if layout.is_empty():
 		layout = _build_layout()
 	for row in layout:
@@ -104,6 +123,7 @@ func _process(delta: float) -> void:
 	var pos := _map.at(_clock.time())
 	_player.dance(pos)
 	_beat_hud.show_at(pos)
+	_growth_graph.show_at(_clock.time(), _player.health.hp)
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)
@@ -112,8 +132,36 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
+	if event.is_action_pressed("toggle_debug"):
+		debug = not debug
+	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
 		get_tree().reload_current_scene()
+
+
+## レーンの中心の x（左から順）
+func lane_xs() -> Array:
+	return range(lane_count).map(func(i): return _lanes.x_of(i))
+
+
+## 曲の今の時刻と、曲の組み立て、今の勝ち負け（自動で遊ばせて記録するときに使う）
+func song_time() -> float:
+	return _clock.time()
+
+
+func song_map() -> SongMap:
+	return _map
+
+
+func result() -> Judge.Result:
+	return _result
+
+
+## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
+func _show_debug() -> void:
+	for node_name in ["BarLines", "BeatLines", "UI/GrowthGraph"]:
+		var node := get_node_or_null(node_name)
+		if node != null:
+			node.visible = debug
 
 
 func _finish() -> void:
@@ -190,10 +238,48 @@ func _line_material(color: Color) -> StandardMaterial3D:
 func _build_layout() -> Array:
 	var seed_value := layout_seed if layout_seed >= 0 else randi()
 	var deck := GateDeck.new(GATE_CARDS, seed_value)
-	var wave := EnemyWave.new(lane_count, enemy_start_hp, enemy_goal_hp, course_length, seed_value)
-	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin)
 	var lines := _map.bar_lines(forward_speed, course_length / forward_speed)
-	return builder.build(lines.map(func(line): return line.distance), course_length)
+	if _map.sections.is_empty():
+		for line in lines:
+			line.energy = UNKNOWN_ENERGY
+	# 小節の線は 0 小節目から順に並ぶので、番号がそのまま小節になる
+	var boss_bars := []
+	for bar in _map.boss_bars():
+		if bar >= 0 and bar < lines.size():
+			lines[bar].boss = true
+			boss_bars.append(bar)
+	_growth = GrowthCurve.new(lines, enemy_start_hp, _growth_anchors(boss_bars, lines.size()))
+	var tension := TensionCurve.new(lines)
+	_setup_growth_graph(lines, tension)
+	var wave := EnemyWave.new(lane_count, _growth, seed_value, tension)
+	var builder := LayoutBuilder.new(deck, wave, row_start, row_end_margin, seed_value, _growth)
+	return builder.build(lines, course_length, _map.beats_per_bar)
+
+
+## 規模の曲線の錨。ボスの小節の線で、ボスの HP が boss_hps の値（後ろから順）になるように、
+## ふつうの敵の規模（ボスの HP ÷ BOSS_HP_RATE）を決める。ボスが無ければ、最後の小節の線で最後の値
+func _growth_anchors(boss_bars: Array, line_count: int) -> Array:
+	if boss_bars.is_empty():
+		return [[line_count - 1, float(boss_hps.back())]]
+	var anchors := []
+	var hps := boss_hps.slice(maxi(boss_hps.size() - boss_bars.size(), 0))
+	for i in mini(boss_bars.size(), hps.size()):
+		var bar: int = boss_bars[boss_bars.size() - hps.size() + i]
+		anchors.append([bar, float(hps[i]) / EnemyWave.BOSS_HP_RATE])
+	return anchors
+
+
+## デバッグモードの成長曲線のグラフに、小節ごとのふつうの敵の HP（規模 × 緊張の倍率）とボスの HP を渡す
+func _setup_growth_graph(lines: Array, tension: TensionCurve) -> void:
+	var curve_points := []
+	var boss_points := []
+	for line in lines:
+		var time: float = line.distance / forward_speed
+		var value := _growth.value_at(line.distance)
+		curve_points.append(Vector2(time, value * tension.rate_at(line.distance)))
+		if line.get("boss", false):
+			boss_points.append(Vector2(time, value * EnemyWave.BOSS_HP_RATE))
+	_growth_graph.setup(curve_points, boss_points, course_length / forward_speed)
 
 
 func _spawn_row(row: Dictionary) -> void:
@@ -210,10 +296,18 @@ func _spawn_row(row: Dictionary) -> void:
 			gate_area.op = row.gates[i][0]
 			gate_area.amount = row.gates[i][1]
 			gate_area.width = slots.width
+			gate_area.grid = _map.grid
+			gate_area.stats = _player.stats
 			gate_area.position.x = slots.x_of(i)
 			pair.add_child(gate_area)
 	for spec in row.get("enemies", []):
 		var enemy: Enemy = EnemyScene.instantiate()
 		enemy.start_hp = spec[1]
-		enemy.position = Vector3(_lanes.x_of(spec[0]), 0, z)
+		enemy.clock = _clock
+		enemy.grid = _map.grid
+		# 3つめは占めるレーンの数（無ければ 1）。占めるレーンのまんなかに置く
+		var wide: int = spec[2] if spec.size() > 2 else 1
+		enemy.lanes_wide = wide
+		var x := (_lanes.x_of(spec[0]) + _lanes.x_of(spec[0] + wide - 1)) / 2.0
+		enemy.position = Vector3(x, 0, z)
 		add_child(enemy)

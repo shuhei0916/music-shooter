@@ -2,6 +2,8 @@ extends GutTest
 ## Main のうち、曲の拍・小節・セクションに合わせて動くところ
 
 const MainScene := preload("res://scenes/main.tscn")
+## 自動で並べたとき、ゲートのあいだに敵の列が出るシード
+const SEED_WITH_ENEMIES := 2
 
 
 func _make_main(speed: float, length: float) -> Main:
@@ -104,7 +106,7 @@ func test_床に拍ごとの線も引く():
 	assert_eq(zs.slice(0, 4), [-5.0, -10.0, -15.0, -25.0])
 
 
-func test_自動で並べるときはゲートと敵の列を小節の線の上に置く():
+func test_自動で並べるときはゲートの列を小節の線に敵の列をゲートのあいだの拍の線に置く():
 	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
 	beats.store_string('{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0}')
 	beats.close()
@@ -112,7 +114,7 @@ func test_自動で並べるときはゲートと敵の列を小節の線の上�
 	main.song_path = "user://test_song.mp3"
 	main.forward_speed = 7.0
 	main.course_length = 100.0
-	main.layout_seed = 1
+	main.layout_seed = SEED_WITH_ENEMIES
 	add_child_autofree(main)
 	DirAccess.remove_absolute("user://test_song.beats.json")
 	# 1小節は 2 秒で 14 進む。スタートから 20 より先、ゴールの 15 手前（85）までの線
@@ -122,8 +124,13 @@ func test_自動で並べるときはゲートと敵の列を小節の線の上�
 	var enemy_zs := {}
 	for enemy in _find_all(main, Enemy):
 		enemy_zs[enemy.global_position.z] = true
+	# 1拍は 3.5 進む
 	assert_eq(gate_zs.keys(), [-28.0, -56.0, -84.0])
-	assert_eq(enemy_zs.keys(), [-42.0, -70.0])
+	assert_gt(enemy_zs.size(), 0)
+	for z: float in enemy_zs:
+		assert_almost_eq(fposmod(z, 3.5), 0.0, 0.001)
+		assert_between(z, -84.0, -28.0)
+		assert_false(z in gate_zs)
 
 
 func test_プレイヤーは曲の拍に合わせて体を弾ませる():
@@ -147,3 +154,106 @@ func test_初めは小節の頭で弾を撃つ():
 	assert_eq(_find_all(main, Bullet).size(), 0)
 	simulate(main, 2, 0.25)
 	assert_eq(_find_all(main, Bullet).size(), 1)
+
+
+func test_セクションが分からない曲では盛り上がりを中くらいとして敵の列を並べる():
+	var counts := []
+	for seed_value in 10:
+		var main: Main = MainScene.instantiate()
+		main.song_path = ""
+		main.course_length = 600.0
+		main.layout_seed = seed_value
+		add_child_autofree(main)
+		counts.append(main.layout.filter(func(row): return row.has("enemies")).size())
+		var gates: int = main.layout.filter(func(row): return row.has("gates")).size()
+		counts[-1] = float(counts[-1]) / (gates - 1)
+	var mean: float = counts.reduce(func(a, b): return a + b) / counts.size()
+	# 盛り上がり 0.5 なら1列ごとの確率は 0.55 で、ゲートのあいだに平均 1.1 列
+	assert_gt(mean, 0.8)
+
+
+func test_自動で並べるときはサビの前の小節にボスを置く():
+	# 1小節は 2 秒で 14 進む。4 小節目からが DROP なので、3 小節目の線（42）にボスを置く
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+			+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+			+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+			+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 7.0
+	main.course_length = 200.0
+	main.layout_seed = 1
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
+	assert_eq(bosses.map(func(e): return e.global_position), [Vector3(0, 0, -42)])
+
+
+func test_自動で並べるときはボスのHPを設定の並びの後ろから順に当てる():
+	# 1小節は 14 進む。サビは 4〜7 小節目の1回だけなので、ボスは 3 小節目（42）と 7 小節目（98）
+	var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+	beats.store_string(
+		(
+			'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+			+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+			+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+			+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1]}'
+		)
+	)
+	beats.close()
+	var main: Main = MainScene.instantiate()
+	main.song_path = "user://test_song.mp3"
+	main.forward_speed = 7.0
+	main.course_length = 200.0
+	main.layout_seed = 1
+	# ボスは2体なので、3つのうち後ろの2つを使う
+	main.boss_hps = [7, 2_000, 1_000_000]
+	add_child_autofree(main)
+	DirAccess.remove_absolute("user://test_song.beats.json")
+	var bosses := _find_all(main, Enemy).filter(func(e): return e.lanes_wide == 3)
+	var hp_by_z := {}
+	for boss in bosses:
+		hp_by_z[boss.global_position.z] = boss.start_hp
+	assert_eq(hp_by_z.get(-98.0), 1_000_000)
+	assert_eq(hp_by_z.get(-42.0), 2_000)
+
+
+func test_自動で並べるときはDROPのふつうの敵を緊張の曲線で弱くする():
+	# サビは 4〜7 小節目（56〜98）。規模はボスの 3 小節目（42）で 1000、7 小節目（98）で 2000
+	# DROP の敵は 0.4 倍されるので、2000 × 0.4 = 800 より多くはならない（倍率が無ければ 1000 以上）
+	var hps := []
+	for seed_value in 5:
+		var beats := FileAccess.open("user://test_song.beats.json", FileAccess.WRITE)
+		beats.store_string(
+			(
+				'{"bpm": 120.0, "offset": 0.0, "beats_per_bar": 4, "downbeat": 0.0, "sections": ['
+				+ '{"bar": 0, "energy": 0.5, "label": "BUILD"},'
+				+ '{"bar": 4, "energy": 1.0, "label": "DROP"}],'
+				+ '"bar_energy": [0, 0, 0, 0, 1, 1, 1, 1]}'
+			)
+		)
+		beats.close()
+		var main: Main = MainScene.instantiate()
+		main.song_path = "user://test_song.mp3"
+		main.forward_speed = 7.0
+		main.course_length = 200.0
+		main.layout_seed = seed_value
+		main.boss_hps = [10_000, 20_000]
+		add_child_autofree(main)
+		DirAccess.remove_absolute("user://test_song.beats.json")
+		for enemy in _find_all(main, Enemy):
+			if (
+				enemy.lanes_wide == 1
+				and enemy.global_position.z < -56
+				and enemy.global_position.z > -98
+			):
+				hps.append(enemy.start_hp)
+	assert_gt(hps.size(), 0)
+	for hp in hps:
+		assert_lte(hp, 800)

@@ -1,6 +1,7 @@
 """曲のファイルを読み、拍の格子（BPMと最初の拍の時刻）と、小節の頭・セクションを求める
 
-使い方: python analyze.py 曲のファイル --bpm おおよそのBPM
+使い方: python analyze.py 曲のファイル [--bpm おおよそのBPM]
+--bpm を省くと、おおよその BPM は librosa で推定する
 曲と同じ場所に「曲の名前.beats.json」を書き出す
 """
 
@@ -19,7 +20,7 @@ SAMPLE_RATE = 22050
 HOP_LENGTH = 128
 # 音を調べる窓の長さ（サンプル数）。短いほど音の立ち上がりの時刻がずれにくい
 N_FFT = 512
-# --bpm で与えたBPMの前後をどこまで、どの刻みで試すか
+# おおよその BPM（--bpm か librosa の推定）の前後をどこまで、どの刻みで試すか
 BPM_MARGIN = 5.0
 BPM_STEP = 0.01
 BEATS_PER_BAR = 4
@@ -36,12 +37,16 @@ SECTION_THRESHOLD = 0.2
 LAST_SEGMENT_SLACK = 0.05
 
 
-def analyze(path, bpm_range, bpm_step):
+def analyze(path, bpm_range=None, bpm_step=BPM_STEP):
+    """bpm_range を省くと、librosa で推定したおおよその BPM の前後 BPM_MARGIN を探す"""
     audio, sample_rate = librosa.load(path, sr=SAMPLE_RATE, mono=True)
     envelope = librosa.onset.onset_strength(
         y=audio, sr=sample_rate, n_fft=N_FFT, hop_length=HOP_LENGTH
     )
     frame_rate = sample_rate / HOP_LENGTH
+    if bpm_range is None:
+        rough = rough_bpm(envelope, sample_rate)
+        bpm_range = (rough - BPM_MARGIN, rough + BPM_MARGIN)
     bpm, offset = find_grid(envelope, frame_rate, bpm_range, bpm_step)
 
     duration = len(audio) / sample_rate
@@ -74,6 +79,13 @@ def analyze(path, bpm_range, bpm_step):
     }
 
 
+def rough_bpm(envelope, sample_rate):
+    """librosa で推定した、おおよその BPM（とびとびの値なので、拍の格子には find_grid で細かく合わせる）"""
+    return float(
+        librosa.feature.tempo(onset_envelope=envelope, sr=sample_rate, hop_length=HOP_LENGTH)[0]
+    )
+
+
 def segment_means(feature, feature_rate, start, length, duration):
     """start 秒から length 秒ごとに区切り、曲の終わりまでに収まる区間ごとの特徴の平均を並べる
 
@@ -91,9 +103,9 @@ def segment_means(feature, feature_rate, start, length, duration):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("song", type=Path)
-    parser.add_argument("--bpm", type=float, required=True, help="おおよそのBPM")
+    parser.add_argument("--bpm", type=float, help="おおよそのBPM（省くと librosa で推定する）")
     args = parser.parse_args(argv)
-    bpm_range = (args.bpm - BPM_MARGIN, args.bpm + BPM_MARGIN)
+    bpm_range = None if args.bpm is None else (args.bpm - BPM_MARGIN, args.bpm + BPM_MARGIN)
     result = analyze(args.song, bpm_range, BPM_STEP)
     beats = {
         "bpm": round(result["bpm"], 2),

@@ -76,6 +76,12 @@ func test_セクションの始まりの小節の線には印をつけ盛り上�
 	assert_almost_eq(lines[0].energy, 0.3, 0.0001)
 
 
+func test_小節の線にはセクションの名前とセクションの中の進み具合も添える():
+	var lines := _map().bar_lines(10.0, 9.0)
+	assert_eq(lines.map(func(line): return line.label), ["BUILD", "BUILD", "DROP", "DROP", "DROP"])
+	assert_eq(lines.map(func(line): return line.progress), [0.0, 0.5, 0.0, 1.0 / 3, 2.0 / 3])
+
+
 func test_セクションがなければ小節の線に印はつけない():
 	var lines := SongMap.from_json("", 120.0).bar_lines(1.0, 4.0)
 	assert_eq(lines.map(func(line): return line.distance), [0.0, 2.0, 4.0])
@@ -92,3 +98,33 @@ func test_弾を撃つ拍の線は最初の小節の頭から引く():
 	var grid := _map().shot_grid()
 	assert_almost_eq(grid.bpm, 120.0, 0.0001)
 	assert_almost_eq(grid.offset, 0.75, 0.0001)
+
+
+## labels のセクションを、4 小節ずつ並べた曲（曲の長さは セクションの数 × 4 小節）
+func _map_of(labels: Array) -> SongMap:
+	var sections := []
+	for i in labels.size():
+		sections.append({"bar": i * 4, "label": labels[i], "energy": 0.5})
+	return SongMap.new(BeatGrid.new(120.0, 0.0), 0.0, 4, sections, labels.size() * 4)
+
+
+func test_ボスを置く小節はサビの前の小節と2回目のサビの最後の小節():
+	# DROP は 8〜11 小節目と 20〜23 小節目
+	var map := _map_of(["VERSE", "BUILD", "DROP", "BREAK", "BUILD", "DROP", "VERSE"])
+	assert_eq(map.boss_bars(), [7, 19, 23])
+
+
+func test_続けて並んだDROPはひとつのサビとみなす():
+	var map := _map_of(["BUILD", "DROP", "DROP", "BUILD", "DROP", "DROP", "BREAK"])
+	assert_eq(map.boss_bars(), [3, 15, 23])
+
+
+func test_3回目からのサビの前にはボスを置かない():
+	var map := _map_of(["BUILD", "DROP", "BUILD", "DROP", "BUILD", "DROP"])
+	assert_eq(map.boss_bars(), [3, 11, 15])
+
+
+func test_サビが1回だけならその前と最後に置き無ければ置かない():
+	assert_eq(_map_of(["VERSE", "DROP", "VERSE"]).boss_bars(), [3, 7])
+	assert_eq(_map_of(["VERSE", "BREAK"]).boss_bars(), [])
+	assert_eq(SongMap.from_json("", 120.0).boss_bars(), [])

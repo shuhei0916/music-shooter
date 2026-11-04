@@ -166,3 +166,57 @@ func test_飛び出す文字はゲートと同じ色になる():
 	var texts := _floating_texts_of(player)
 	assert_eq(Color(texts[0].modulate, 1.0), Color(good.good_color, 1.0))
 	assert_eq(Color(texts[1].modulate, 1.0), Color(bad.harmful_color, 1.0))
+
+
+func test_拍の線を渡されたゲートの文字は2拍で消す():
+	var gate_area := _make_gate(Gate.Op.ADD, 5)
+	gate_area.grid = BeatGrid.new(120.0)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	assert_almost_eq(_floating_texts_of(player)[0].duration, 1.0, 0.0001)
+
+
+func test_能力値を渡されたゲートは取る前と取ったあとのダメージを表示する():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	simulate(gate_area, 1, 0.0)
+	assert_eq(gate_area.get_node("Label").text, "ダメージUP\n1->2")
+
+
+func test_威力が上がるとゲートの表示も変わる():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	gate_area.stats.power = 4
+	simulate(gate_area, 1, 0.0)
+	assert_eq(gate_area.get_node("Label").text, "ダメージUP\n4->5")
+
+
+func test_取ったときに飛び出す文字は取る前と取ったあとのダメージになる():
+	var gate_area := _make_gate(Gate.Op.POWER, 2)
+	var player := _make_player(1)
+	gate_area.area_entered.emit(player)
+	assert_eq(_floating_texts_of(player)[0].text, "ダメージUP\n1->3")
+
+
+func _label_size(gate_area: GateArea) -> Vector2:
+	var label: Label3D = gate_area.get_node("Label")
+	var font: Font = label.font if label.font != null else ThemeDB.fallback_font
+	var size := font.get_multiline_string_size(
+		label.text, HORIZONTAL_ALIGNMENT_CENTER, -1, label.font_size
+	)
+	return size * label.pixel_size
+
+
+func test_パネルに収まらない文字は小さくしてパネルに収める():
+	var gate_area := _make_gate(Gate.Op.POWER, 1)
+	gate_area.stats = PlayerStats.new(10)
+	simulate(gate_area, 1, 0.0)
+	var panel: BoxMesh = gate_area.get_node("Panel").mesh
+	var size := _label_size(gate_area)
+	assert_lt(size.x, panel.size.x)
+	assert_lt(size.y, panel.size.y)
+
+
+func test_パネルに収まる文字は元の大きさのまま():
+	var gate_area := _make_gate(Gate.Op.MULTIPLY, 2)
+	assert_eq(gate_area.get_node("Label").font_size, 160)

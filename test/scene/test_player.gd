@@ -115,3 +115,20 @@ func test_弾は銃口から出る():
 	player.shoot_on_beat(0.0, BeatGrid.new(120.0))
 	var muzzle: Node3D = player.get_node("Muzzle")
 	assert_eq(_bullets_of(player)[0].position, player.position + muzzle.position)
+
+
+func test_自動操縦では渡された向きに動く():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.autopilot = true
+	player.auto_axis = 1.0
+	simulate(player, 1, 0.1)
+	assert_gt(player.position.x, 0.0)
+
+
+func test_自動操縦ではキーの操作を受けつけない():
+	var player: Player = add_child_autofree(PlayerScene.instantiate())
+	player.autopilot = true
+	Input.action_press("move_left")
+	simulate(player, 1, 0.1)
+	Input.action_release("move_left")
+	assert_eq(player.position.x, 0.0)

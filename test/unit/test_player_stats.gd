@@ -13,3 +13,10 @@ func test_初めは1小節に1発で連射の段階が上がるごとに撃つ�
 		stats.fire_level = level
 		beats.append(stats.beats_per_shot())
 	assert_eq(beats, [4.0, 2.0, 1.0])
+
+
+func test_1小節に撃つ数は連射の段階が上がるたびに倍になる():
+	assert_eq(
+		[PlayerStats.shots_per_bar(0), PlayerStats.shots_per_bar(1), PlayerStats.shots_per_bar(2)],
+		[1, 2, 4]
+	)

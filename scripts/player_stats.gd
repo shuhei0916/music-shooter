@@ -23,3 +23,8 @@ func raise_fire_level(amount: int) -> void:
 
 func beats_per_shot() -> float:
 	return BASE_BEATS_PER_SHOT / pow(2, fire_level)
+
+
+## 連射の段階が level のときに、1小節（4拍）で撃つ弾の数
+static func shots_per_bar(level: int) -> int:
+	return 1 << level

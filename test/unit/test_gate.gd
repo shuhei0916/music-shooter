@@ -46,8 +46,19 @@ func test_威力のゲートを通ると弾の威力がその数だけ上がる(
 	assert_eq([stats.power, stats.health.hp], [3, 10])
 
 
-func test_威力のゲートの表示は威力と符号つきの数になる():
-	assert_eq(Gate.new(Gate.Op.POWER, 2).label(), "威力+2")
+func test_威力のゲートの表示は能力値が無ければダメージUPと上がる数になる():
+	assert_eq(Gate.new(Gate.Op.POWER, 2).label(), "ダメージUP\n+2")
+
+
+func test_威力のゲートの表示は取る前と取ったあとのダメージになる():
+	var stats := PlayerStats.new(10)
+	stats.power = 3
+	assert_eq(Gate.new(Gate.Op.POWER, 2).label(stats), "ダメージUP\n3->5")
+
+
+func test_威力以外のゲートの表示は能力値を渡しても変わらない():
+	var stats := PlayerStats.new(10)
+	assert_eq(Gate.new(Gate.Op.ADD, 5).label(stats), "+5")
 
 
 func test_連射のゲートを通ると連射の段階が上がる():
@@ -65,3 +76,31 @@ func test_連射の段階は上限より上がらない():
 
 func test_連射のゲートの表示は連射UP():
 	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(), "連射UP")
+
+
+func test_連射のゲートの表示は1小節に撃つ数の取る前と取ったあとになる():
+	var stats := PlayerStats.new(10)
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射UP\n1->2")
+	stats.fire_level = 1
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射UP\n2->4")
+
+
+func test_連射のゲートで上限を超える分は数に入れない():
+	var stats := PlayerStats.new(10)
+	stats.fire_level = 1
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 3).label(stats), "連射UP\n2->4")
+
+
+func test_連射が上限のときの連射のゲートの表示は連射MAX():
+	var stats := PlayerStats.new(10)
+	stats.fire_level = PlayerStats.MAX_FIRE_LEVEL
+	assert_eq(Gate.new(Gate.Op.FIRE_RATE, 1).label(stats), "連射MAX")
+
+
+func test_大きな数のゲートは数を短く表す():
+	assert_eq(Gate.new(Gate.Op.ADD, 12_000).label(), "+12k")
+	assert_eq(Gate.new(Gate.Op.ADD, -3_500_000).label(), "-3.5m")
+	assert_eq(Gate.new(Gate.Op.POWER, 1_200).label(), "ダメージUP\n+1.2k")
+	var stats := PlayerStats.new(10)
+	stats.power = 2_500
+	assert_eq(Gate.new(Gate.Op.POWER, 1_200).label(stats), "ダメージUP\n2.5k->3.7k")

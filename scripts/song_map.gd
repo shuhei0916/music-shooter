@@ -81,18 +81,24 @@ func at(time: float) -> Dictionary:
 
 
 ## 曲の長さ duration 秒までの、小節の頭の線。速さ speed で進むコース上の距離（distance）と、
-## セクションの始まりか（section_start）、その小節のセクションの盛り上がり（energy）
+## セクションの始まりか（section_start）、その小節のセクションの盛り上がり（energy）・名前（label）、
+## セクションの中の進み具合（progress。始まりが 0 で、セクションの小節の数で割る。分からなければ 0）
 func bar_lines(speed: float, duration: float) -> Array:
 	var bar_length := grid.seconds_per_beat() * beats_per_bar
 	var lines := []
 	var bar := 0
 	var time := downbeat
 	while time <= duration:
+		var pos := at(time)
+		var bars_in_section: int = pos.bars_in_section
 		lines.append(
 			{
 				"distance": time * speed,
 				"section_start": sections.any(func(s): return s.bar == bar),
-				"energy": at(time).energy,
+				"energy": pos.energy,
+				"label": pos.label,
+				"progress":
+				float(pos.bar_in_section) / bars_in_section if bars_in_section > 0 else 0.0,
 			}
 		)
 		bar += 1
@@ -113,3 +119,30 @@ func beat_lines(speed: float, duration: float) -> Array:
 		beat += 1
 		time = downbeat + beat * beat_length
 	return lines
+
+
+## ボス（3レーンを埋める避けられない敵）を置く小節。ランをこの小節で区切ってゾーンに分ける
+## 1回目と2回目のサビ（DROP）の前の小節に中ボスを、2回目のサビの最後の小節にボスを置く
+## サビが1回だけなら、その前と最後。続けて並んだ DROP はひとつのサビとみなす
+func boss_bars() -> Array:
+	var choruses := _choruses()
+	var bars := []
+	for chorus in choruses.slice(0, 2):
+		bars.append(chorus[0] - 1)
+	if not choruses.is_empty():
+		bars.append(choruses[mini(choruses.size(), 2) - 1][1] - 1)
+	return bars
+
+
+## サビ（続けて並んだ DROP）の [始まる小節, 終わりの次の小節] の並び
+func _choruses() -> Array:
+	var result := []
+	for i in sections.size():
+		if sections[i].label != "DROP":
+			continue
+		var end: int = sections[i + 1].bar if i + 1 < sections.size() else bar_count
+		if i > 0 and sections[i - 1].label == "DROP":
+			result.back()[1] = end
+		else:
+			result.append([sections[i].bar, end])
+	return result

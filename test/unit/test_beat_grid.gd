@@ -50,3 +50,19 @@ func test_拍のJSONが壊れていればBPMは決めておいた値で最初の
 	var grid := BeatGrid.from_json('{"bpm": 105', 120.0)
 	assert_almost_eq(grid.bpm, 120.0, 0.0001)
 	assert_almost_eq(grid.offset, 0.0, 0.0001)
+
+
+func test_次の拍の線の時刻を求める():
+	assert_almost_eq(BeatGrid.new(120.0).next_time(0.3, 1.0), 0.5, 0.0001)
+
+
+func test_四分の一拍ごとなら次の四分の一拍の線の時刻():
+	assert_almost_eq(BeatGrid.new(120.0).next_time(0.3, 0.25), 0.375, 0.0001)
+
+
+func test_ちょうど線の上なら今の時刻のまま():
+	assert_almost_eq(BeatGrid.new(120.0).next_time(0.5, 1.0), 0.5, 0.0001)
+
+
+func test_次の線の時刻も最初の拍の時刻の分だけずれる():
+	assert_almost_eq(BeatGrid.new(120.0, 0.45).next_time(0.5, 1.0), 0.95, 0.0001)
