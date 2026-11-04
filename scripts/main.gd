@@ -3,6 +3,9 @@ extends Node3D
 
 const GateScene := preload("res://scenes/gate.tscn")
 const EnemyScene := preload("res://scenes/enemy.tscn")
+## 自分のシーンは preload すると循環するので、使うときに読む
+const MAIN_SCENE := "res://scenes/main.tscn"
+const SONG_SELECT_SCENE := "res://scenes/song_select.tscn"
 ## 山札に入れるゲートのカード。選択肢は2つか3つで、[[種類, 数], ...]
 const GATE_CARDS := [
 	[[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]],
@@ -103,6 +106,7 @@ func _ready() -> void:
 	_beat_hud.beats_per_bar = _map.beats_per_bar
 	_clock.start()
 	$PauseMenu.quit_requested.connect(get_tree().quit)
+	$PauseMenu.song_select_requested.connect(_back_to_song_select)
 	$GoalLine.position.z = -course_length
 	_fit_road()
 	_draw_bar_lines()
@@ -135,7 +139,25 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		debug = not debug
 	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
-		get_tree().reload_current_scene()
+		Main.start(get_tree(), song_path)
+
+
+## path の曲で遊ぶゲームを作る
+static func create(path: String) -> Main:
+	var main: Main = load(MAIN_SCENE).instantiate()
+	main.song_path = path
+	return main
+
+
+## 今の画面を、path の曲で遊ぶゲームに置き換える（曲を選んだときと、同じ曲でやり直すとき）
+static func start(tree: SceneTree, path: String) -> void:
+	tree.change_scene_to_node(create(path))
+
+
+## 一時停止のメニューから、曲を選ぶ画面に戻る
+func _back_to_song_select() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(SONG_SELECT_SCENE)
 
 
 ## レーンの中心の x（左から順）

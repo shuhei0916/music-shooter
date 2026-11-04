@@ -53,3 +53,11 @@ func test_終了ボタンを押すとゲームの終了を求める():
 	_press_pause(menu)
 	menu.get_node("Box/QuitButton").pressed.emit()
 	assert_signal_emitted(menu, "quit_requested")
+
+
+func test_曲を選び直すボタンを押すと曲を選ぶ画面に戻るよう求める():
+	var menu := _make_menu()
+	watch_signals(menu)
+	_press_pause(menu)
+	menu.get_node("Box/SongSelectButton").pressed.emit()
+	assert_signal_emitted(menu, "song_select_requested")

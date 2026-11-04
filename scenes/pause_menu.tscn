@@ -22,9 +22,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -160.0
-offset_top = -110.0
+offset_top = -150.0
 offset_right = 160.0
-offset_bottom = 110.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
@@ -37,6 +37,10 @@ horizontal_alignment = 1
 [node name="ResumeButton" type="Button" parent="Box"]
 theme_override_font_sizes/font_size = 32
 text = "再開する"
+
+[node name="SongSelectButton" type="Button" parent="Box"]
+theme_override_font_sizes/font_size = 32
+text = "曲を選び直す"
 
 [node name="QuitButton" type="Button" parent="Box"]
 theme_override_font_sizes/font_size = 32

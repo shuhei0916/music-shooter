@@ -1,8 +1,10 @@
 class_name PauseMenu
 extends CanvasLayer
-## Escキーでゲームを一時停止するメニュー。ゲームの終了は、呼び出し側が quit_requested を受けて行う
+## Escキーでゲームを一時停止するメニュー。ゲームの終了と曲を選ぶ画面に戻るのは、
+## 呼び出し側が quit_requested と song_select_requested を受けて行う
 
 signal quit_requested
+signal song_select_requested
 
 @onready var _resume_button: Button = $Box/ResumeButton
 
@@ -10,6 +12,7 @@ signal quit_requested
 func _ready() -> void:
 	visible = false
 	_resume_button.pressed.connect(_close)
+	$Box/SongSelectButton.pressed.connect(song_select_requested.emit)
 	$Box/QuitButton.pressed.connect(quit_requested.emit)
 
 

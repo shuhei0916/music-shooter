@@ -2,10 +2,12 @@ extends SceneTree
 ## 曲を自動で遊ばせて、難易度を数字で確かめる
 ##
 ## 使い方（プロジェクトのフォルダで）:
-##   godot --headless --fixed-fps 60 --script res://tools/autoplay_run.gd -- [--seeds=5] [--out=DIR]
+##   godot --headless --fixed-fps 60 --script res://tools/autoplay_run.gd --
+##     [--seeds=5] [--out=DIR] [--song=res://music/曲.mp3]
 ## シードを 0 から順に変えて遊ばせ、シードごとの小節の頭の記録を DIR/autoplay_seed_N.csv に書き、
 ## 結果（CLEAR か GAME OVER か、どこまで進んだか、到達したゾーン、最後の強さ、
 ## ボスごとの余裕＝ぶつかる直前のプレイヤーの HP ÷ ボスの残りの HP。出会わなければ -）を表示する
+## --song を省くと、Main に書いた曲（song_path）で遊ぶ
 ## 当たり判定に物理の処理が要るので、--fixed-fps で決まった刻みのフレームを待たずに回す
 
 const MainScene := preload("res://scenes/main.tscn")
@@ -14,6 +16,8 @@ const BOSS_COUNT := 3
 
 var _seeds := 5
 var _out_dir := "user://autoplay"
+## 遊ばせる曲。空なら Main に書いた曲
+var _song := ""
 var _seed := 0
 var _main: Main
 var _autoplay: Autoplay
@@ -25,6 +29,8 @@ func _initialize() -> void:
 			_seeds = int(arg.trim_prefix("--seeds="))
 		elif arg.begins_with("--out="):
 			_out_dir = arg.trim_prefix("--out=")
+		elif arg.begins_with("--song="):
+			_song = arg.trim_prefix("--song=")
 	DirAccess.make_dir_recursive_absolute(_out_dir)
 	print("seed,result,time,section,zone,hp,power,fire_level,boss1,boss2,boss3")
 	_start()
@@ -42,7 +48,7 @@ func _process(_delta: float) -> bool:
 
 
 func _start() -> void:
-	_main = MainScene.instantiate()
+	_main = MainScene.instantiate() if _song.is_empty() else Main.create(_song)
 	_main.silent = true
 	_main.layout_seed = _seed
 	root.add_child(_main)

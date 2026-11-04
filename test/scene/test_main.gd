@@ -180,3 +180,8 @@ func test_道はスタートの後ろからゴールの先まで続く():
 	var half_length: float = road.mesh.size.y / 2.0
 	assert_gte(road.position.z + half_length, 10.0)
 	assert_lte(road.position.z - half_length, -1000.0 - 40.0)
+
+
+func test_曲を指定してゲームを作れる():
+	var main: Main = autofree(Main.create("res://music/a.mp3"))
+	assert_eq(main.song_path, "res://music/a.mp3")

@@ -8,12 +8,15 @@
    - 自動操縦に宝箱を取りに行かせる。届くまでに倒しきれるとき（DPS × 届くまでの時間 ≥ HP）だけ、敵のいるレーンを選ぶ（今は敵をよけるので、たまたま倒せた宝箱しか取らない）
    - 遊んでみて、倒しに行くか、よけるかの判断が生まれているか確かめる
    - あとで中身を増やすなら、ゲートとは別の山札から引き、数は成長曲線に合わせる。ボスとの戦いのごほうびと仕組みを共通にする
-2. 複数の曲に対応する
-   - まず `tools/autoplay_run.gd` に `--song=` を足し、曲ごとのクリア率とボスごとの余裕を出す（釣り合いは Tropic Love 1曲でしか取っていない。My Heart は自動操縦が3回とも約31秒で中ボス1に負ける。余裕は 0.24〜0.31 倍）
-   - そのあと曲選択の画面（`music/` の中で `.beats.json` のある曲を並べる）。今は `main.gd` の `song_path` に1曲を書いているだけ
+2. 複数の曲に対応する。曲を選ぶ画面と、自動で遊ばせるときの `--song=` まではできた
+   - 曲ごとの釣り合いを取る（自動で遊ばせた結果、シード 0〜9）。釣り合いは Tropic Love でしか取っていない
+     - Tropic Love：10回中7回クリア
+     - Eclipse：10回中8回クリア。セクションの推定の外れで DROP が1回だけになり、ボスが2体しか出ない（下の3）
+     - My Heart：10回とも約31秒で中ボス1に負ける（余裕 0.1〜0.4 倍）。曲の初めから中ボス1までが短く、強くなりきれない
    - `analyze.py` に複数の曲をまとめて渡せるようにする
    - 曲をどこから持ってくるか：まずは解析ずみの曲を同梱して配布する（NCS はクレジットを出せば使える曲が多い）。遊ぶ人の mp3 をその場で解析するかはあとで決める
    - その場で解析するなら、解析は Python のまま exe にして同梱し、Godot から `OS.execute` で呼ぶのを本命にする（楽器の推定・分離など、Python のライブラリに頼る解析を今後増やすため）。Demucs などで PyTorch を含めると数 GB になるので、そのときは解析だけサーバーでやる案も比べる
+   - 書き出したゲームでは、`.beats.json` を書き出しに含める設定（エクスポートの「リソース以外のファイル」）が要る
 3. セクションの推定の外れを直す（下の「曲の解析」の Aメロ・サビの項目）。ボスの位置がずれる曲がある
    - Eclipse・Firefly：1回目のサビが VERSE になり、DROP が1回だけ
    - Puzzle：切れ目が見つからず、曲全体が1つの DROP
@@ -22,10 +25,10 @@
 
 ### 別の環境で始めるとき
 - `music/`（曲と `.beats.json`）は git に入れていない。曲を `music/` に置き、`tools/` で `python analyze.py ../music/曲.mp3` を曲ごとに流して `.beats.json` を作る（`--bpm` は付けない。ただし My Heart だけは推定がずれるので `--bpm 174` を付ける）
-  - 今入れている曲：tropic_love.mp3、NCS の6曲（DEAF KEV - Invincible、Different Heaven, EH!DE - My Heart、Distrion, Alex Skrindo - Entropy、Jim Yosef - Eclipse、Jim Yosef - Firefly、RetroVision - Puzzle。ファイル名は「アーティスト - 曲名 [NCS Release].mp3」）
+  - 今入れている曲（この PC は Tropic Love・My Heart・Eclipse だけ）：tropic_love.mp3、NCS の6曲（DEAF KEV - Invincible、Different Heaven, EH!DE - My Heart、Distrion, Alex Skrindo - Entropy、Jim Yosef - Eclipse、Jim Yosef - Firefly、RetroVision - Puzzle。ファイル名は「アーティスト - 曲名 [NCS Release].mp3」）
 - tools/ の仮想環境は Python 3.12 以上で作る（librosa 1.0.0 が 3.12 以上を要る）：`python -m venv .venv` のあと `.venv` の pip で `pip install -r requirements-dev.txt`、テストは `pytest`
 - Godot のテストは GUT（`--headless --script addons/gut/gut_cmdln.gd -gdir=res://test/ -ginclude_subdirs -gexit`）。clone 直後は先に `--headless --import` を1回流す
-- 自動で遊ばせる：`godot --headless --fixed-fps 60 --script res://tools/autoplay_run.gd -- --seeds=10`。今の Tropic Love の結果は10回中7回クリア
+- 自動で遊ばせる：`godot --headless --fixed-fps 60 --script res://tools/autoplay_run.gd -- --seeds=10 --song=res://music/曲.mp3`（`--song` を省くと Tropic Love）
 
 ## 曲の解析と、ゲームへの組み込み
 
@@ -117,6 +120,7 @@
   - 中身は出たときの HP の分だけ HP が増える。頭の上に「+1.2k」と出す。ボスの宝箱はボスと同じ幅で、どのレーンからでも取れる
   - 結果（Tropic Love、シード 0〜9）：10回中7回クリアで前と同じ。ボスごとの余裕は少し上がった（中ボス1が1.3〜3.8倍 → 1.7〜4.4倍）
 - [ ] 宝箱の中身を増やす（威力・連射・特殊なバフ）。取り方（撃って開ける など）や、出る・開く演出を拍に合わせることも考える
+- [ ] ぶつかって倒した敵も宝箱を落とすようにする（中身が HP だけのうちは、削られた HP がその場で戻って体当たりがただになるので、中身を増やしてから）
 
 ## 後回し
 
