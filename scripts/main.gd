@@ -75,6 +75,8 @@ var _lanes: Lanes
 var _shot_grid: BeatGrid
 var _map: SongMap
 var _growth: GrowthCurve
+## 曲のパートの音量。パートに分けた曲なら、取ったゲートのパートを大きくする
+var _mix: StemMix
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
@@ -88,8 +90,9 @@ var _result := Judge.Result.PLAYING
 
 
 func _ready() -> void:
-	if song == null and ResourceLoader.exists(song_path):
-		song = load(song_path)
+	if song == null:
+		song = StemMix.load_song(song_path)
+	_mix = StemMix.new(song)
 	if song != null:
 		if silent:
 			_clock = TimerClock.new(song.get_length())
@@ -172,6 +175,10 @@ func song_time() -> float:
 
 func song_map() -> SongMap:
 	return _map
+
+
+func stem_mix() -> StemMix:
+	return _mix
 
 
 func result() -> Judge.Result:
@@ -321,6 +328,7 @@ func _spawn_row(row: Dictionary) -> void:
 			gate_area.grid = _map.grid
 			gate_area.stats = _player.stats
 			gate_area.position.x = slots.x_of(i)
+			gate_area.taken.connect(_mix.take)
 			pair.add_child(gate_area)
 	for spec in row.get("enemies", []):
 		var enemy: Enemy = EnemyScene.instantiate()

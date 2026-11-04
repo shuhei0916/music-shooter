@@ -1,6 +1,9 @@
 class_name GateArea
 extends Area3D
 
+## プレイヤーがこのゲートを取ったとき
+signal taken(gate: Gate)
+
 const FloatingTextScene := preload("res://scenes/floating_text.tscn")
 ## 取ったときに飛び出す文字の、プレイヤーの足もとからの高さ
 const POPUP_HEIGHT := 3.2
@@ -104,6 +107,7 @@ func give_to(player: Player) -> void:
 	var popup: FloatingText = FloatingTextScene.instantiate()
 	popup.text = _gate.label(player.stats)
 	_gate.apply(player.stats)
+	taken.emit(_gate)
 	popup.modulate = Color(_color, 1.0)
 	popup.position.y = POPUP_HEIGHT
 	if grid != null:
