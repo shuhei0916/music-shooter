@@ -87,6 +87,7 @@ var _result := Judge.Result.PLAYING
 @onready var _music: AudioStreamPlayer = $Music
 @onready var _beat_hud: BeatHud = $UI/BeatHud
 @onready var _growth_graph: GrowthGraph = $UI/GrowthGraph
+@onready var _part_hud: PartHud = $UI/PartHud
 
 
 func _ready() -> void:
@@ -104,7 +105,8 @@ func _ready() -> void:
 		_clock = TimerClock.new(course_length / forward_speed)
 	_course = Course.new(forward_speed, course_length)
 	_lanes = Lanes.new(lane_count, lane_width)
-	_map = SongMap.from_json(_read_beats_json(), bpm)
+	_map = SongMap.from_json(_read_beside(".beats.json"), bpm)
+	_part_hud.track = PartTrack.from_json(_read_beside(".parts.json"))
 	_shot_grid = _map.shot_grid()
 	_beat_hud.beats_per_bar = _map.beats_per_bar
 	_clock.start()
@@ -131,6 +133,7 @@ func _process(delta: float) -> void:
 	_player.dance(pos)
 	_beat_hud.show_at(pos)
 	_growth_graph.show_at(_clock.time(), _player.health.hp)
+	_part_hud.show_at(_clock.time())
 	_player.position.z = -_course.distance
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
 	_result = Judge.result(_course, _player.health)
@@ -187,7 +190,7 @@ func result() -> Judge.Result:
 
 ## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
 func _show_debug() -> void:
-	for node_name in ["BarLines", "BeatLines", "UI/GrowthGraph"]:
+	for node_name in ["BarLines", "BeatLines", "UI/GrowthGraph", "UI/PartHud"]:
 		var node := get_node_or_null(node_name)
 		if node != null:
 			node.visible = debug
@@ -202,8 +205,9 @@ func _finish() -> void:
 	_hint.visible = true
 
 
-func _read_beats_json() -> String:
-	var path := song_path.get_basename() + ".beats.json"
+## 曲の隣にある「曲の名前 + suffix」のファイルの中身。無ければ空
+func _read_beside(suffix: String) -> String:
+	var path := song_path.get_basename() + suffix
 	if not FileAccess.file_exists(path):
 		return ""
 	return FileAccess.get_file_as_string(path)
