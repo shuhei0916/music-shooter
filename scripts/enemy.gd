@@ -2,6 +2,7 @@ class_name Enemy
 extends Area3D
 
 const FloatingTextScene := preload("res://scenes/floating_text.tscn")
+const TreasureScene := preload("res://scenes/treasure.tscn")
 ## ダメージの数字を出す、敵の足もとからの高さ・色・文字の大きさ
 const DAMAGE_HEIGHT := 2.6
 const DAMAGE_COLOR := Color(1, 0.85, 0.3)
@@ -36,6 +37,8 @@ var _hit_at := INF
 ## 倒れる演出を始める時刻と、演出の残り秒数（演出の前は負）
 var _die_at := INF
 var _dying_left := -1.0
+## 弾で倒されたら、倒れる演出の始まりに宝箱を落とす（ぶつかって倒れたときは落とさない）
+var _drops_treasure := false
 
 @onready var _hp_label: Label3D = $HpLabel
 @onready var _body: MeshInstance3D = $Body
@@ -75,6 +78,7 @@ func _on_area_entered(area: Area3D) -> void:
 	if area is Bullet:
 		health.damage(area.damage)
 		area.queue_free()
+		_drops_treasure = health.is_dead()
 		if _pending_damage == 0:
 			_hit_at = _beat_time(hit_beats)
 		_pending_damage += area.damage
@@ -125,6 +129,19 @@ func _play_due_death() -> void:
 	_dying_left = death_duration
 	_body.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_show_death_effect()
+	if _drops_treasure:
+		_drop_treasure()
+
+
+## 倒れた場所に、出たときの HP を中身とする宝箱を落とす。敵が消えても残るよう、敵と同じ親に置く
+## ぶつかって倒したときに落とすと、削られた HP がその場で戻って体当たりがただになるので、弾で倒したときだけ
+func _drop_treasure() -> void:
+	var treasure: Treasure = TreasureScene.instantiate()
+	treasure.hp_bonus = start_hp
+	treasure.lanes_wide = lanes_wide
+	treasure.grid = grid
+	treasure.position = position
+	get_parent().add_child(treasure)
 
 
 ## 倒れる演出。ふくらみながら薄くなって消える

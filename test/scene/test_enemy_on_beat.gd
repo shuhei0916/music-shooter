@@ -91,3 +91,18 @@ func test_倒れる演出を待つあいだはHPを表示しない():
 	_sync_to_beat(enemy, 0.3)
 	_hit(enemy, 2)
 	assert_false(enemy.get_node("HpLabel").visible)
+
+
+func _treasures(enemy: Enemy) -> Array:
+	return enemy.get_parent().get_children().filter(func(n): return n is Treasure)
+
+
+func test_拍に合わせるときは宝箱も倒れる演出と同じ次の半拍に出る():
+	var enemy := _make_enemy(2)
+	var clock := _sync_to_beat(enemy, 0.3)
+	_hit(enemy, 2)
+	assert_eq(_treasures(enemy).size(), 0)
+	clock.advance(0.2)
+	simulate(enemy, 1, 0.0)
+	assert_eq(_treasures(enemy).size(), 1)
+	assert_eq(_treasures(enemy)[0].grid, enemy.grid)
