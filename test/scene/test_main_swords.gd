@@ -34,3 +34,12 @@ func test_曲の時刻に合わせて剣をためキックで撃ち出す():
 	assert_eq(main.get_node("Player").swords.count, PlayerStats.SWORDS_PER_VOLLEY)
 	simulate(main, 2, 0.1)
 	assert_eq(_swords_of(main).size(), PlayerStats.SWORDS_PER_VOLLEY)
+
+
+func test_左上に武器の強化の状況を出し取ったゲートに合わせて変わる():
+	var main := _make_main("")
+	var player: Player = main.get_node("Player")
+	Gate.new(Gate.Op.SWORD, 1).apply(player.stats)
+	simulate(main, 1, 0.1)
+	var rows := main.get_node("UI/LoadoutHud/Rows").get_children()
+	assert_string_starts_with(rows[1].text, "ドラム剣 Lv2")

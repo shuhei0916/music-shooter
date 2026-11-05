@@ -21,7 +21,7 @@ func apply(stats: PlayerStats) -> void:
 		Op.FIRE_RATE:
 			stats.raise_fire_level(amount)
 		Op.SWORD:
-			stats.sword_count += amount
+			stats.raise_sword_level(amount)
 		Op.SWORD_DAMAGE:
 			stats.sword_damage += amount
 		Op.SWORD_RETARGET:

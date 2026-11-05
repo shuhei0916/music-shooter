@@ -40,3 +40,10 @@ func test_剣ダメージのゲートの表示は取る前と取ったあとの�
 	var stats := PlayerStats.new(10)
 	stats.sword_damage = 2_500
 	assert_eq(Gate.new(Gate.Op.SWORD_DAMAGE, 1_200).label(stats), "剣ダメージUP\n2.5k->3.7k")
+
+
+func test_剣のゲートは剣の段階の上限を超えない():
+	var stats := PlayerStats.new(10)
+	stats.sword_count = PlayerStats.MAX_SWORD_LEVEL
+	Gate.new(Gate.Op.SWORD, 1).apply(stats)
+	assert_eq(stats.sword_count, PlayerStats.MAX_SWORD_LEVEL)

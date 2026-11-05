@@ -21,7 +21,7 @@ const GATE_CARDS := [
 	{"gate": [Gate.Op.POWER, 1], "count": 4, "endless": true},
 	{"gate": [Gate.Op.POWER, 2], "count": 1, "endless": true},
 	{"gate": [Gate.Op.FIRE_RATE, 1], "count": PlayerStats.MAX_FIRE_LEVEL},
-	{"gate": [Gate.Op.SWORD, 1], "count": 7},
+	{"gate": [Gate.Op.SWORD, 1], "count": PlayerStats.MAX_SWORD_LEVEL - 1},
 	{"gate": [Gate.Op.SWORD_DAMAGE, 1], "count": 3, "endless": true},
 	{"gate": [Gate.Op.SWORD_RETARGET, 1], "count": 1},
 ]
@@ -104,6 +104,7 @@ var _result := Judge.Result.PLAYING
 @onready var _beat_hud: BeatHud = $UI/BeatHud
 @onready var _growth_graph: GrowthGraph = $UI/GrowthGraph
 @onready var _part_hud: PartHud = $UI/PartHud
+@onready var _loadout_hud: LoadoutHud = $UI/LoadoutHud
 
 
 func _ready() -> void:
@@ -158,6 +159,7 @@ func _process(delta: float) -> void:
 	_beat_hud.show_at(pos)
 	_growth_graph.show_at(_clock.time(), _player.health.hp)
 	_part_hud.show_at(_clock.time())
+	_loadout_hud.show_stats(_player.stats)
 	_player.position.z = -_course.distance
 	_deal_near_gates()
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
