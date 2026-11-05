@@ -16,8 +16,8 @@ var _quiver: SwordQuiver
 func before_each():
 	_track = PartTrack.from_json(JSON_TEXT)
 	_stats = PlayerStats.new(10)
-	_stats.sword_charge_parts = ["snare", "hihat"]
-	_stats.sword_release_part = "kick"
+	_stats.sword.charge_parts = ["snare", "hihat"]
+	_stats.sword.release_part = "kick"
 	_quiver = SwordQuiver.new()
 
 
@@ -25,7 +25,7 @@ func before_each():
 func _play(times: Array) -> Array:
 	var released := []
 	for i in range(1, times.size()):
-		released.append(_quiver.update(_track, times[i - 1], times[i], _stats))
+		released.append(_quiver.update(_track, times[i - 1], times[i], _stats.sword))
 	return released
 
 
@@ -51,27 +51,27 @@ func test_区間の中ではキックより前に鳴った音だけで上限を�
 
 
 func test_上限より多くはたまらない():
-	_quiver.count = _stats.sword_capacity()
+	_quiver.count = _stats.sword.capacity()
 	_play([0.0, 0.12])
-	assert_eq(_quiver.count, _stats.sword_capacity())
+	assert_eq(_quiver.count, _stats.sword.capacity())
 
 
 func test_剣の段階が上がると1回の音でたまる本数と上限が増える():
-	_stats.sword_count = 2
-	assert_eq(_stats.sword_capacity(), PlayerStats.SWORDS_PER_VOLLEY * 2)
+	_stats.sword.level = 2
+	assert_eq(_stats.sword.capacity(), SwordWeapon.SWORDS_PER_VOLLEY * 2)
 	_play([0.0, 0.12])
 	assert_eq(_quiver.count, 2)
 
 
 func test_パートの解析が無ければ剣はたまらない():
-	assert_eq(_quiver.update(PartTrack.from_json(""), 0.0, 10.0, _stats), 0)
+	assert_eq(_quiver.update(PartTrack.from_json(""), 0.0, 10.0, _stats.sword), 0)
 	assert_eq(_quiver.count, 0)
 
 
 func test_ためるパートと撃つパートを変えられる():
-	_stats.sword_charge_parts = ["hihat"]
-	_stats.sword_release_part = "snare"
-	_stats.sword_count = 1
+	_stats.sword.charge_parts = ["hihat"]
+	_stats.sword.release_part = "snare"
+	_stats.sword.level = 1
 	# hihat 0.2・0.4 で2本、上限は4本なので、まだ撃たない
 	assert_eq(_play([0.0, 0.5, 1.0]), [0, 0])
 	assert_eq(_quiver.count, 2)

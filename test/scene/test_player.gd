@@ -162,7 +162,7 @@ func test_ハイハットで剣がたまり体のまわりに見える():
 func test_上限までたまったら次のスネアで剣をまとめて撃つ():
 	var player := _make_player_on_stage()
 	_play_swords(player, [0.0, 0.45, 0.55])
-	assert_eq(_swords_of(player).size(), PlayerStats.SWORDS_PER_VOLLEY)
+	assert_eq(_swords_of(player).size(), SwordWeapon.SWORDS_PER_VOLLEY)
 	assert_eq(player.swords.count, 0)
 	assert_eq(player.get_node("SwordRing").get_child_count(), 0)
 
@@ -171,7 +171,7 @@ func test_撃った剣は弾の威力ではなく剣のダメージを持ち体�
 	var player := _make_player_on_stage()
 	player.position = Vector3(2, 0, -5)
 	player.stats.power = 7
-	player.stats.sword_damage = 3
+	player.stats.sword.damage = 3
 	_play_swords(player, [0.0, 0.55])
 	for sword: Sword in _swords_of(player):
 		assert_eq(sword.damage, 3)
@@ -181,6 +181,6 @@ func test_撃った剣は弾の威力ではなく剣のダメージを持ち体�
 
 func test_乗りかえを解放していれば撃った剣は乗りかえられる():
 	var player := _make_player_on_stage()
-	player.stats.sword_retarget = true
+	player.stats.sword.retarget = true
 	_play_swords(player, [0.0, 0.55])
 	assert_true(_swords_of(player)[0].retarget)

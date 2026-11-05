@@ -26,17 +26,12 @@ static func gate_score(gate: Gate, stats: PlayerStats) -> float:
 				)
 				- 1.0
 			)
-		Gate.Op.SWORD:
-			return float(gate.amount) / stats.sword_count
-		Gate.Op.SWORD_DAMAGE:
-			return float(gate.amount) / stats.sword_damage
+		Gate.Op.WEAPON_LEVEL:
+			return stats.weapon(gate.weapon).level_score(gate.amount)
+		Gate.Op.WEAPON_DAMAGE:
+			return float(gate.amount) / stats.weapon(gate.weapon).damage
 		Gate.Op.SWORD_RETARGET:
-			return 0.0 if stats.sword_retarget else RETARGET_SCORE
-		Gate.Op.SHOCKWAVE:
-			var after := mini(stats.shockwave_level + gate.amount, PlayerStats.MAX_SHOCKWAVE_LEVEL)
-			return stats.shockwave_radius(after) / stats.shockwave_radius() - 1.0
-		Gate.Op.SHOCKWAVE_DAMAGE:
-			return float(gate.amount) / stats.shockwave_damage
+			return 0.0 if stats.sword.retarget else RETARGET_SCORE
 		_:
 			return float(gate.amount) / maxi(stats.health.hp, 1)
 

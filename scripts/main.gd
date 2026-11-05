@@ -6,9 +6,9 @@ const EnemyScene := preload("res://scenes/enemy.tscn")
 ## 自分のシーンは preload すると循環するので、使うときに読む
 const MAIN_SCENE := "res://scenes/main.tscn"
 const SONG_SELECT_SCENE := "res://scenes/song_select.tscn"
-## 山札に入れるゲートのカード。{"gate": [種類, 数], "count": 枚数, "endless": なくならないか}
+## 山札に入れるゲートのカード。{"gate": [種類, 数（, 武器の名前の記号）], "count": 枚数, "endless": なくならないか}
 ## カード1枚が強化1段。取ったカードは山札から抜ける。強化に上限があるものは、枚数を上限に合わせる
-## HP・威力・剣と衝撃波のダメージ・掛け算はなくならないカードで、枚数は出やすさの重み
+## HP・威力・武器のダメージ・掛け算はなくならないカードで、枚数は出やすさの重み
 const GATE_CARDS := [
 	{"gate": [Gate.Op.ADD, 10], "count": 6, "endless": true},
 	{"gate": [Gate.Op.ADD, 5], "count": 4, "endless": true},
@@ -21,11 +21,13 @@ const GATE_CARDS := [
 	{"gate": [Gate.Op.POWER, 1], "count": 4, "endless": true},
 	{"gate": [Gate.Op.POWER, 2], "count": 1, "endless": true},
 	{"gate": [Gate.Op.FIRE_RATE, 1], "count": PlayerStats.MAX_FIRE_LEVEL},
-	{"gate": [Gate.Op.SWORD, 1], "count": PlayerStats.MAX_SWORD_LEVEL - 1},
-	{"gate": [Gate.Op.SWORD_DAMAGE, 1], "count": 3, "endless": true},
+	{"gate": [Gate.Op.WEAPON_LEVEL, 1, "sword"], "count": SwordWeapon.MAX_LEVEL - 1},
+	{"gate": [Gate.Op.WEAPON_DAMAGE, 1, "sword"], "count": 3, "endless": true},
 	{"gate": [Gate.Op.SWORD_RETARGET, 1], "count": 1},
-	{"gate": [Gate.Op.SHOCKWAVE, 1], "count": PlayerStats.MAX_SHOCKWAVE_LEVEL - 1},
-	{"gate": [Gate.Op.SHOCKWAVE_DAMAGE, 1], "count": 3, "endless": true},
+	{"gate": [Gate.Op.WEAPON_LEVEL, 1, "shockwave"], "count": ShockwaveWeapon.MAX_LEVEL - 1},
+	{"gate": [Gate.Op.WEAPON_DAMAGE, 1, "shockwave"], "count": 3, "endless": true},
+	{"gate": [Gate.Op.WEAPON_LEVEL, 1, "lightning"], "count": LightningWeapon.MAX_LEVEL - 1},
+	{"gate": [Gate.Op.WEAPON_DAMAGE, 1, "lightning"], "count": 3, "endless": true},
 ]
 ## ゲートの列は、プレイヤーのこの距離（m）先に入ったら山札から引いて出す（カメラから見える遠さくらい）
 const DEAL_AHEAD := 90.0
@@ -157,6 +159,7 @@ func _process(delta: float) -> void:
 	_player.shoot_on_beat(_clock.time(), _shot_grid)
 	_player.play_swords(_clock.time(), _parts)
 	_player.play_shockwave(_clock.time(), _parts)
+	_player.play_lightning(_clock.time(), _parts)
 	var pos := _map.at(_clock.time())
 	_player.dance(pos)
 	_beat_hud.show_at(pos)
@@ -175,7 +178,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		debug = not debug
 	elif event.is_action_pressed("cycle_sword_parts"):
-		_player.stats.cycle_sword_parts()
+		_player.stats.sword.cycle_parts()
 	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
 		Main.start(get_tree(), song_path)
 
@@ -372,7 +375,7 @@ func _put_back_unchosen(_gate: Gate, cards: Array, chosen: int) -> void:
 			_deck.put_back(card)
 
 
-## z の位置に、gates（[[種類, 数], ...]、左から順）のゲートを道の幅いっぱいに並べる
+## z の位置に、gates（[[種類, 数（, 武器の名前の記号）], ...]、左から順）のゲートを道の幅いっぱいに並べる
 func _spawn_gates(z: float, gates: Array) -> Array:
 	var pair := Node3D.new()
 	pair.position.z = -z
@@ -385,6 +388,7 @@ func _spawn_gates(z: float, gates: Array) -> Array:
 		var gate_area: GateArea = GateScene.instantiate()
 		gate_area.op = gates[i][0]
 		gate_area.amount = gates[i][1]
+		gate_area.weapon = gates[i][2] if gates[i].size() > 2 else ""
 		gate_area.width = slots.width
 		gate_area.grid = _map.grid
 		gate_area.stats = _player.stats

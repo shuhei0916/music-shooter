@@ -1,7 +1,7 @@
 class_name Shockwave
 extends RefCounted
 ## 衝撃波。撃つパート（初めはキック）が鳴るたびに、プレイヤーから前（-z）に向けた扇形
-## （半径 PlayerStats.shockwave_radius、前から左右に HALF_ANGLE ずつ）の中の敵にまとめてダメージを与える。
+## （半径 ShockwaveWeapon.radius、前から左右に HALF_ANGLE ずつ）の中の敵にまとめてダメージを与える。
 ## 後ろの敵はもうすれ違ったあとなので当てない。高さは数えず、床の上の距離と向きで測る
 
 ## 扇形の、前から左右それぞれに開く角度

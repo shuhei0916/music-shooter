@@ -19,6 +19,7 @@ func test_武器ごとに名前と段階と使うパートと項目を出す():
 			"ビート弾 Lv1\n拍\nダメージ 1",
 			"剣 Lv1\nハイハット → スネア\nダメージ 1",
 			"衝撃波 Lv1\nキック\nダメージ 1  広さ 4m",
+			"落雷 Lv1\nスネア\nダメージ 1  一度に1体",
 		]
 	)
 
@@ -35,7 +36,7 @@ func test_強化すると出す文字も変わる():
 	var hud := _make_hud()
 	var stats := PlayerStats.new(10)
 	hud.show_stats(stats)
-	stats.raise_sword_level(1)
-	stats.sword_retarget = true
+	stats.sword.raise_level(1)
+	stats.sword.retarget = true
 	hud.show_stats(stats)
 	assert_eq(_texts(hud)[1], "剣 Lv2\nハイハット → スネア\nダメージ 1  乗りかえ")

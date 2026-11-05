@@ -1,25 +1,27 @@
 class_name Gate
 extends RefCounted
 
+## WEAPON_LEVEL と WEAPON_DAMAGE は、weapon（"sword" などの名前の記号）の武器の段階とダメージを上げる
 enum Op {
 	ADD,
 	MULTIPLY,
 	POWER,
 	FIRE_RATE,
-	SWORD,
-	SWORD_DAMAGE,
+	WEAPON_LEVEL,
+	WEAPON_DAMAGE,
 	SWORD_RETARGET,
-	SHOCKWAVE,
-	SHOCKWAVE_DAMAGE
 }
 
 var op: Op
 var amount: int
+## 段階やダメージを上げる武器の名前の記号。武器のゲートでなければ空
+var weapon: String
 
 
-func _init(p_op: Op, p_amount: int) -> void:
+func _init(p_op: Op, p_amount: int, p_weapon := "") -> void:
 	op = p_op
 	amount = p_amount
+	weapon = p_weapon
 
 
 func apply(stats: PlayerStats) -> void:
@@ -30,16 +32,12 @@ func apply(stats: PlayerStats) -> void:
 			stats.power += amount
 		Op.FIRE_RATE:
 			stats.raise_fire_level(amount)
-		Op.SWORD:
-			stats.raise_sword_level(amount)
-		Op.SWORD_DAMAGE:
-			stats.sword_damage += amount
+		Op.WEAPON_LEVEL:
+			stats.weapon(weapon).raise_level(amount)
+		Op.WEAPON_DAMAGE:
+			stats.weapon(weapon).damage += amount
 		Op.SWORD_RETARGET:
-			stats.sword_retarget = true
-		Op.SHOCKWAVE:
-			stats.raise_shockwave_level(amount)
-		Op.SHOCKWAVE_DAMAGE:
-			stats.shockwave_damage += amount
+			stats.sword.retarget = true
 		_:
 			stats.health.hp += amount
 
@@ -54,16 +52,19 @@ func label(stats: PlayerStats = null) -> String:
 			text = _damage_label("ダメージUP", stats.power if stats != null else null)
 		Op.FIRE_RATE:
 			text = _fire_rate_label(stats)
-		Op.SWORD:
-			text = _sword_label(stats)
-		Op.SWORD_DAMAGE:
-			text = _damage_label("剣ダメージUP", stats.sword_damage if stats != null else null)
+		Op.WEAPON_LEVEL:
+			text = (
+				stats.weapon(weapon).level_label(amount)
+				if stats != null
+				else Weapon.name_of(weapon) + "UP"
+			)
+		Op.WEAPON_DAMAGE:
+			text = _damage_label(
+				Weapon.name_of(weapon) + "ダメージUP",
+				stats.weapon(weapon).damage if stats != null else null
+			)
 		Op.SWORD_RETARGET:
 			text = "剣の乗りかえ"
-		Op.SHOCKWAVE:
-			text = _shockwave_label(stats)
-		Op.SHOCKWAVE_DAMAGE:
-			text = _damage_label("衝撃波ダメージUP", stats.shockwave_damage if stats != null else null)
 	return text
 
 
@@ -90,24 +91,6 @@ func _fire_rate_label(stats: PlayerStats) -> String:
 		"連射UP\n%d->%d"
 		% [PlayerStats.shots_per_bar(stats.fire_level), PlayerStats.shots_per_bar(after)]
 	)
-
-
-## 剣のゲートの文字。1回にまとめて撃つ剣の本数の、取る前と取ったあと
-func _sword_label(stats: PlayerStats) -> String:
-	if stats == null:
-		return "剣UP"
-	var before := stats.sword_capacity()
-	var after := PlayerStats.SWORDS_PER_VOLLEY * (stats.sword_count + amount)
-	return "剣UP\n%d->%d" % [before, after]
-
-
-## 衝撃波のゲートの文字。届く広さの、取る前と取ったあと
-func _shockwave_label(stats: PlayerStats) -> String:
-	if stats == null:
-		return "衝撃波UP"
-	var after := mini(stats.shockwave_level + amount, PlayerStats.MAX_SHOCKWAVE_LEVEL)
-	var before := PlayerStats.meters(stats.shockwave_radius())
-	return "衝撃波UP\n%s->%s" % [before, PlayerStats.meters(stats.shockwave_radius(after))]
 
 
 func is_harmful() -> bool:

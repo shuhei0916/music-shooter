@@ -4,7 +4,7 @@ extends GutTest
 const MainScene := preload("res://scenes/main.tscn")
 const CARDS := [
 	{"gate": [Gate.Op.ADD, 10], "count": 3},
-	{"gate": [Gate.Op.SWORD, 1], "count": 3},
+	{"gate": [Gate.Op.WEAPON_LEVEL, 1, "sword"], "count": 3},
 	{"gate": [Gate.Op.FIRE_RATE, 1], "count": 3},
 ]
 

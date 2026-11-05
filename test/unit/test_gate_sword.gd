@@ -1,26 +1,26 @@
 extends GutTest
-## 剣のゲート。スネアやハイハットでたまる剣の本数を増やす
+## 剣のゲート。剣の段階（1回に撃つ本数）とダメージを上げ、乗りかえを解放する（武器に共通のところは test_gate_weapon）
 
 
 func test_剣のゲートを通ると剣の段階が上がる():
 	var stats := PlayerStats.new(10)
-	Gate.new(Gate.Op.SWORD, 1).apply(stats)
-	assert_eq(stats.sword_count, 2)
+	Gate.new(Gate.Op.WEAPON_LEVEL, 1, "sword").apply(stats)
+	assert_eq(stats.sword.level, 2)
 
 
 func test_剣のゲートの表示は剣UP():
-	assert_eq(Gate.new(Gate.Op.SWORD, 1).label(), "剣UP")
+	assert_eq(Gate.new(Gate.Op.WEAPON_LEVEL, 1, "sword").label(), "剣UP")
 
 
 func test_剣のゲートの表示は1回に撃つ本数の取る前と取ったあとになる():
 	var stats := PlayerStats.new(10)
-	assert_eq(Gate.new(Gate.Op.SWORD, 1).label(stats), "剣UP\n4->8")
+	assert_eq(Gate.new(Gate.Op.WEAPON_LEVEL, 1, "sword").label(stats), "剣UP\n4->8")
 
 
 func test_乗りかえのゲートを通ると剣が乗りかえられるようになる():
 	var stats := PlayerStats.new(10)
 	Gate.new(Gate.Op.SWORD_RETARGET, 1).apply(stats)
-	assert_true(stats.sword_retarget)
+	assert_true(stats.sword.retarget)
 
 
 func test_乗りかえのゲートの表示():
@@ -30,20 +30,20 @@ func test_乗りかえのゲートの表示():
 
 func test_剣ダメージのゲートを通ると剣のダメージが上がり弾の威力は変わらない():
 	var stats := PlayerStats.new(10)
-	Gate.new(Gate.Op.SWORD_DAMAGE, 2).apply(stats)
-	assert_eq(stats.sword_damage, 3)
+	Gate.new(Gate.Op.WEAPON_DAMAGE, 2, "sword").apply(stats)
+	assert_eq(stats.sword.damage, 3)
 	assert_eq(stats.power, 1)
 
 
 func test_剣ダメージのゲートの表示は取る前と取ったあとのダメージ():
-	assert_eq(Gate.new(Gate.Op.SWORD_DAMAGE, 1).label(), "剣ダメージUP\n+1")
+	assert_eq(Gate.new(Gate.Op.WEAPON_DAMAGE, 1, "sword").label(), "剣ダメージUP\n+1")
 	var stats := PlayerStats.new(10)
-	stats.sword_damage = 2_500
-	assert_eq(Gate.new(Gate.Op.SWORD_DAMAGE, 1_200).label(stats), "剣ダメージUP\n2.5k->3.7k")
+	stats.sword.damage = 2_500
+	assert_eq(Gate.new(Gate.Op.WEAPON_DAMAGE, 1_200, "sword").label(stats), "剣ダメージUP\n2.5k->3.7k")
 
 
 func test_剣のゲートは剣の段階の上限を超えない():
 	var stats := PlayerStats.new(10)
-	stats.sword_count = PlayerStats.MAX_SWORD_LEVEL
-	Gate.new(Gate.Op.SWORD, 1).apply(stats)
-	assert_eq(stats.sword_count, PlayerStats.MAX_SWORD_LEVEL)
+	stats.sword.level = SwordWeapon.MAX_LEVEL
+	Gate.new(Gate.Op.WEAPON_LEVEL, 1, "sword").apply(stats)
+	assert_eq(stats.sword.level, SwordWeapon.MAX_LEVEL)

@@ -63,32 +63,38 @@ func test_2レーンを占める敵は両方のレーンをふさぐ():
 
 func test_剣のゲートの得点は剣が増える割合():
 	var stats := _stats(20)
-	stats.sword_count = 2
-	assert_almost_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SWORD, 1), stats), 0.5, 0.0001)
+	stats.sword.level = 2
+	assert_almost_eq(
+		AutoPilot.gate_score(Gate.new(Gate.Op.WEAPON_LEVEL, 1, "sword"), stats), 0.5, 0.0001
+	)
 
 
 func test_剣ダメージのゲートの得点は剣のダメージが増える割合():
 	var stats := _stats(20)
-	stats.sword_damage = 4
-	assert_almost_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SWORD_DAMAGE, 2), stats), 0.5, 0.0001)
+	stats.sword.damage = 4
+	assert_almost_eq(
+		AutoPilot.gate_score(Gate.new(Gate.Op.WEAPON_DAMAGE, 2, "sword"), stats), 0.5, 0.0001
+	)
 
 
 func test_乗りかえのゲートの得点はまだなら決めた値ですでに持っていれば0():
 	var stats := _stats(20)
 	var gate := Gate.new(Gate.Op.SWORD_RETARGET, 1)
 	assert_almost_eq(AutoPilot.gate_score(gate, stats), AutoPilot.RETARGET_SCORE, 0.0001)
-	stats.sword_retarget = true
+	stats.sword.retarget = true
 	assert_almost_eq(AutoPilot.gate_score(gate, stats), 0.0, 0.0001)
 
 
 func test_衝撃波のゲートの得点は届く広さが広がる割合で上限なら0():
 	var stats := PlayerStats.new(10)
-	assert_almost_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE, 1), stats), 0.25, 0.001)
-	stats.shockwave_level = PlayerStats.MAX_SHOCKWAVE_LEVEL
-	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE, 1), stats), 0.0)
+	assert_almost_eq(
+		AutoPilot.gate_score(Gate.new(Gate.Op.WEAPON_LEVEL, 1, "shockwave"), stats), 0.25, 0.001
+	)
+	stats.shockwave.level = ShockwaveWeapon.MAX_LEVEL
+	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.WEAPON_LEVEL, 1, "shockwave"), stats), 0.0)
 
 
 func test_衝撃波ダメージのゲートの得点は衝撃波のダメージが増える割合():
 	var stats := PlayerStats.new(10)
-	stats.shockwave_damage = 4
-	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE_DAMAGE, 2), stats), 0.5)
+	stats.shockwave.damage = 4
+	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.WEAPON_DAMAGE, 2, "shockwave"), stats), 0.5)

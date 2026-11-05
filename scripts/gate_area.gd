@@ -14,6 +14,8 @@ const LABEL_FILL := 0.9
 
 @export var op := Gate.Op.ADD
 @export var amount := 1
+## 武器のゲート（Gate.Op.WEAPON_LEVEL など）が上げる武器の名前の記号
+@export var weapon := ""
 @export var width := 4.0
 @export var good_color := Color(0.3, 0.7, 1, 0.45)
 @export var harmful_color := Color(1, 0.3, 0.3, 0.45)
@@ -31,7 +33,7 @@ var _label_outline_size: int
 
 
 func _ready() -> void:
-	_gate = Gate.new(op, amount)
+	_gate = Gate.new(op, amount, weapon)
 	_label_font_size = $Label.font_size
 	_label_outline_size = $Label.outline_size
 	_color = harmful_color if _gate.is_harmful() else good_color

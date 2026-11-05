@@ -70,14 +70,16 @@ func scaled(amount: int, distance: float) -> int:
 	return round_nice(amount * value_at(distance) / _start)
 
 
-## ゲート [種類, 数] の数を、distance の位置に合わせて大きくする。足し算（HP・威力・剣と衝撃波のダメージ）は規模に、
-## 掛け算はそのゾーンの伸びの速さに合わせる。ほか（連射・剣など段階で数えるもの）はそのまま
+## ゲート [種類, 数（, 武器の名前の記号）] の数を、distance の位置に合わせて大きくする。
+## 足し算（HP・威力・武器のダメージ）は規模に、掛け算はそのゾーンの伸びの速さに合わせる。
+## ほか（連射・武器の段階など段階で数えるもの）はそのまま
 func scaled_gate(gate: Array, distance: float) -> Array:
-	if gate[0] in [Gate.Op.ADD, Gate.Op.POWER, Gate.Op.SWORD_DAMAGE, Gate.Op.SHOCKWAVE_DAMAGE]:
-		return [gate[0], scaled(gate[1], distance)]
-	if gate[0] == Gate.Op.MULTIPLY:
-		return [gate[0], scaled_multiplier(gate[1], distance)]
-	return gate
+	var result := gate.duplicate()
+	if gate[0] in [Gate.Op.ADD, Gate.Op.POWER, Gate.Op.WEAPON_DAMAGE]:
+		result[1] = scaled(gate[1], distance)
+	elif gate[0] == Gate.Op.MULTIPLY:
+		result[1] = scaled_multiplier(gate[1], distance)
+	return result
 
 
 ## 上から2桁に丸める（12,345 → 12,000）。100 未満はそのまま整数に丸める

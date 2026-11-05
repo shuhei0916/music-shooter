@@ -130,9 +130,15 @@ func test_ゲートは足し算と威力なら規模に合わせ掛け算なら�
 	var growth := GrowthCurve.new(_flat(5), 5.0, [[2, 500.0]])
 	assert_eq(growth.scaled_gate([Gate.Op.ADD, -5], 20.0), [Gate.Op.ADD, -500])
 	assert_eq(growth.scaled_gate([Gate.Op.POWER, 1], 20.0), [Gate.Op.POWER, 100])
-	assert_eq(growth.scaled_gate([Gate.Op.SWORD_DAMAGE, 1], 20.0), [Gate.Op.SWORD_DAMAGE, 100])
+	assert_eq(
+		growth.scaled_gate([Gate.Op.WEAPON_DAMAGE, 1, "sword"], 20.0),
+		[Gate.Op.WEAPON_DAMAGE, 100, "sword"]
+	)
 	var multiplier := growth.scaled_multiplier(2, 20.0)
 	assert_gt(multiplier, 2)
 	assert_eq(growth.scaled_gate([Gate.Op.MULTIPLY, 2], 20.0), [Gate.Op.MULTIPLY, multiplier])
 	assert_eq(growth.scaled_gate([Gate.Op.FIRE_RATE, 1], 20.0), [Gate.Op.FIRE_RATE, 1])
-	assert_eq(growth.scaled_gate([Gate.Op.SWORD, 1], 20.0), [Gate.Op.SWORD, 1])
+	assert_eq(
+		growth.scaled_gate([Gate.Op.WEAPON_LEVEL, 1, "sword"], 20.0),
+		[Gate.Op.WEAPON_LEVEL, 1, "sword"]
+	)

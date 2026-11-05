@@ -7,14 +7,14 @@ const SWORD := 1
 const FIRE_RATE := 2
 const CARDS := [
 	{"gate": [Gate.Op.ADD, 10], "count": 5, "endless": true},
-	{"gate": [Gate.Op.SWORD, 1], "count": 3},
+	{"gate": [Gate.Op.WEAPON_LEVEL, 1, "sword"], "count": 3},
 	{"gate": [Gate.Op.FIRE_RATE, 1], "count": 1},
 ]
 
 
 func test_カードのゲートを返す():
 	var deck := GateDeck.new(CARDS, 1)
-	assert_eq(deck.gate_of(SWORD), [Gate.Op.SWORD, 1])
+	assert_eq(deck.gate_of(SWORD), [Gate.Op.WEAPON_LEVEL, 1, "sword"])
 
 
 func test_1列ぶんの選択肢は別々のカードから引く():

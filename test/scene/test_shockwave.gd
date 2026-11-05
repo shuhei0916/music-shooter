@@ -86,4 +86,4 @@ func test_衝撃波の弧はプレイヤーの子として足元に出て進ん�
 	assert_eq(rings.size(), 1)
 	player.position.z -= 1.0
 	assert_eq(Vector2(rings[0].global_position.x, rings[0].global_position.z), Vector2(2, -6))
-	assert_eq(player.stats.shockwave_radius(), rings[0].radius)
+	assert_eq(player.stats.shockwave.radius(), rings[0].radius)

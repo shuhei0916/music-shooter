@@ -22,6 +22,7 @@ var _steering: Steering
 var _last_shot_check := -0.001
 var _last_sword_check := -0.001
 var _last_shockwave_check := -0.001
+var _last_lightning_check := -0.001
 
 @onready var _hp_label: Label3D = $HpLabel
 ## 体を動かすときの支点（足もと）
@@ -50,7 +51,7 @@ func shoot_on_beat(time: float, grid: BeatGrid) -> void:
 
 ## 曲の時刻とパートの解析を受け取り、前回からのあいだに鳴った音で剣をため、撃つときは撃ち出す
 func play_swords(time: float, track: PartTrack) -> void:
-	var released := swords.update(track, _last_sword_check, time, stats)
+	var released := swords.update(track, _last_sword_check, time, stats.sword)
 	_last_sword_check = time
 	for i in released:
 		_launch_sword(position + _sword_ring.transform * SwordRing.slot(i, released))
@@ -60,17 +61,31 @@ func play_swords(time: float, track: PartTrack) -> void:
 ## 曲の時刻とパートの解析を受け取り、前回からのあいだに衝撃波のパート（初めはキック）が鳴った回数だけ、
 ## 前に向けた扇形の中の敵にダメージを与え、足元から衝撃波の弧を出す
 func play_shockwave(time: float, track: PartTrack) -> void:
-	var beats := track.onsets_in(stats.shockwave_part, _last_shockwave_check, time).size()
+	var beats := track.onsets_in(stats.shockwave.part, _last_shockwave_check, time).size()
 	_last_shockwave_check = time
-	var radius := stats.shockwave_radius()
+	var radius := stats.shockwave.radius()
 	for i in beats:
 		Shockwave.blast(
-			position, get_tree().get_nodes_in_group("enemies"), radius, stats.shockwave_damage
+			position, get_tree().get_nodes_in_group("enemies"), radius, stats.shockwave.damage
 		)
 		# 弧はプレイヤーの子にして、広がるあいだも足元に付いてこさせる
 		var ring := ShockwaveRing.new()
 		ring.radius = radius
 		add_child(ring)
+
+
+## 曲の時刻とパートの解析を受け取り、前回からのあいだに落雷のパート（初めはスネア）が鳴るたびに、
+## 前にいる HP の多い敵（段階の数だけ）に雷を落としてダメージを与える。雷の見た目は敵の場所に出す
+func play_lightning(time: float, track: PartTrack) -> void:
+	var beats := track.onsets_in(stats.lightning.part, _last_lightning_check, time).size()
+	_last_lightning_check = time
+	for i in beats:
+		var enemies := get_tree().get_nodes_in_group("enemies")
+		for enemy: Enemy in Lightning.targets(position, enemies, stats.lightning.strikes()):
+			enemy.take_hit(stats.lightning.damage)
+			var bolt := LightningBolt.new()
+			bolt.position = enemy.position
+			enemy.get_parent().add_child(bolt)
 
 
 ## 曲の位置 pos（SongMap.at の結果）に合わせて体を弾ませる
@@ -88,6 +103,6 @@ func _fire() -> void:
 func _launch_sword(from: Vector3) -> void:
 	var sword: Sword = SwordScene.instantiate()
 	sword.position = from
-	sword.damage = stats.sword_damage
-	sword.retarget = stats.sword_retarget
+	sword.damage = stats.sword.damage
+	sword.retarget = stats.sword.retarget
 	get_parent().add_child(sword)
