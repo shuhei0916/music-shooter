@@ -5,8 +5,8 @@
 [ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="3_pause"]
 [ext_resource type="PackedScene" path="res://scenes/beat_hud.tscn" id="4_hud"]
 [ext_resource type="Script" uid="uid://yl6ou1xaprqu" path="res://scripts/growth_graph.gd" id="5_graph"]
-[ext_resource type="Script" path="res://scripts/part_hud.gd" id="6_parts"]
-[ext_resource type="Script" path="res://scripts/loadout_hud.gd" id="7_loadout"]
+[ext_resource type="Script" uid="uid://ym7jljpqarh6" path="res://scripts/part_hud.gd" id="6_parts"]
+[ext_resource type="Script" uid="uid://bfexh15t1js2n" path="res://scripts/loadout_hud.gd" id="7_loadout"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 
@@ -95,7 +95,7 @@ offset_right = -20.0
 offset_bottom = 220.0
 grow_horizontal = 0
 
-[node name="PartHud" type="Control" parent="UI"]
+[node name="PartHud" type="Control" parent="UI" unique_id=854816028]
 visible = false
 layout_mode = 3
 anchors_preset = 1
@@ -108,7 +108,7 @@ offset_bottom = 375.0
 grow_horizontal = 0
 script = ExtResource("6_parts")
 
-[node name="LoadoutHud" type="Control" parent="UI"]
+[node name="LoadoutHud" type="Control" parent="UI" unique_id=1102953316]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 20.0
