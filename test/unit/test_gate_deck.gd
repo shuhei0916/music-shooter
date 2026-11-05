@@ -1,60 +1,94 @@
 extends GutTest
+## ゲートのカードの山札。カード1枚が強化1段で、残りの枚数に比例して出やすい
+## 引いたカードは山札から抜き、取られなかったカードは戻す。なくならないカードもある
 
+const ADD := 0
+const SWORD := 1
+const FIRE_RATE := 2
 const CARDS := [
-	[[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]],
-	[[Gate.Op.MULTIPLY, 2], [Gate.Op.ADD, 5]],
-	[[Gate.Op.ADD, -10], [Gate.Op.MULTIPLY, 3]],
+	{"gate": [Gate.Op.ADD, 10], "count": 5, "endless": true},
+	{"gate": [Gate.Op.SWORD, 1], "count": 3},
+	{"gate": [Gate.Op.FIRE_RATE, 1], "count": 1},
 ]
 
 
-## 左右の入れ替えを無視して比べるため、ペアの中身を並べ替えた形にする
-func _normalize(pair: Array) -> Array:
-	var sorted := pair.duplicate()
-	sorted.sort()
-	return sorted
-
-
-func test_山札のカードを全部引くまでは同じカードが出ない():
+func test_カードのゲートを返す():
 	var deck := GateDeck.new(CARDS, 1)
-	var drawn := []
-	for i in CARDS.size():
-		drawn.append(_normalize(deck.draw()))
-	drawn.sort()
-	var expected := CARDS.map(_normalize)
-	expected.sort()
-	assert_eq(drawn, expected)
+	assert_eq(deck.gate_of(SWORD), [Gate.Op.SWORD, 1])
 
 
-func test_全部引いたら混ぜ直して引き続けられる():
+func test_1列ぶんの選択肢は別々のカードから引く():
 	var deck := GateDeck.new(CARDS, 1)
-	var drawn := []
-	for i in CARDS.size() * 2:
-		drawn.append(_normalize(deck.draw()))
-	for card in CARDS:
-		assert_eq(drawn.count(_normalize(card)), 2)
+	for i in 20:
+		var drawn := deck.draw(3)
+		var sorted := drawn.duplicate()
+		sorted.sort()
+		assert_eq(sorted, [ADD, SWORD, FIRE_RATE])
+		for card in drawn:
+			deck.put_back(card)
+
+
+func test_引いたカードは戻すまで山札から抜ける():
+	var deck := GateDeck.new(CARDS, 1)
+	var drawn := deck.draw(3)
+	assert_eq(deck.remaining(SWORD), 2)
+	assert_eq(deck.remaining(FIRE_RATE), 0)
+	for card in drawn:
+		deck.put_back(card)
+	assert_eq(deck.remaining(SWORD), 3)
+	assert_eq(deck.remaining(FIRE_RATE), 1)
+
+
+func test_なくなったカードは出ない():
+	var deck := GateDeck.new(CARDS, 1)
+	deck.draw(3)
+	for i in 20:
+		assert_false(FIRE_RATE in deck.draw(2))
+
+
+func test_なくならないカードは引いても減らない():
+	var deck := GateDeck.new(CARDS, 1)
+	deck.draw(3)
+	assert_eq(deck.remaining(ADD), 5)
+
+
+func test_残りのカードが選択肢の数より少なければあるだけ引く():
+	var deck := GateDeck.new([CARDS[1]], 1)
+	assert_eq(deck.draw(2), [0])
+	assert_eq(deck.draw(2), [0])
+	assert_eq(deck.draw(2), [0])
+	assert_eq(deck.draw(2), [])
+
+
+func test_残りの枚数が多いカードほど出やすい():
+	var cards := [
+		{"gate": [Gate.Op.ADD, 10], "count": 9, "endless": true},
+		{"gate": [Gate.Op.ADD, 5], "count": 1, "endless": true},
+	]
+	var deck := GateDeck.new(cards, 3)
+	var counts := [0, 0]
+	for i in 200:
+		counts[deck.draw(1)[0]] += 1
+	assert_gt(counts[0], counts[1] * 4)
 
 
 func test_同じシードなら同じ順番で出る():
 	var a := GateDeck.new(CARDS, 42)
 	var b := GateDeck.new(CARDS, 42)
 	for i in 10:
-		assert_eq(a.draw(), b.draw())
+		var drawn := a.draw(2)
+		assert_eq(drawn, b.draw(2))
+		for card in drawn:
+			a.put_back(card)
+			b.put_back(card)
 
 
-func test_同じカードでも左右が入れ替わって出ることがある():
-	var deck := GateDeck.new([CARDS[0]], 7)
-	var orders := {}
-	for i in 20:
-		orders[deck.draw()] = true
-	assert_eq(orders.size(), 2)
-
-
-func test_選択肢が3つのカードは3つとも出て並びが入れ替わる():
-	var card := [[Gate.Op.ADD, 1], [Gate.Op.ADD, 2], [Gate.Op.ADD, 3]]
-	var deck := GateDeck.new([card], 7)
+func test_選択肢の並びは入れ替わる():
+	var deck := GateDeck.new(CARDS, 7)
 	var orders := {}
 	for i in 30:
-		var drawn := deck.draw()
-		assert_eq(_normalize(drawn), _normalize(card))
+		var drawn := deck.draw(2)
 		orders[drawn] = true
+		for card in drawn:
+			deck.put_back(card)
 	assert_gt(orders.size(), 2)

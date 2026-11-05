@@ -6,6 +6,8 @@ extends RefCounted
 
 ## 向かう位置にこれより近ければ止まる
 const ARRIVED := 0.1
+## 剣の乗りかえのゲートの得点。強さが何割上がるか測りにくいので、決めておいた値にする
+const RETARGET_SCORE := 0.5
 
 
 ## ゲートを取ったときに、能力値がどれだけの割合で上がるか。損なゲートはマイナス
@@ -24,6 +26,12 @@ static func gate_score(gate: Gate, stats: PlayerStats) -> float:
 				)
 				- 1.0
 			)
+		Gate.Op.SWORD:
+			return float(gate.amount) / stats.sword_count
+		Gate.Op.SWORD_DAMAGE:
+			return float(gate.amount) / stats.sword_damage
+		Gate.Op.SWORD_RETARGET:
+			return 0.0 if stats.sword_retarget else RETARGET_SCORE
 		_:
 			return float(gate.amount) / maxi(stats.health.hp, 1)
 

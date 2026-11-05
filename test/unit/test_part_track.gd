@@ -40,3 +40,18 @@ func test_読めなければ項目なし():
 	assert_eq(track.names(), [])
 	assert_eq(track.level("kick", 1.0), 0.0)
 	assert_eq(track.since_onset("kick", 1.0), INF)
+
+
+func test_区間のあいだに鳴った時刻を並べる():
+	var track := PartTrack.from_json(JSON_TEXT)
+	assert_eq(track.onsets_in("kick", 0.0, 0.3), [0.05, 0.25])
+	assert_eq(track.onsets_in("kick", 0.3, 0.4), [])
+
+
+func test_区間の終わりちょうどに鳴った音は含め始まりちょうどは含めない():
+	var track := PartTrack.from_json(JSON_TEXT)
+	assert_eq(track.onsets_in("kick", 0.05, 0.25), [0.25])
+
+
+func test_無い項目は鳴った時刻なし():
+	assert_eq(PartTrack.from_json(JSON_TEXT).onsets_in("snare", 0.0, 1.0), [])

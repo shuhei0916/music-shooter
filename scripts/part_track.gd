@@ -41,3 +41,9 @@ func since_onset(part: String, time: float) -> float:
 	if i < 0:
 		return INF
 	return time - times[i]
+
+
+## from 秒より後から to 秒まで（to を含む）に鳴った時刻
+func onsets_in(part: String, from: float, to: float) -> Array:
+	var times: Array = _parts.get(part, {}).get("onsets", [])
+	return times.slice(times.bsearch(from, false), times.bsearch(to, false))

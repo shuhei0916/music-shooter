@@ -165,7 +165,7 @@ func test_セクションが分からない曲では盛り上がりを中くら�
 		main.layout_seed = seed_value
 		add_child_autofree(main)
 		counts.append(main.layout.filter(func(row): return row.has("enemies")).size())
-		var gates: int = main.layout.filter(func(row): return row.has("gates")).size()
+		var gates: int = main.layout.filter(func(row): return row.has("gate_count")).size()
 		counts[-1] = float(counts[-1]) / (gates - 1)
 	var mean: float = counts.reduce(func(a, b): return a + b) / counts.size()
 	# 盛り上がり 0.5 なら1列ごとの確率は 0.55 で、ゲートのあいだに平均 1.1 列

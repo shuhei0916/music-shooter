@@ -1,6 +1,5 @@
 extends GutTest
 
-const CARD := [[Gate.Op.ADD, 10], [Gate.Op.ADD, -5]]
 ## 小節の線の位置（コース上の距離）。1小節は 4 拍で 16、1拍は 4
 const DISTANCES := [0.0, 16.0, 32.0, 48.0, 64.0, 80.0, 96.0, 112.0, 128.0]
 const LENGTH := 140.0
@@ -13,13 +12,12 @@ static func _lines(energy: float) -> Array:
 
 
 func _make_builder(seed_value := 1) -> LayoutBuilder:
-	var deck := GateDeck.new([CARD], seed_value)
 	var wave := EnemyWave.new(3, GrowthCurve.new([], 5.0, []), seed_value)
-	return LayoutBuilder.new(deck, wave, 20.0, 15.0, seed_value)
+	return LayoutBuilder.new(wave, 20.0, 15.0, seed_value)
 
 
 func _gate_zs(rows: Array) -> Array:
-	return rows.filter(func(row): return row.has("gates")).map(func(row): return row.z)
+	return rows.filter(func(row): return row.has("gate_count")).map(func(row): return row.z)
 
 
 ## 各ゲートの列から次のゲートの列までに置いた敵の列の、ゲートからの拍数
@@ -28,7 +26,7 @@ func _enemy_beats_between_gates(rows: Array) -> Array:
 	var result := []
 	var gate_z := 0.0
 	for row in rows:
-		if row.has("gates"):
+		if row.has("gate_count"):
 			gate_z = row.z
 			result.append([])
 		else:
@@ -40,7 +38,7 @@ func _enemy_beats_between_gates(rows: Array) -> Array:
 func test_スタートの位置より先の最初の線にゲートの列を置く():
 	var rows := _make_builder().build(_lines(0.5), LENGTH)
 	assert_almost_eq(rows[0].z, 32.0, 0.001)
-	assert_true(rows[0].has("gates"))
+	assert_true(rows[0].has("gate_count"))
 
 
 func test_ゲートの列は小節の線1本おきに置く():
@@ -121,29 +119,16 @@ func test_ゲートを置く線にボスの印があればゲートの代わり�
 	var rows := _make_builder().build(_lines_with_boss(4), LENGTH)
 	var at_64 := rows.filter(func(row): return is_equal_approx(row.z, 64.0))
 	assert_eq(at_64.size(), 1)
-	assert_false(at_64[0].has("gates"))
+	assert_false(at_64[0].has("gate_count"))
 	assert_eq(at_64[0].enemies[0][2], 3)
 
 
-func test_規模の曲線を渡すと足し算のゲートは規模に合わせ掛け算のゲートはゾーンの伸びの速さに合わせて大きくし連射はそのまま():
-	# 規模は 5 から、最初のゲートの線（32）で 500（100倍）
-	var growth := GrowthCurve.new(_lines(0.5), 5.0, [[2, 500.0]])
-	var card := [
-		[Gate.Op.ADD, -5], [Gate.Op.POWER, 1], [Gate.Op.MULTIPLY, 2], [Gate.Op.FIRE_RATE, 1]
-	]
-	var deck := GateDeck.new([card], 1)
-	var wave := EnemyWave.new(3, growth, 1)
-	var builder := LayoutBuilder.new(deck, wave, 20.0, 15.0, 1, growth)
-	var gates: Array = builder.build(_lines(0.5), LENGTH)[0].gates.duplicate()
-	gates.sort()
-	var multiplier := growth.scaled_multiplier(2, 32.0)
-	assert_gt(multiplier, 2)
-	assert_eq(
-		gates,
-		[
-			[Gate.Op.ADD, -500],
-			[Gate.Op.MULTIPLY, multiplier],
-			[Gate.Op.POWER, 100],
-			[Gate.Op.FIRE_RATE, 1]
-		]
-	)
+func test_ゲートの列には選択肢の数を2か3で決めて入れる():
+	var counts := {}
+	for seed_value in 10:
+		for row in _make_builder(seed_value).build(_lines(0.5), LENGTH):
+			if row.has("gate_count"):
+				counts[row.gate_count] = true
+	var found := counts.keys()
+	found.sort()
+	assert_eq(found, [2, 3])

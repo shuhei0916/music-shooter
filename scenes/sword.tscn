@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/sword.gd" id="1_sword"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sword"]
+size = Vector3(0.3, 0.3, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sword"]
+albedo_color = Color(0.6, 0.95, 1, 1)
+emission_enabled = true
+emission = Color(0.3, 0.8, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sword"]
+material = SubResource("StandardMaterial3D_sword")
+size = Vector3(0.12, 0.25, 1.2)
+
+[node name="Sword" type="Area3D" groups=["bullets"]]
+script = ExtResource("1_sword")
+speed = 25.0
+max_range = 60.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_sword")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_sword")

@@ -15,7 +15,7 @@ top_radius = 1.1
 bottom_radius = 1.1
 height = 1.4
 
-[node name="Enemy" type="Area3D"]
+[node name="Enemy" type="Area3D" groups=["enemies"]]
 script = ExtResource("1_enemy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

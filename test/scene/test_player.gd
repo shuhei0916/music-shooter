@@ -2,6 +2,13 @@ extends GutTest
 
 const PlayerScene := preload("res://scenes/player.tscn")
 
+## スネアが 0.1・0.2・0.3・0.4 秒、キックが 0.15・0.5 秒に鳴る曲
+const SWORD_PARTS := (
+	'{"frame_rate": 10, "parts": {'
+	+ '"snare": {"level": [], "onsets": [0.1, 0.2, 0.3, 0.4]},'
+	+ '"kick": {"level": [], "onsets": [0.15, 0.5]}}}'
+)
+
 
 func test_プレイヤーは初期HPを持って登場する():
 	var player: Player = PlayerScene.instantiate()
@@ -132,3 +139,48 @@ func test_自動操縦ではキーの操作を受けつけない():
 	simulate(player, 1, 0.1)
 	Input.action_release("move_left")
 	assert_eq(player.position.x, 0.0)
+
+
+func _swords_of(player: Player) -> Array:
+	return player.get_parent().get_children().filter(func(n): return n is Sword)
+
+
+func _play_swords(player: Player, times: Array) -> void:
+	var track := PartTrack.from_json(SWORD_PARTS)
+	for time in times:
+		player.play_swords(time, track)
+
+
+func test_スネアで剣がたまり体のまわりに見える():
+	var player := _make_player_on_stage()
+	_play_swords(player, [0.0, 0.25])
+	assert_eq(player.swords.count, 2)
+	assert_eq(player.get_node("SwordRing").get_child_count(), 2)
+	assert_eq(_swords_of(player).size(), 0)
+
+
+func test_上限までたまったら次のキックで剣をまとめて撃つ():
+	var player := _make_player_on_stage()
+	_play_swords(player, [0.0, 0.45, 0.55])
+	assert_eq(_swords_of(player).size(), PlayerStats.SWORDS_PER_VOLLEY)
+	assert_eq(player.swords.count, 0)
+	assert_eq(player.get_node("SwordRing").get_child_count(), 0)
+
+
+func test_撃った剣は弾の威力ではなく剣のダメージを持ち体のまわりから飛び出す():
+	var player := _make_player_on_stage()
+	player.position = Vector3(2, 0, -5)
+	player.stats.power = 7
+	player.stats.sword_damage = 3
+	_play_swords(player, [0.0, 0.55])
+	for sword: Sword in _swords_of(player):
+		assert_eq(sword.damage, 3)
+		assert_false(sword.retarget)
+		assert_almost_eq(sword.position.distance_to(player.position), SwordRing.RADIUS, 1.0)
+
+
+func test_乗りかえを解放していれば撃った剣は乗りかえられる():
+	var player := _make_player_on_stage()
+	player.stats.sword_retarget = true
+	_play_swords(player, [0.0, 0.55])
+	assert_true(_swords_of(player)[0].retarget)

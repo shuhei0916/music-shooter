@@ -123,3 +123,16 @@ func test_掛け算のゲートはそれぞれのゾーンの伸びで決め最�
 func test_掛け算のゲートはとても速いゾーンでも上限の累乗までしか大きくしない():
 	var curve := GrowthCurve.new(_flat(3), 1.0, [[2, 1e9]])
 	assert_eq(curve.scaled_multiplier(2, 10.0), roundi(pow(2, GrowthCurve.MAX_MULTIPLIER_POWER)))
+
+
+func test_ゲートは足し算と威力なら規模に合わせ掛け算ならゾーンの伸びの速さに合わせて大きくしほかはそのまま():
+	# 規模は 5 から、小節の線 2（20m）で 500（100倍）
+	var growth := GrowthCurve.new(_flat(5), 5.0, [[2, 500.0]])
+	assert_eq(growth.scaled_gate([Gate.Op.ADD, -5], 20.0), [Gate.Op.ADD, -500])
+	assert_eq(growth.scaled_gate([Gate.Op.POWER, 1], 20.0), [Gate.Op.POWER, 100])
+	assert_eq(growth.scaled_gate([Gate.Op.SWORD_DAMAGE, 1], 20.0), [Gate.Op.SWORD_DAMAGE, 100])
+	var multiplier := growth.scaled_multiplier(2, 20.0)
+	assert_gt(multiplier, 2)
+	assert_eq(growth.scaled_gate([Gate.Op.MULTIPLY, 2], 20.0), [Gate.Op.MULTIPLY, multiplier])
+	assert_eq(growth.scaled_gate([Gate.Op.FIRE_RATE, 1], 20.0), [Gate.Op.FIRE_RATE, 1])
+	assert_eq(growth.scaled_gate([Gate.Op.SWORD, 1], 20.0), [Gate.Op.SWORD, 1])
