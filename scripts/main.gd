@@ -171,6 +171,8 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		debug = not debug
+	elif event.is_action_pressed("cycle_sword_parts"):
+		_player.stats.cycle_sword_parts()
 	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
 		Main.start(get_tree(), song_path)
 

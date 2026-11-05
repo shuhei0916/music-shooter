@@ -1,6 +1,6 @@
 class_name LoadoutHud
 extends Control
-## 左上に、持っている武器ごとに名前と段階、ダメージなどの強化の状況を並べる（例：「ドラム剣 Lv2」）
+## 左上に、持っている武器ごとに名前と段階、使うパート、ダメージなどの強化の状況を並べる（例：「剣 Lv2」）
 
 const FONT_SIZE := 22
 const OUTLINE_SIZE := 6
@@ -27,10 +27,10 @@ func show_stats(stats: PlayerStats) -> void:
 		_rows.get_child(i).text = text_of(weapons[i])
 
 
-## 武器1つぶんの文字。1行目が名前と段階、2行目がダメージなどの項目
+## 武器1つぶんの文字。1行目が名前と段階、2行目が使うパート、3行目がダメージなどの項目
 static func text_of(weapon: Dictionary) -> String:
 	var level := "Lv MAX" if weapon.level >= weapon.max_level else "Lv%d" % weapon.level
-	return "%s %s\n%s" % [weapon.name, level, "  ".join(weapon.details)]
+	return "%s %s\n%s\n%s" % [weapon.name, level, weapon.parts, "  ".join(weapon.details)]
 
 
 func _make_label() -> Label:

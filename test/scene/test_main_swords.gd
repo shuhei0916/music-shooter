@@ -42,4 +42,22 @@ func test_左上に武器の強化の状況を出し取ったゲートに合わ�
 	Gate.new(Gate.Op.SWORD, 1).apply(player.stats)
 	simulate(main, 1, 0.1)
 	var rows := main.get_node("UI/LoadoutHud/Rows").get_children()
-	assert_string_starts_with(rows[1].text, "ドラム剣 Lv2")
+	assert_string_starts_with(rows[1].text, "剣 Lv2")
+
+
+func test_剣のパートを切りかえるキーで剣のパートの組み合わせが次に変わる():
+	var main := _make_main("")
+	var event := InputEventAction.new()
+	event.action = "cycle_sword_parts"
+	event.pressed = true
+	main._unhandled_input(event)
+	var stats: PlayerStats = main.get_node("Player").stats
+	assert_eq(
+		[stats.sword_charge_parts, stats.sword_release_part], PlayerStats.SWORD_PART_PRESETS[1]
+	)
+
+
+func test_剣のパートを切りかえるキーはF4():
+	var events := InputMap.action_get_events("cycle_sword_parts")
+	assert_eq(events.size(), 1)
+	assert_eq(events[0].physical_keycode, KEY_F4)

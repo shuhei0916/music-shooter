@@ -1,11 +1,7 @@
 class_name SwordQuiver
 extends RefCounted
-## プレイヤーのまわりにためる剣。スネアとハイハットが鳴るたびにたまり、
-## 上限（PlayerStats.sword_capacity）までたまったら、次のキックでまとめて撃つ
-
-## 剣がたまる項目と、撃つ項目（parts.json の項目の名前）
-const CHARGE_PARTS := ["snare", "hihat"]
-const RELEASE_PART := "kick"
+## プレイヤーのまわりにためる剣。ためるパート（初めはスネアとハイハット）が鳴るたびにたまり、
+## 上限（PlayerStats.sword_capacity）までたまったら、次に撃つパート（初めはキック）が鳴ったときにまとめて撃つ
 
 ## いまたまっている剣の本数
 var count := 0
@@ -15,10 +11,10 @@ var count := 0
 ## 撃った本数を返す（撃たなければ 0）
 func update(track: PartTrack, from: float, to: float, stats: PlayerStats) -> int:
 	var events := []
-	for part in CHARGE_PARTS:
+	for part in stats.sword_charge_parts:
 		for time in track.onsets_in(part, from, to):
 			events.append([time, false])
-	for time in track.onsets_in(RELEASE_PART, from, to):
+	for time in track.onsets_in(stats.sword_release_part, from, to):
 		events.append([time, true])
 	events.sort()
 	var released := 0

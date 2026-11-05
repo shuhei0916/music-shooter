@@ -11,6 +11,14 @@ const BASE_BEATS_PER_SHOT := 4.0
 const SWORDS_PER_VOLLEY := 4
 ## 剣の段階の上限
 const MAX_SWORD_LEVEL := 8
+## 剣をためるパートと撃つパートの組み合わせ（[ためるパート, 撃つパート]）
+## どの組み合わせが遊んで気持ちいいかを比べるため、遊びながら順に切りかえられる。最初のものから始める
+const SWORD_PART_PRESETS := [
+	[["snare", "hihat"], "kick"],
+	[["hihat"], "snare"],
+	[["bass"], "kick"],
+	[["other"], "snare"],
+]
 
 var health: Health
 var power := 1
@@ -21,6 +29,10 @@ var sword_count := 1
 var sword_damage := 1
 ## 撃った剣が、ねらった敵が倒れたときに次の敵へ乗りかえられるか（あとでレアなゲートで解放する）
 var sword_retarget := false
+## 剣をためるパート（鳴るたびにたまる）と、撃つパート（上限までたまっていれば鳴ったときに撃つ）
+var sword_charge_parts: Array = SWORD_PART_PRESETS[0][0]
+var sword_release_part: String = SWORD_PART_PRESETS[0][1]
+var _sword_preset := 0
 
 
 func _init(hp: int) -> void:
@@ -33,6 +45,13 @@ func raise_fire_level(amount: int) -> void:
 
 func raise_sword_level(amount: int) -> void:
 	sword_count = mini(sword_count + amount, MAX_SWORD_LEVEL)
+
+
+## 剣のパートの組み合わせを、SWORD_PART_PRESETS の次のものにする（最後の次は最初）
+func cycle_sword_parts() -> void:
+	_sword_preset = (_sword_preset + 1) % SWORD_PART_PRESETS.size()
+	sword_charge_parts = SWORD_PART_PRESETS[_sword_preset][0]
+	sword_release_part = SWORD_PART_PRESETS[_sword_preset][1]
 
 
 func beats_per_shot() -> float:
@@ -50,7 +69,8 @@ func sword_capacity() -> int:
 
 
 ## 持っている武器の一覧。画面に強化の状況を出すときに使う
-## {"name": 名前, "level": 段階（1から）, "max_level": 段階の上限, "details": ダメージや解放した能力の文字}
+## {"name": 名前, "level": 段階（1から）, "max_level": 段階の上限, "parts": 使うパートの文字,
+##  "details": ダメージや解放した能力の文字}
 func weapons() -> Array:
 	var sword_details := ["ダメージ " + NumberFormat.short(sword_damage)]
 	if sword_retarget:
@@ -60,12 +80,20 @@ func weapons() -> Array:
 			"name": "ビート弾",
 			"level": fire_level + 1,
 			"max_level": MAX_FIRE_LEVEL + 1,
+			"parts": "拍",
 			"details": ["ダメージ " + NumberFormat.short(power)],
 		},
 		{
-			"name": "ドラム剣",
+			"name": "剣",
 			"level": sword_count,
 			"max_level": MAX_SWORD_LEVEL,
+			"parts": _sword_parts_text(),
 			"details": sword_details,
 		},
 	]
+
+
+## 剣の使うパートの文字（例：「スネア・ハイハット → キック」）
+func _sword_parts_text() -> String:
+	var charge := "・".join(sword_charge_parts.map(PartTrack.display_name))
+	return "%s → %s" % [charge, PartTrack.display_name(sword_release_part)]

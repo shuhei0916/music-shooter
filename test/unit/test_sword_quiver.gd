@@ -64,3 +64,12 @@ func test_剣の段階が上がると1回の音でたまる本数と上限が増
 func test_パートの解析が無ければ剣はたまらない():
 	assert_eq(_quiver.update(PartTrack.from_json(""), 0.0, 10.0, _stats), 0)
 	assert_eq(_quiver.count, 0)
+
+
+func test_ためるパートと撃つパートを変えられる():
+	_stats.sword_charge_parts = ["hihat"]
+	_stats.sword_release_part = "snare"
+	_stats.sword_count = 1
+	# hihat 0.2・0.4 で2本、上限は4本なので、まだ撃たない
+	assert_eq(_play([0.0, 0.5, 1.0]), [0, 0])
+	assert_eq(_quiver.count, 2)

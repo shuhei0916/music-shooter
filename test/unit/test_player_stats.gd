@@ -28,9 +28,9 @@ func test_剣の段階は上限より上がらない():
 	assert_eq(stats.sword_count, PlayerStats.MAX_SWORD_LEVEL)
 
 
-func test_武器の一覧は拍の弾とドラム剣で初めはどちらもLv1():
+func test_武器の一覧はビート弾と剣で初めはどちらもLv1():
 	var weapons := PlayerStats.new(10).weapons()
-	assert_eq(weapons.map(func(w): return [w.name, w.level]), [["ビート弾", 1], ["ドラム剣", 1]])
+	assert_eq(weapons.map(func(w): return [w.name, w.level]), [["ビート弾", 1], ["剣", 1]])
 
 
 func test_武器の段階の上限は強化の上限と同じ():
@@ -54,3 +54,23 @@ func test_武器の項目にダメージと解放した能力を並べる():
 	stats.sword_damage = 3
 	stats.sword_retarget = true
 	assert_eq(stats.weapons().map(func(w): return w.details), [["ダメージ 12k"], ["ダメージ 3", "乗りかえ"]])
+
+
+func test_剣は初めスネアとハイハットでためてキックで撃つ():
+	var stats := PlayerStats.new(10)
+	assert_eq([stats.sword_charge_parts, stats.sword_release_part], [["snare", "hihat"], "kick"])
+
+
+func test_剣のパートの組み合わせを順に切りかえ最後の次は最初に戻る():
+	var stats := PlayerStats.new(10)
+	var seen := []
+	for i in PlayerStats.SWORD_PART_PRESETS.size():
+		stats.cycle_sword_parts()
+		seen.append([stats.sword_charge_parts, stats.sword_release_part])
+	assert_eq(seen.back(), [["snare", "hihat"], "kick"])
+	assert_eq(seen[0], PlayerStats.SWORD_PART_PRESETS[1])
+
+
+func test_武器の一覧に使うパートを書く():
+	var stats := PlayerStats.new(10)
+	assert_eq(stats.weapons().map(func(w): return w.parts), ["拍", "スネア・ハイハット → キック"])

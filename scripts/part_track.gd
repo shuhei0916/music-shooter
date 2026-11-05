@@ -3,6 +3,16 @@ extends RefCounted
 ## 曲のパートの項目（ボーカル・キックなど）ごとの、鳴っている大きさと鳴った瞬間
 ## tools/parts.py で作る「曲の名前.parts.json」から読む
 
+## 項目の、画面に出す名前
+const DISPLAY_NAMES := {
+	"vocals": "ボーカル",
+	"kick": "キック",
+	"snare": "スネア",
+	"hihat": "ハイハット",
+	"bass": "ベース",
+	"other": "その他",
+}
+
 var _frame_rate := 1.0
 ## 項目の名前 → {"level": [0〜1, ...], "onsets": [秒, ...]}
 var _parts := {}
@@ -47,3 +57,8 @@ func since_onset(part: String, time: float) -> float:
 func onsets_in(part: String, from: float, to: float) -> Array:
 	var times: Array = _parts.get(part, {}).get("onsets", [])
 	return times.slice(times.bsearch(from, false), times.bsearch(to, false))
+
+
+## 項目の、画面に出す名前。知らない項目はそのまま
+static func display_name(part: String) -> String:
+	return DISPLAY_NAMES.get(part, part)
