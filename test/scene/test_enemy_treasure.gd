@@ -49,3 +49,9 @@ func test_ボスの宝箱はボスと同じだけのレーンを占める():
 	var boss := _make_enemy(1, 3)
 	boss.area_entered.emit(add_child_autofree(BulletScene.instantiate()))
 	assert_eq(_treasures(boss)[0].lanes_wide, 3)
+
+
+func test_衝撃波などの武器のダメージで倒しても宝箱を落とす():
+	var enemy := _make_enemy(5)
+	enemy.take_hit(5)
+	assert_eq(_treasures(enemy).size(), 1)

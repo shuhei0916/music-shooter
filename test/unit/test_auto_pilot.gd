@@ -79,3 +79,16 @@ func test_乗りかえのゲートの得点はまだなら決めた値ですで�
 	assert_almost_eq(AutoPilot.gate_score(gate, stats), AutoPilot.RETARGET_SCORE, 0.0001)
 	stats.sword_retarget = true
 	assert_almost_eq(AutoPilot.gate_score(gate, stats), 0.0, 0.0001)
+
+
+func test_衝撃波のゲートの得点は届く広さが広がる割合で上限なら0():
+	var stats := PlayerStats.new(10)
+	assert_almost_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE, 1), stats), 0.25, 0.001)
+	stats.shockwave_level = PlayerStats.MAX_SHOCKWAVE_LEVEL
+	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE, 1), stats), 0.0)
+
+
+func test_衝撃波ダメージのゲートの得点は衝撃波のダメージが増える割合():
+	var stats := PlayerStats.new(10)
+	stats.shockwave_damage = 4
+	assert_eq(AutoPilot.gate_score(Gate.new(Gate.Op.SHOCKWAVE_DAMAGE, 2), stats), 0.5)

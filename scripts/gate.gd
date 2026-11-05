@@ -1,7 +1,17 @@
 class_name Gate
 extends RefCounted
 
-enum Op { ADD, MULTIPLY, POWER, FIRE_RATE, SWORD, SWORD_DAMAGE, SWORD_RETARGET }
+enum Op {
+	ADD,
+	MULTIPLY,
+	POWER,
+	FIRE_RATE,
+	SWORD,
+	SWORD_DAMAGE,
+	SWORD_RETARGET,
+	SHOCKWAVE,
+	SHOCKWAVE_DAMAGE
+}
 
 var op: Op
 var amount: int
@@ -26,6 +36,10 @@ func apply(stats: PlayerStats) -> void:
 			stats.sword_damage += amount
 		Op.SWORD_RETARGET:
 			stats.sword_retarget = true
+		Op.SHOCKWAVE:
+			stats.raise_shockwave_level(amount)
+		Op.SHOCKWAVE_DAMAGE:
+			stats.shockwave_damage += amount
 		_:
 			stats.health.hp += amount
 
@@ -46,6 +60,10 @@ func label(stats: PlayerStats = null) -> String:
 			text = _damage_label("剣ダメージUP", stats.sword_damage if stats != null else null)
 		Op.SWORD_RETARGET:
 			text = "剣の乗りかえ"
+		Op.SHOCKWAVE:
+			text = _shockwave_label(stats)
+		Op.SHOCKWAVE_DAMAGE:
+			text = _damage_label("衝撃波ダメージUP", stats.shockwave_damage if stats != null else null)
 	return text
 
 
@@ -81,6 +99,15 @@ func _sword_label(stats: PlayerStats) -> String:
 	var before := stats.sword_capacity()
 	var after := PlayerStats.SWORDS_PER_VOLLEY * (stats.sword_count + amount)
 	return "剣UP\n%d->%d" % [before, after]
+
+
+## 衝撃波のゲートの文字。届く広さの、取る前と取ったあと
+func _shockwave_label(stats: PlayerStats) -> String:
+	if stats == null:
+		return "衝撃波UP"
+	var after := mini(stats.shockwave_level + amount, PlayerStats.MAX_SHOCKWAVE_LEVEL)
+	var before := PlayerStats.meters(stats.shockwave_radius())
+	return "衝撃波UP\n%s->%s" % [before, PlayerStats.meters(stats.shockwave_radius(after))]
 
 
 func is_harmful() -> bool:

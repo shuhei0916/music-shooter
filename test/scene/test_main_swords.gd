@@ -1,7 +1,8 @@
 extends GutTest
-## Main のうち、パートの解析に合わせてプレイヤーが剣をため、キックで撃ち出すところ
+## Main のうち、パートの解析に合わせてプレイヤーが剣をため撃ち出すところと、キックで衝撃波を出すところ
 
 const MainScene := preload("res://scenes/main.tscn")
+const EnemyScene := preload("res://scenes/enemy.tscn")
 const PARTS_PATH := "user://sword_song.parts.json"
 
 
@@ -21,13 +22,12 @@ func _swords_of(main: Main) -> Array:
 	return main.get_children().filter(func(n): return n is Sword)
 
 
-func test_曲の時刻に合わせて剣をためキックで撃ち出す():
+func test_曲の時刻に合わせて剣をハイハットでためスネアで撃ち出す():
 	var main := _make_main(
 		(
 			'{"frame_rate": 10, "parts": {'
-			+ '"snare": {"level": [], "onsets": [0.1, 0.2]},'
-			+ '"hihat": {"level": [], "onsets": [0.3, 0.4]},'
-			+ '"kick": {"level": [], "onsets": [0.5]}}}'
+			+ '"hihat": {"level": [], "onsets": [0.1, 0.2, 0.3, 0.4]},'
+			+ '"snare": {"level": [], "onsets": [0.5]}}}'
 		)
 	)
 	simulate(main, 4, 0.1)
@@ -61,3 +61,15 @@ func test_剣のパートを切りかえるキーはF4():
 	var events := InputMap.action_get_events("cycle_sword_parts")
 	assert_eq(events.size(), 1)
 	assert_eq(events[0].physical_keycode, KEY_F4)
+
+
+func test_キックが鳴るとプレイヤーのまわりの敵に衝撃波のダメージを与える():
+	var main := _make_main('{"frame_rate": 10, "parts": {"kick": {"level": [], "onsets": [0.05]}}}')
+	var near: Enemy = EnemyScene.instantiate()
+	near.start_hp = 10
+	near.position = Vector3(0, 0, -2)
+	main.add_child(near)
+	simulate(main, 1, 0.1)
+	assert_eq(near.health.hp, 10 - main.get_node("Player").stats.shockwave_damage)
+	var player := main.get_node("Player")
+	assert_eq(player.get_children().filter(func(n): return n is ShockwaveRing).size(), 1)

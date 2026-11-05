@@ -13,12 +13,17 @@ const SWORDS_PER_VOLLEY := 4
 const MAX_SWORD_LEVEL := 8
 ## 剣をためるパートと撃つパートの組み合わせ（[ためるパート, 撃つパート]）
 ## どの組み合わせが遊んで気持ちいいかを比べるため、遊びながら順に切りかえられる。最初のものから始める
+## キックは衝撃波が使うので、初めはキックを使わない組み合わせにする
 const SWORD_PART_PRESETS := [
-	[["snare", "hihat"], "kick"],
 	[["hihat"], "snare"],
+	[["snare", "hihat"], "kick"],
 	[["bass"], "kick"],
 	[["other"], "snare"],
 ]
+## 衝撃波の段階の上限と、段階が 1 のときの届く広さ（半径 m）、段階が1つ上がるごとに広がる長さ
+const MAX_SHOCKWAVE_LEVEL := 5
+const BASE_SHOCKWAVE_RADIUS := 4.0
+const SHOCKWAVE_RADIUS_STEP := 1.0
 
 var health: Health
 var power := 1
@@ -32,6 +37,10 @@ var sword_retarget := false
 ## 剣をためるパート（鳴るたびにたまる）と、撃つパート（上限までたまっていれば鳴ったときに撃つ）
 var sword_charge_parts: Array = SWORD_PART_PRESETS[0][0]
 var sword_release_part: String = SWORD_PART_PRESETS[0][1]
+## 衝撃波の段階（届く広さ）と、1回のダメージ、鳴ると衝撃波を出すパート
+var shockwave_level := 1
+var shockwave_damage := 1
+var shockwave_part := "kick"
 var _sword_preset := 0
 
 
@@ -45,6 +54,22 @@ func raise_fire_level(amount: int) -> void:
 
 func raise_sword_level(amount: int) -> void:
 	sword_count = mini(sword_count + amount, MAX_SWORD_LEVEL)
+
+
+func raise_shockwave_level(amount: int) -> void:
+	shockwave_level = mini(shockwave_level + amount, MAX_SHOCKWAVE_LEVEL)
+
+
+## 衝撃波の届く広さ（半径 m）。段階が level のとき（省略すると今の段階）
+func shockwave_radius(level := shockwave_level) -> float:
+	return BASE_SHOCKWAVE_RADIUS + SHOCKWAVE_RADIUS_STEP * (level - 1)
+
+
+## 長さ（m）の文字。整数ならそのまま、そうでなければ小数1桁（4m、4.5m）
+static func meters(value: float) -> String:
+	if is_equal_approx(value, roundf(value)):
+		return "%dm" % roundi(value)
+	return "%.1fm" % value
 
 
 ## 剣のパートの組み合わせを、SWORD_PART_PRESETS の次のものにする（最後の次は最初）
@@ -89,6 +114,17 @@ func weapons() -> Array:
 			"max_level": MAX_SWORD_LEVEL,
 			"parts": _sword_parts_text(),
 			"details": sword_details,
+		},
+		{
+			"name": "衝撃波",
+			"level": shockwave_level,
+			"max_level": MAX_SHOCKWAVE_LEVEL,
+			"parts": PartTrack.display_name(shockwave_part),
+			"details":
+			[
+				"ダメージ " + NumberFormat.short(shockwave_damage),
+				"広さ " + PlayerStats.meters(shockwave_radius()),
+			],
 		},
 	]
 

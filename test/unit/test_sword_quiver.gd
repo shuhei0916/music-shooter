@@ -16,6 +16,8 @@ var _quiver: SwordQuiver
 func before_each():
 	_track = PartTrack.from_json(JSON_TEXT)
 	_stats = PlayerStats.new(10)
+	_stats.sword_charge_parts = ["snare", "hihat"]
+	_stats.sword_release_part = "kick"
 	_quiver = SwordQuiver.new()
 
 

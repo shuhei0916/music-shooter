@@ -76,15 +76,25 @@ func _on_area_entered(area: Area3D) -> void:
 	if health.is_dead():
 		return
 	if area is Bullet:
-		health.damage(area.damage)
 		area.queue_free()
-		_drops_treasure = health.is_dead()
-		if _pending_damage == 0:
-			_hit_at = _beat_time(hit_beats)
-		_pending_damage += area.damage
-		_play_due_hit()
+		take_hit(area.damage)
 	elif area is Player:
 		area.health.clash(health)
+		_update_hp_label()
+		if health.is_dead():
+			_die()
+
+
+## 弾や衝撃波など、プレイヤーの武器から amount のダメージを受ける。倒されたら宝箱を落とす
+func take_hit(amount: int) -> void:
+	if health.is_dead():
+		return
+	health.damage(amount)
+	_drops_treasure = health.is_dead()
+	if _pending_damage == 0:
+		_hit_at = _beat_time(hit_beats)
+	_pending_damage += amount
+	_play_due_hit()
 	_update_hp_label()
 	if health.is_dead():
 		_die()

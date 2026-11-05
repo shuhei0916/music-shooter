@@ -8,7 +8,7 @@ const MAIN_SCENE := "res://scenes/main.tscn"
 const SONG_SELECT_SCENE := "res://scenes/song_select.tscn"
 ## 山札に入れるゲートのカード。{"gate": [種類, 数], "count": 枚数, "endless": なくならないか}
 ## カード1枚が強化1段。取ったカードは山札から抜ける。強化に上限があるものは、枚数を上限に合わせる
-## HP・威力・剣のダメージ・掛け算はなくならないカードで、枚数は出やすさの重み
+## HP・威力・剣と衝撃波のダメージ・掛け算はなくならないカードで、枚数は出やすさの重み
 const GATE_CARDS := [
 	{"gate": [Gate.Op.ADD, 10], "count": 6, "endless": true},
 	{"gate": [Gate.Op.ADD, 5], "count": 4, "endless": true},
@@ -24,6 +24,8 @@ const GATE_CARDS := [
 	{"gate": [Gate.Op.SWORD, 1], "count": PlayerStats.MAX_SWORD_LEVEL - 1},
 	{"gate": [Gate.Op.SWORD_DAMAGE, 1], "count": 3, "endless": true},
 	{"gate": [Gate.Op.SWORD_RETARGET, 1], "count": 1},
+	{"gate": [Gate.Op.SHOCKWAVE, 1], "count": PlayerStats.MAX_SHOCKWAVE_LEVEL - 1},
+	{"gate": [Gate.Op.SHOCKWAVE_DAMAGE, 1], "count": 3, "endless": true},
 ]
 ## ゲートの列は、プレイヤーのこの距離（m）先に入ったら山札から引いて出す（カメラから見える遠さくらい）
 const DEAL_AHEAD := 90.0
@@ -154,6 +156,7 @@ func _process(delta: float) -> void:
 	_course.seek(_clock.time())
 	_player.shoot_on_beat(_clock.time(), _shot_grid)
 	_player.play_swords(_clock.time(), _parts)
+	_player.play_shockwave(_clock.time(), _parts)
 	var pos := _map.at(_clock.time())
 	_player.dance(pos)
 	_beat_hud.show_at(pos)

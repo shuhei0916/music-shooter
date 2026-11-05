@@ -12,7 +12,7 @@ var stats: PlayerStats
 ## 自動操縦。キーの操作の代わりに、auto_axis の向き（-1 で左、1 で右）に動く
 var autopilot := false
 var auto_axis := 0.0
-## まわりにためている剣。スネアとハイハットでたまり、キックで撃ち出す
+## まわりにためている剣。ためるパート（初めはハイハット）でたまり、撃つパート（初めはスネア）で撃ち出す
 var swords := SwordQuiver.new()
 var health: Health:
 	get:
@@ -21,6 +21,7 @@ var _steering: Steering
 ## 時刻 0 ちょうどの拍でも撃てるよう、最初は 0 より少し前にしておく
 var _last_shot_check := -0.001
 var _last_sword_check := -0.001
+var _last_shockwave_check := -0.001
 
 @onready var _hp_label: Label3D = $HpLabel
 ## 体を動かすときの支点（足もと）
@@ -54,6 +55,22 @@ func play_swords(time: float, track: PartTrack) -> void:
 	for i in released:
 		_launch_sword(position + _sword_ring.transform * SwordRing.slot(i, released))
 	_sword_ring.show_count(swords.count)
+
+
+## 曲の時刻とパートの解析を受け取り、前回からのあいだに衝撃波のパート（初めはキック）が鳴った回数だけ、
+## 前に向けた扇形の中の敵にダメージを与え、足元から衝撃波の弧を出す
+func play_shockwave(time: float, track: PartTrack) -> void:
+	var beats := track.onsets_in(stats.shockwave_part, _last_shockwave_check, time).size()
+	_last_shockwave_check = time
+	var radius := stats.shockwave_radius()
+	for i in beats:
+		Shockwave.blast(
+			position, get_tree().get_nodes_in_group("enemies"), radius, stats.shockwave_damage
+		)
+		# 弧はプレイヤーの子にして、広がるあいだも足元に付いてこさせる
+		var ring := ShockwaveRing.new()
+		ring.radius = radius
+		add_child(ring)
 
 
 ## 曲の位置 pos（SongMap.at の結果）に合わせて体を弾ませる

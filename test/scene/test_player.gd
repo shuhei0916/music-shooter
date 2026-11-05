@@ -5,8 +5,8 @@ const PlayerScene := preload("res://scenes/player.tscn")
 ## スネアが 0.1・0.2・0.3・0.4 秒、キックが 0.15・0.5 秒に鳴る曲
 const SWORD_PARTS := (
 	'{"frame_rate": 10, "parts": {'
-	+ '"snare": {"level": [], "onsets": [0.1, 0.2, 0.3, 0.4]},'
-	+ '"kick": {"level": [], "onsets": [0.15, 0.5]}}}'
+	+ '"hihat": {"level": [], "onsets": [0.1, 0.2, 0.3, 0.4]},'
+	+ '"snare": {"level": [], "onsets": [0.15, 0.5]}}}'
 )
 
 
@@ -151,7 +151,7 @@ func _play_swords(player: Player, times: Array) -> void:
 		player.play_swords(time, track)
 
 
-func test_スネアで剣がたまり体のまわりに見える():
+func test_ハイハットで剣がたまり体のまわりに見える():
 	var player := _make_player_on_stage()
 	_play_swords(player, [0.0, 0.25])
 	assert_eq(player.swords.count, 2)
@@ -159,7 +159,7 @@ func test_スネアで剣がたまり体のまわりに見える():
 	assert_eq(_swords_of(player).size(), 0)
 
 
-func test_上限までたまったら次のキックで剣をまとめて撃つ():
+func test_上限までたまったら次のスネアで剣をまとめて撃つ():
 	var player := _make_player_on_stage()
 	_play_swords(player, [0.0, 0.45, 0.55])
 	assert_eq(_swords_of(player).size(), PlayerStats.SWORDS_PER_VOLLEY)

@@ -13,7 +13,14 @@ func _texts(hud: LoadoutHud) -> Array:
 func test_武器ごとに名前と段階と使うパートと項目を出す():
 	var hud := _make_hud()
 	hud.show_stats(PlayerStats.new(10))
-	assert_eq(_texts(hud), ["ビート弾 Lv1\n拍\nダメージ 1", "剣 Lv1\nスネア・ハイハット → キック\nダメージ 1"])
+	assert_eq(
+		_texts(hud),
+		[
+			"ビート弾 Lv1\n拍\nダメージ 1",
+			"剣 Lv1\nハイハット → スネア\nダメージ 1",
+			"衝撃波 Lv1\nキック\nダメージ 1  広さ 4m",
+		]
+	)
 
 
 func test_段階が上限ならMAXと出す():
@@ -31,4 +38,4 @@ func test_強化すると出す文字も変わる():
 	stats.raise_sword_level(1)
 	stats.sword_retarget = true
 	hud.show_stats(stats)
-	assert_eq(_texts(hud)[1], "剣 Lv2\nスネア・ハイハット → キック\nダメージ 1  乗りかえ")
+	assert_eq(_texts(hud)[1], "剣 Lv2\nハイハット → スネア\nダメージ 1  乗りかえ")
