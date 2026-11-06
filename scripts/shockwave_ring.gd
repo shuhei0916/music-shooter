@@ -4,7 +4,8 @@ extends MeshInstance3D
 ## 形は Shockwave と同じ扇形（前から左右に Shockwave.HALF_ANGLE ずつ）
 
 const DURATION := 0.3
-const COLOR := Color(1.0, 0.6, 0.2, 0.8)
+## 色は 1 を超える明るさにして、発光のにじみを出す
+const COLOR := Color(3.0, 1.6, 0.5, 0.8)
 ## 弧の太さ（半径 1 のときの、内側の半径）と、床からの高さ。弧を何個の四角でつなぐか
 const INNER := 0.8
 const HEIGHT := 0.1

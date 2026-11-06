@@ -97,9 +97,12 @@ var _deck: GateDeck
 var _undealt_gate_rows: Array = []
 ## 曲のパートの項目ごとの、鳴っている大きさと鳴った瞬間。剣はこれに合わせてためて撃つ
 var _parts: PartTrack
+## 音と曲の組み立てから求める、背景の演出の値
+var _visual: MusicVisual
 var _result := Judge.Result.PLAYING
 
 @onready var _player: Player = $Player
+@onready var _backdrop: Backdrop = $Backdrop
 @onready var _camera: Camera3D = $Camera3D
 @onready var _camera_offset := _camera.position
 @onready var _message: Label = $UI/Message
@@ -129,6 +132,7 @@ func _ready() -> void:
 	_map = SongMap.from_json(_read_beside(".beats.json"), bpm)
 	_parts = PartTrack.from_json(_read_beside(".parts.json"))
 	_part_hud.track = _parts
+	_visual = MusicVisual.new(_parts, _map)
 	_shot_grid = _map.shot_grid()
 	_beat_hud.beats_per_bar = _map.beats_per_bar
 	_clock.start()
@@ -169,6 +173,7 @@ func _process(delta: float) -> void:
 	_player.position.z = -_course.distance
 	_deal_near_gates()
 	_camera.position = _camera_offset + Vector3(0, 0, _player.position.z)
+	_backdrop.show_at(_visual.at(_clock.time(), pos), _player.position.z, forward_speed, delta)
 	_result = Judge.result(_course, _player.health)
 	if _result != Judge.Result.PLAYING:
 		_finish()
@@ -254,6 +259,7 @@ func _fit_road() -> void:
 	road.size.y = ROAD_BEHIND + course_length + ROAD_AHEAD
 	$Road.mesh = road
 	$Road.position.z = ROAD_BEHIND - road.size.y / 2.0
+	_backdrop.fit_road(lane_count, lane_width, $Road.position.z, road.size.y)
 
 
 ## 床に小節の線を引く。セクションの始まりは2本線にする

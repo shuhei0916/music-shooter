@@ -1,11 +1,12 @@
 class_name LightningBolt
 extends MeshInstance3D
 ## 落雷の見た目。敵の足もとから空まで伸びる細い光の柱が、DURATION 秒で細く薄くなって消える
+## 色は 1 を超える明るさにして、発光のにじみを出す
 
 const DURATION := 0.25
 const HEIGHT := 14.0
 const WIDTH := 0.25
-const COLOR := Color(1.0, 1.0, 0.6, 1.0)
+const COLOR := Color(3.0, 3.0, 1.6, 1.0)
 
 var _elapsed := 0.0
 var _material := StandardMaterial3D.new()

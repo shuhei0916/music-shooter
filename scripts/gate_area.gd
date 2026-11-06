@@ -11,14 +11,17 @@ const POPUP_HEIGHT := 3.2
 const POPUP_BEATS := 2.0
 ## ゲートの文字を、パネルの幅と高さのこの割合までに収める
 const LABEL_FILL := 0.9
+## 枠の発光の強さと、パネルのほのかな発光の強さ
+const FRAME_GLOW := 3.0
+const PANEL_GLOW := 0.4
 
 @export var op := Gate.Op.ADD
 @export var amount := 1
 ## 武器のゲート（Gate.Op.WEAPON_LEVEL など）が上げる武器の名前の記号
 @export var weapon := ""
 @export var width := 4.0
-@export var good_color := Color(0.3, 0.7, 1, 0.45)
-@export var harmful_color := Color(1, 0.3, 0.3, 0.45)
+@export var good_color := Color(0.3, 0.7, 1, 0.22)
+@export var harmful_color := Color(1, 0.3, 0.3, 0.25)
 
 ## 取ったときの文字を出す長さを決める拍の線。無ければ文字の決めておいた長さで消す
 var grid: BeatGrid
@@ -39,9 +42,15 @@ func _ready() -> void:
 	_color = harmful_color if _gate.is_harmful() else good_color
 	var material: StandardMaterial3D = $Panel.mesh.material.duplicate()
 	material.albedo_color = _color
+	material.emission_enabled = true
+	material.emission = Color(_color, 1.0)
+	material.emission_energy_multiplier = PANEL_GLOW
 	$Panel.material_override = material
 	var frame_material := StandardMaterial3D.new()
 	frame_material.albedo_color = Color(_color, 1.0)
+	frame_material.emission_enabled = true
+	frame_material.emission = Color(_color, 1.0)
+	frame_material.emission_energy_multiplier = FRAME_GLOW
 	for part: MeshInstance3D in $Frame.get_children():
 		part.material_override = frame_material
 	_apply_width()

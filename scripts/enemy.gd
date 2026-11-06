@@ -12,6 +12,8 @@ const DAMAGE_BEATS := 1.0
 ## 何レーンも占める大きな敵（ボス）の、占めるレーン1つあたりの横と奥行きの大きさ（ふつうの敵が 1）
 ## 3レーンなら 3.36 倍で、道の端まで寄ったプレイヤーもすり抜けられない。高さはふつうの敵と同じ
 const SCALE_PER_LANE := 1.12
+## 当たった瞬間の発光の強さ
+const FLASH_GLOW := 7.0
 
 @export var start_hp := 3
 ## 占めるレーンの数。2 以上なら大きな敵（ボス）として大きく出る
@@ -30,6 +32,7 @@ var health: Health
 var clock: SongClock
 var grid: BeatGrid
 var _base_color: Color
+var _base_glow: float
 var _flash_left := 0.0
 ## まだ演出を出していないダメージの合計と、それを出す時刻
 var _pending_damage := 0
@@ -54,6 +57,7 @@ func _ready() -> void:
 	_update_hp_label()
 	var material: StandardMaterial3D = _body.mesh.material.duplicate()
 	_base_color = material.albedo_color
+	_base_glow = material.emission_energy_multiplier
 	_body.material_override = material
 	area_entered.connect(_on_area_entered)
 
@@ -164,6 +168,7 @@ func _show_death_effect() -> void:
 func _show_hit_effect() -> void:
 	var t := _flash_left / flash_duration
 	_body.material_override.albedo_color = _base_color.lerp(Color.WHITE, t)
+	_body.material_override.emission_energy_multiplier = lerpf(_base_glow, FLASH_GLOW, t)
 	_body.scale = Vector3.ONE * lerpf(1.0, hit_scale, t)
 
 
