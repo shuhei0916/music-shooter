@@ -22,6 +22,8 @@ const LINE_HEIGHT := 0.03
 ## どの Backdrop でも同じなので、1つ作ったら使い回す（ゲームをやり直すたびに作らない）
 static var _shared_stars: MultiMesh
 
+## 派手な表示か。false のときは粒を消し、道の線もキックに反応させない
+var _fancy := true
 var _scroll := 0.0
 ## 目標へなめらかに近づけている値。最初に見せるときは目標そのものにする
 var _started := false
@@ -46,6 +48,12 @@ func _ready() -> void:
 		material.emission_enabled = true
 	_lane_material.emission_energy_multiplier = LANE_GLOW
 	_edge_material.emission_energy_multiplier = EDGE_GLOW
+
+
+## 派手な表示とシンプル表示を切り替える
+func set_fancy(fancy: bool) -> void:
+	_fancy = fancy
+	_stars.visible = fancy
 
 
 ## 粒のシェーダーの材質（音の値を渡す先）
@@ -90,7 +98,8 @@ func show_at(look: Dictionary, anchor_z: float, speed: float, delta: float) -> v
 		_material.set_shader_parameter(param, values[param])
 	_edge_material.emission = _color_a
 	_lane_material.emission = _color_a
-	_edge_material.emission_energy_multiplier = EDGE_GLOW + KICK_GLOW * look.kick
+	var kick_glow: float = KICK_GLOW * look.kick if _fancy else 0.0
+	_edge_material.emission_energy_multiplier = EDGE_GLOW + kick_glow
 
 
 ## 急に変わると目につく値を、目標へ少しずつ近づける

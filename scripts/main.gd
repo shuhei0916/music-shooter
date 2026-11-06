@@ -79,6 +79,14 @@ const MESSAGES := {
 var song: AudioStream
 ## 音を出さないモード。曲は流さず、曲の長さだけ経過時間で進む（自動で遊ばせるときに使う）
 var silent := false
+## 派手な表示か。false はシンプル表示で、発光のにじみと背景の粒を消す（F2 で切り替える）
+var fancy_look := true:
+	set(value):
+		fancy_look = value
+		if is_node_ready():
+			_show_look()
+## 見た目の設定の保存先。空のときは読み書きしない（テストが本物の設定にふれないように）
+var look_settings_path := ""
 ## デバッグモード。床の小節・拍の線と成長曲線のグラフは、デバッグモードのときだけ見せる
 var debug := false:
 	set(value):
@@ -116,6 +124,9 @@ var _result := Judge.Result.PLAYING
 
 func _ready() -> void:
 	_seed = layout_seed if layout_seed >= 0 else randi()
+	if not look_settings_path.is_empty():
+		fancy_look = LookSettings.load_fancy(look_settings_path)
+	_show_look()
 	if song == null:
 		song = StemMix.load_song(song_path)
 	if song != null:
@@ -182,6 +193,8 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_debug"):
 		debug = not debug
+	elif event.is_action_pressed("toggle_look"):
+		_toggle_look()
 	elif event.is_action_pressed("cycle_sword_parts"):
 		_player.stats.sword.cycle_parts()
 	elif _result != Judge.Result.PLAYING and event.is_action_pressed("ui_accept"):
@@ -192,6 +205,7 @@ func _unhandled_input(event: InputEvent) -> void:
 static func create(path: String) -> Main:
 	var main: Main = load(MAIN_SCENE).instantiate()
 	main.song_path = path
+	main.look_settings_path = LookSettings.PATH
 	return main
 
 
@@ -229,6 +243,17 @@ func result() -> Judge.Result:
 
 
 ## デバッグモードかどうかに合わせて、床の線を見せたり隠したりする。線を引く前なら何もしない
+func _toggle_look() -> void:
+	fancy_look = not fancy_look
+	if not look_settings_path.is_empty():
+		LookSettings.save_fancy(look_settings_path, fancy_look)
+
+
+func _show_look() -> void:
+	$WorldEnvironment.environment.glow_enabled = fancy_look
+	_backdrop.set_fancy(fancy_look)
+
+
 func _show_debug() -> void:
 	for node_name in ["BarLines", "BeatLines", "UI/GrowthGraph", "UI/PartHud"]:
 		var node := get_node_or_null(node_name)

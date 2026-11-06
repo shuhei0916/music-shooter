@@ -101,3 +101,24 @@ func test_道の線はキックで強く光る():
 	var quiet := backdrop.edge_material().emission_energy_multiplier
 	backdrop.show_at(_look({"kick": 1.0}), 0.0, 6.0, 0.016)
 	assert_gt(backdrop.edge_material().emission_energy_multiplier, quiet)
+
+
+func test_シンプル表示ではキックで道の線が光らない():
+	var backdrop := _make()
+	backdrop.set_fancy(false)
+	backdrop.show_at(_look(), 0.0, 6.0, 0.016)
+	var quiet := backdrop.edge_material().emission_energy_multiplier
+	backdrop.show_at(_look({"kick": 1.0}), 0.0, 6.0, 0.016)
+	assert_eq(backdrop.edge_material().emission_energy_multiplier, quiet)
+	assert_false(backdrop.get_node("Stars").visible)
+
+
+func test_シンプル表示から戻すと粒もキックの反応も戻る():
+	var backdrop := _make()
+	backdrop.set_fancy(false)
+	backdrop.set_fancy(true)
+	backdrop.show_at(_look(), 0.0, 6.0, 0.016)
+	var quiet := backdrop.edge_material().emission_energy_multiplier
+	backdrop.show_at(_look({"kick": 1.0}), 0.0, 6.0, 0.016)
+	assert_gt(backdrop.edge_material().emission_energy_multiplier, quiet)
+	assert_true(backdrop.get_node("Stars").visible)
